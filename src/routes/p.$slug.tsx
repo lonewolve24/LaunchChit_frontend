@@ -65,6 +65,7 @@ type Product = {
   topics?: Topic[]
   pricing?: string
   platforms?: string[]
+  platform_codes?: Array<'web' | 'mobile' | 'desktop'>
   launch_date?: string
   day_rank?: number
   gallery?: Array<{ color: string; label: string }>
@@ -215,19 +216,44 @@ export function ProductDetailPage() {
                     )}
                   </div>
 
-                  {product.topics && product.topics.length > 0 && (
-                    <div className="flex items-center gap-1.5 flex-wrap mt-4">
-                      {product.topics.map((topic) => (
-                        <a
-                          key={topic.slug}
-                          href={`/topics/${topic.slug}`}
-                          className="text-xs font-medium text-foreground-muted bg-surface-subtle hover:bg-primary hover:text-white px-2.5 py-1 rounded-full border border-border transition-colors"
-                        >
-                          {topic.name}
-                        </a>
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-3 flex-wrap mt-4">
+                    {product.topics && product.topics.length > 0 && (
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {product.topics.map((topic) => (
+                          <a
+                            key={topic.slug}
+                            href={`/topics/${topic.slug}`}
+                            className="text-xs font-medium text-foreground-muted bg-surface-subtle hover:bg-primary hover:text-white px-2.5 py-1 rounded-full border border-border transition-colors"
+                          >
+                            {topic.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                    {product.platform_codes && product.platform_codes.length > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        {product.platform_codes.map((code) => {
+                          const label = code === 'web' ? 'Web app' : code === 'mobile' ? 'Mobile app' : 'Desktop app'
+                          return (
+                            <span
+                              key={code}
+                              title={label}
+                              className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground-muted bg-surface-subtle px-2.5 py-1 rounded-full border border-border"
+                            >
+                              {code === 'web' ? (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+                              ) : code === 'mobile' ? (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></svg>
+                              ) : (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect width="20" height="14" x="2" y="3" rx="2" ry="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>
+                              )}
+                              {label}
+                            </span>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex sm:flex-col items-stretch sm:items-end gap-2 flex-shrink-0">

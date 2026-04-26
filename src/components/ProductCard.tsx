@@ -13,6 +13,7 @@ function formatLaunchDate(iso: string): string {
 }
 
 type Topic = { slug: string; name: string }
+type Platform = 'web' | 'mobile' | 'desktop'
 
 type Product = {
   id: string
@@ -24,9 +25,32 @@ type Product = {
   has_voted: boolean
   maker: { name: string }
   topics?: Topic[]
+  platforms?: Platform[]
   created_at?: string
   comments_count?: number
   waitlist_count?: number
+}
+
+function PlatformIcon({ kind }: { kind: Platform }) {
+  const common = { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true }
+  const label = kind === 'web' ? 'Web app' : kind === 'mobile' ? 'Mobile app' : 'Desktop app'
+  const icon =
+    kind === 'web' ? (
+      <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+    ) : kind === 'mobile' ? (
+      <svg {...common}><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></svg>
+    ) : (
+      <svg {...common}><rect width="20" height="14" x="2" y="3" rx="2" ry="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>
+    )
+  return (
+    <span
+      className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-surface-subtle border border-border text-foreground-muted"
+      title={label}
+      aria-label={label}
+    >
+      {icon}
+    </span>
+  )
 }
 
 type Props = {
@@ -109,6 +133,14 @@ export function ProductCard({ product, onVote, onWaitlist }: Props) {
                     {topic.name}
                   </a>
                 ))}
+              </div>
+            </>
+          )}
+          {product.platforms && product.platforms.length > 0 && (
+            <>
+              <span className="text-foreground-faint text-xs">·</span>
+              <div className="flex items-center gap-1">
+                {product.platforms.map((p) => <PlatformIcon key={p} kind={p} />)}
               </div>
             </>
           )}
