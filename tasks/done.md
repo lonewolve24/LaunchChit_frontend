@@ -4,6 +4,15 @@ _Completed features will be logged here._
 
 ---
 
+## F13 — InlineError component
+- Props: `message: string | null`, `id?`
+- Returns null when message is null — renders nothing
+- `role="alert"` for screen reader announcements
+- `id` prop enables `aria-describedby` association from form fields
+- Tests: 4/4 ✓
+
+---
+
 ## F12 — Skeleton component
 - `Skeleton`: single pulse block, accepts `className` for sizing
 - `SkeletonCard`: repeatable card placeholder matching `ProductCard` layout, `count` prop (default 3)

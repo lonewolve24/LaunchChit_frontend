@@ -15,7 +15,7 @@
 - [x] F10 — EmptyState component
 - [x] F11 — Toast component
 - [x] F12 — Skeleton component
-- [ ] F13 — InlineError component
+- [x] F13 — InlineError component
 - [ ] F14 — PageError component (404 / 500)
 
 ## Routes
