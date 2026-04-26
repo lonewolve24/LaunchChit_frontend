@@ -20,7 +20,7 @@ type Product = {
 
 type Props = {
   product: Product
-  onVote: (id: string) => void
+  onVote?: (id: string) => void
 }
 
 const cardShadow = '0 1px 4px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06)'
@@ -36,7 +36,7 @@ export function ProductCard({ product, onVote }: Props) {
     >
       {/* Upvote */}
       <button
-        onClick={() => onVote(product.id)}
+        onClick={() => onVote?.(product.id)}
         aria-label="Upvote"
         aria-pressed={product.has_voted}
         className={`flex flex-col items-center gap-1 w-12 rounded-button border-2 py-2 transition-all flex-shrink-0 ${

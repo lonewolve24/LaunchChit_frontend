@@ -84,8 +84,8 @@ export function FeedPage() {
             )}
           </div>
 
-          <aside className="hidden lg:block w-72 flex-shrink-0">
-            <div className="bg-surface rounded-card p-6" style={{ boxShadow: 'var(--shadow-card)' }}>
+          <aside className="hidden lg:block w-72 flex-shrink-0 space-y-4">
+            <div className="bg-surface rounded-card p-6" style={{ boxShadow: '0 1px 4px 0 rgb(0 0 0 / 0.08)' }}>
               <p className="text-base font-bold text-foreground mb-2">What is LaunchedChit?</p>
               <p className="text-sm text-foreground-muted leading-relaxed">
                 A daily feed of products built by Gambian makers. Ship something. Get seen.
@@ -95,6 +95,32 @@ export function FeedPage() {
                 className="mt-5 block text-center bg-accent text-white text-sm font-semibold px-4 py-3 rounded-button hover:bg-accent-dark transition-colors"
               >
                 Submit your product
+              </a>
+            </div>
+
+            <div className="bg-surface rounded-card p-6" style={{ boxShadow: '0 1px 4px 0 rgb(0 0 0 / 0.08)' }}>
+              <p className="text-base font-bold text-foreground mb-3">Popular Topics</p>
+              <div className="space-y-1">
+                {[
+                  { label: 'Fintech', slug: 'fintech' },
+                  { label: 'Agri-Tech', slug: 'agri-tech' },
+                  { label: 'EdTech', slug: 'edtech' },
+                  { label: 'HealthTech', slug: 'healthtech' },
+                  { label: 'Logistics', slug: 'logistics' },
+                  { label: 'E-commerce', slug: 'ecommerce' },
+                ].map((t) => (
+                  <a
+                    key={t.slug}
+                    href={`/topics/${t.slug}`}
+                    className="flex items-center justify-between text-sm text-foreground-muted hover:text-foreground hover:bg-surface-subtle px-2 py-1.5 rounded-button transition-colors group"
+                  >
+                    <span>{t.label}</span>
+                    <span className="text-foreground-faint group-hover:text-foreground-muted transition-colors">›</span>
+                  </a>
+                ))}
+              </div>
+              <a href="/topics" className="mt-3 block text-xs text-primary hover:underline font-medium">
+                View all topics →
               </a>
             </div>
           </aside>

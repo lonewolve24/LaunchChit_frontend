@@ -45,6 +45,27 @@ const mockProducts = [
   },
 ]
 
+const mockTopics = [
+  { id: 'topic-001', slug: 'fintech', name: 'Fintech', description: 'Mobile money, payments, and financial inclusion', product_count: 4 },
+  { id: 'topic-002', slug: 'agri-tech', name: 'Agri-Tech', description: 'Tools for Gambian farmers and agriculture', product_count: 3 },
+  { id: 'topic-003', slug: 'edtech', name: 'EdTech', description: 'Education technology for schools and learners', product_count: 2 },
+  { id: 'topic-004', slug: 'healthtech', name: 'HealthTech', description: 'Healthcare and wellness products', product_count: 1 },
+  { id: 'topic-005', slug: 'logistics', name: 'Logistics', description: 'Delivery, transport, and supply chain', product_count: 2 },
+  { id: 'topic-006', slug: 'social', name: 'Social', description: 'Community and social networking', product_count: 1 },
+  { id: 'topic-007', slug: 'ecommerce', name: 'E-commerce', description: 'Online retail and marketplaces', product_count: 3 },
+  { id: 'topic-008', slug: 'govtech', name: 'Gov Tech', description: 'Civic and government technology', product_count: 1 },
+]
+
+const mockProfile = {
+  id: 'user-001',
+  username: 'musa-jallow',
+  name: 'Musa Jallow',
+  bio: 'Building products for The Gambia. Founder of FarmLink GM.',
+  avatar_url: null,
+  website: 'https://musajallow.com',
+  products: mockProducts,
+}
+
 let products = [...mockProducts]
 let votes = new Set<string>()
 let sessionActive = false
@@ -73,10 +94,30 @@ export const handlers = [
     return HttpResponse.json(mockUser)
   }),
 
+  // PATCH /me
+  http.patch(`${BASE}/me`, async ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json()) as Record<string, string>
+    if (body.name) mockUser.name = body.name
+    return new HttpResponse(null, { status: 204 })
+  }),
+
   // GET /products/today
   http.get(`${BASE}/products/today`, () => {
     const feed = [...products].sort((a, b) => b.vote_count - a.vote_count)
     return HttpResponse.json(feed)
+  }),
+
+  // GET /products/leaderboard — MUST be before /products/:slug
+  http.get(`${BASE}/products/leaderboard`, () => {
+    const ranked = [...products].sort((a, b) => b.vote_count - a.vote_count)
+    return HttpResponse.json(ranked)
+  }),
+
+  // GET /products/archive — MUST be before /products/:slug
+  http.get(`${BASE}/products/archive`, () => {
+    const archived = [...products].sort((a, b) => b.vote_count - a.vote_count)
+    return HttpResponse.json(archived)
   }),
 
   // GET /products/:slug
@@ -135,5 +176,23 @@ export const handlers = [
     product.vote_count -= 1
     product.has_voted = false
     return HttpResponse.json({ vote_count: product.vote_count })
+  }),
+
+  // GET /topics
+  http.get(`${BASE}/topics`, () => {
+    return HttpResponse.json(mockTopics)
+  }),
+
+  // GET /topics/:slug/products
+  http.get(`${BASE}/topics/:slug/products`, ({ params }) => {
+    const topic = mockTopics.find((t) => t.slug === params.slug)
+    if (!topic) return new HttpResponse(null, { status: 404 })
+    return HttpResponse.json([...products].sort((a, b) => b.vote_count - a.vote_count))
+  }),
+
+  // GET /profile/:username
+  http.get(`${BASE}/profile/:username`, ({ params }) => {
+    if (params.username === mockProfile.username) return HttpResponse.json(mockProfile)
+    return new HttpResponse(null, { status: 404 })
   }),
 ]
