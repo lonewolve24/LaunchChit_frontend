@@ -4,6 +4,14 @@ _Completed features will be logged here._
 
 ---
 
+## F12 — Skeleton component
+- `Skeleton`: single pulse block, accepts `className` for sizing
+- `SkeletonCard`: repeatable card placeholder matching `ProductCard` layout, `count` prop (default 3)
+- Uses `role="presentation"` for test targeting without leaking implementation detail
+- Tests: 4/4 ✓
+
+---
+
 ## F11 — Toast component
 - Props: `message`, `variant: success | error | info`, `onDismiss`
 - Auto-dismisses after 4s via `useEffect` + `setTimeout`

@@ -14,7 +14,7 @@
 - [x] F09 — UpvoteButton component (sm + lg variants)
 - [x] F10 — EmptyState component
 - [x] F11 — Toast component
-- [ ] F12 — Skeleton component
+- [x] F12 — Skeleton component
 - [ ] F13 — InlineError component
 - [ ] F14 — PageError component (404 / 500)
 
