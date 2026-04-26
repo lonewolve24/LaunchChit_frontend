@@ -10,7 +10,7 @@
 ## Shared Components
 - [x] F06 — Header component
 - [x] F07 — Avatar component
-- [ ] F08 — ProductCard component
+- [x] F08 — ProductCard component
 - [ ] F09 — UpvoteButton component (sm + lg variants)
 - [ ] F10 — EmptyState component
 - [ ] F11 — Toast component

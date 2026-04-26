@@ -4,6 +4,16 @@ _Completed features will be logged here._
 
 ---
 
+## F08 — ProductCard component
+- Props: `product` (id, slug, name, tagline, logo_url, vote_count, has_voted, maker), `onVote`
+- Upvote button: left-side chevron + count, `aria-pressed` voted state, calls `onVote(id)`
+- Logo placeholder when `logo_url` is null
+- Product name links to `/p/[slug]`
+- Maker name displayed as "by [name]"
+- Tests: 6/6 ✓
+
+---
+
 ## F07 — Avatar component
 - Props: `name`, `email`, `avatarUrl?`, `size: sm | md`
 - Renders initials (two-word name → two initials, single name → one, null name → email initial)
