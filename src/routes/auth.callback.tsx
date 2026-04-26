@@ -14,7 +14,7 @@ export function AuthCallbackPage() {
 
   useEffect(() => {
     if (!token) {
-      navigate({ to: '/login', search: { error: 'invalid_token' } })
+      navigate({ to: '/login', search: { next: '/', error: 'invalid_token' } })
       return
     }
 
@@ -26,10 +26,10 @@ export function AuthCallbackPage() {
         if (res.ok || res.redirected) {
           navigate({ to: '/' })
         } else {
-          navigate({ to: '/login', search: { error: 'invalid_token' } })
+          navigate({ to: '/login', search: { next: '/', error: 'invalid_token' } })
         }
       })
-      .catch(() => navigate({ to: '/login', search: { error: 'invalid_token' } }))
+      .catch(() => navigate({ to: '/login', search: { next: '/', error: 'invalid_token' } }))
   }, [token, navigate])
 
   return (

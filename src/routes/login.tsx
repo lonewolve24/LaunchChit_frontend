@@ -12,7 +12,10 @@ function safeNext(raw: unknown): string {
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
-  validateSearch: (s: Record<string, unknown>) => ({ next: safeNext(s.next) }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: safeNext(s.next),
+    error: typeof s.error === 'string' ? s.error : undefined,
+  }),
 })
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
