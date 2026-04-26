@@ -66,6 +66,8 @@ type Product = {
   pricing?: string
   platforms?: string[]
   platform_codes?: Array<'web' | 'mobile' | 'desktop'>
+  ios_url?: string | null
+  android_url?: string | null
   launch_date?: string
   day_rank?: number
   gallery?: Array<{ color: string; label: string }>
@@ -650,6 +652,50 @@ export function ProductDetailPage() {
                 </a>
               </div>
             </div>
+
+            {/* Get the app — only when mobile platform exists */}
+            {(product.ios_url || product.android_url) && (
+              <div className="bg-surface rounded-card p-6" style={{ boxShadow: cardShadow }}>
+                <p className="text-xs text-foreground-faint uppercase tracking-wider font-semibold mb-3">Get the app</p>
+                <div className="space-y-2">
+                  {product.ios_url && (
+                    <a
+                      href={product.ios_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 bg-foreground text-white rounded-button px-4 py-2.5 hover:opacity-90 transition-opacity"
+                    >
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                      </svg>
+                      <div className="flex-1 text-left">
+                        <p className="text-[10px] uppercase opacity-80 leading-none">Download on the</p>
+                        <p className="text-sm font-bold leading-tight">App Store</p>
+                      </div>
+                    </a>
+                  )}
+                  {product.android_url && (
+                    <a
+                      href={product.android_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 bg-foreground text-white rounded-button px-4 py-2.5 hover:opacity-90 transition-opacity"
+                    >
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M3 20.5V3.5c0-.9.7-1.6 1.6-1.6.3 0 .5.1.8.2l13.4 8c.8.5.8 1.6 0 2.1l-13.4 8c-.7.4-1.6.2-2-.5-.2-.3-.4-.6-.4-1.2zm10-7.5l3.5-2.1L7 5.6v12.7l9.5-5.3L13 13z" />
+                      </svg>
+                      <div className="flex-1 text-left">
+                        <p className="text-[10px] uppercase opacity-80 leading-none">Get it on</p>
+                        <p className="text-sm font-bold leading-tight">Google Play</p>
+                      </div>
+                    </a>
+                  )}
+                </div>
+                <p className="text-[11px] text-foreground-faint mt-3 leading-relaxed">
+                  Available for {product.platform_codes?.join(', ').replace('mobile', 'iOS + Android')}.
+                </p>
+              </div>
+            )}
 
             {/* Maker block */}
             <div className="bg-surface rounded-card p-6" style={{ boxShadow: cardShadow }}>

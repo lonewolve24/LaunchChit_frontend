@@ -212,9 +212,20 @@ const mockProfile = {
   id: 'user-001',
   username: 'musa-jallow',
   name: 'Musa Jallow',
-  bio: 'Building products for The Gambia. Founder of FarmLink GM.',
+  tagline: 'Founder · Product engineer',
+  bio: 'Building products for The Gambia from Banjul. Currently building FarmLink GM full-time. Previously: built two B2B tools that didn\'t make it. Always interested in conversations about distribution, payments, and ag.',
+  location: 'Banjul, The Gambia',
+  joined_at: '2024-08-12',
   avatar_url: null,
+  cover_color: '#1B4332',
   website: 'https://musajallow.com',
+  github: 'https://github.com/musajallow',
+  twitter: 'https://twitter.com/musajallow',
+  linkedin: 'https://linkedin.com/in/musajallow',
+  email: 'musa@example.com',
+  followers: 412,
+  following: 67,
+  total_upvotes: 318,
   products: mockProducts.filter((p) => p.maker.name === 'Musa Jallow'),
 }
 
@@ -344,7 +355,9 @@ export const handlers = [
       platform_codes: product.platforms ?? ['web'],
       launch_date: '2026-04-26',
       day_rank: dayRank,
-      maker: { id: 'user-001', name: product.maker.name, avatar_url: null, bio: `Building ${product.name} and other tools for The Gambia.` },
+      maker: { id: 'user-001', name: product.maker.name, avatar_url: null, bio: `Building ${product.name} and other tools for The Gambia.`, username: product.maker.name.toLowerCase().replace(/\s+/g, '-') },
+      ios_url: (product.platforms ?? []).includes('mobile') ? 'https://apps.apple.com/gm/app/' + product.slug : null,
+      android_url: (product.platforms ?? []).includes('mobile') ? 'https://play.google.com/store/apps/details?id=gm.launchedchit.' + product.slug.replace(/-/g, '') : null,
       topics: product.topics ?? [],
       gallery: [
         { color: '#1B4332', label: 'Dashboard' },
@@ -510,8 +523,39 @@ export const handlers = [
 
   // GET /profile/:username
   http.get(`${BASE}/profile/:username`, ({ params }) => {
-    if (params.username === mockProfile.username) return HttpResponse.json(mockProfile)
-    return new HttpResponse(null, { status: 404 })
+    const username = String(params.username).toLowerCase()
+    if (username === mockProfile.username) return HttpResponse.json(mockProfile)
+
+    // Generate a profile for any other maker that exists in mockProducts
+    const productsByMaker = mockProducts.filter((p) => p.maker.name.toLowerCase().replace(/\s+/g, '-') === username)
+    if (productsByMaker.length === 0) return new HttpResponse(null, { status: 404 })
+
+    const name = productsByMaker[0].maker.name
+    const totalUpvotes = productsByMaker.reduce((sum, p) => sum + p.vote_count, 0)
+    const colors = ['#1B4332', '#7C5CBF', '#2563EB', '#DC4A22', '#0891B2', '#B45309']
+    const colorIdx = name.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % colors.length
+
+    const handle = name.toLowerCase().replace(/\s+/g, '')
+    return HttpResponse.json({
+      id: `user-${username}`,
+      username,
+      name,
+      tagline: 'Gambian builder',
+      bio: `Building products for The Gambia. Maker of ${productsByMaker.map((p) => p.name).join(', ')}.`,
+      location: 'The Gambia',
+      joined_at: '2025-01-15',
+      avatar_url: null,
+      cover_color: colors[colorIdx],
+      website: `https://${handle}.gm`,
+      github: `https://github.com/${handle}`,
+      twitter: `https://twitter.com/${handle}`,
+      linkedin: null,
+      email: null,
+      followers: Math.round(totalUpvotes * 1.3),
+      following: 24,
+      total_upvotes: totalUpvotes,
+      products: productsByMaker,
+    })
   }),
 
   // GET /community/categories
