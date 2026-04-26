@@ -25,6 +25,8 @@ import { Route as TopicsSlugRouteImport } from './routes/topics_.$slug'
 import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
+import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
 
 const TopicsRoute = TopicsRouteImport.update({
   id: '/topics',
@@ -106,6 +108,16 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityThreadsIdRoute = CommunityThreadsIdRouteImport.update({
+  id: '/community_/threads/$id',
+  path: '/community/threads/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityEventsIdRoute = CommunityEventsIdRouteImport.update({
+  id: '/community_/events/$id',
+  path: '/community/events/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -124,6 +136,8 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
+  '/community/events/$id': typeof CommunityEventsIdRoute
+  '/community/threads/$id': typeof CommunityThreadsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,6 +156,8 @@ export interface FileRoutesByTo {
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
+  '/community/events/$id': typeof CommunityEventsIdRoute
+  '/community/threads/$id': typeof CommunityThreadsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,6 +177,8 @@ export interface FileRoutesById {
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics_/$slug': typeof TopicsSlugRoute
+  '/community_/events/$id': typeof CommunityEventsIdRoute
+  '/community_/threads/$id': typeof CommunityThreadsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +199,8 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/profile/$username'
     | '/topics/$slug'
+    | '/community/events/$id'
+    | '/community/threads/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,6 +219,8 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/profile/$username'
     | '/topics/$slug'
+    | '/community/events/$id'
+    | '/community/threads/$id'
   id:
     | '__root__'
     | '/'
@@ -217,6 +239,8 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/profile/$username'
     | '/topics_/$slug'
+    | '/community_/events/$id'
+    | '/community_/threads/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,6 +260,8 @@ export interface RootRouteChildren {
   PSlugRoute: typeof PSlugRoute
   ProfileUsernameRoute: typeof ProfileUsernameRoute
   TopicsSlugRoute: typeof TopicsSlugRoute
+  CommunityEventsIdRoute: typeof CommunityEventsIdRoute
+  CommunityThreadsIdRoute: typeof CommunityThreadsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -352,6 +378,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community_/threads/$id': {
+      id: '/community_/threads/$id'
+      path: '/community/threads/$id'
+      fullPath: '/community/threads/$id'
+      preLoaderRoute: typeof CommunityThreadsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community_/events/$id': {
+      id: '/community_/events/$id'
+      path: '/community/events/$id'
+      fullPath: '/community/events/$id'
+      preLoaderRoute: typeof CommunityEventsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -372,6 +412,8 @@ const rootRouteChildren: RootRouteChildren = {
   PSlugRoute: PSlugRoute,
   ProfileUsernameRoute: ProfileUsernameRoute,
   TopicsSlugRoute: TopicsSlugRoute,
+  CommunityEventsIdRoute: CommunityEventsIdRoute,
+  CommunityThreadsIdRoute: CommunityThreadsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

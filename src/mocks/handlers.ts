@@ -87,70 +87,115 @@ const mockForumCategories = [
   { slug: 'off-topic',     name: 'Off Topic',     description: 'Memes, news, life — everything else',         icon_color: '#B45309' },
 ]
 
-const mockThreads = [
-  { id: 't1',  category: 'general',       product_slug: null,                     title: 'What is the biggest blocker for Gambian startups in 2026?',                          body_preview: 'I keep hearing the same three things — payments, distribution, talent…',  author: { name: 'Musa Jallow' },      replies: 47, upvotes: 124, last_reply_at: '2 hours ago',  pinned: true },
-  { id: 't2',  category: 'show-and-tell', product_slug: 'paygam-b7x2m1',          title: 'PayGam — we hit 10,000 transactions yesterday 🎉',                                  body_preview: 'Took us 8 months and 14 rewrites of the QR flow. Here\'s what we learned…', author: { name: 'Momodou Jatta' },    replies: 32, upvotes: 98,  last_reply_at: '4 hours ago',  pinned: false },
-  { id: 't3',  category: 'help',          product_slug: null,                     title: 'How are people handling KYC for fintech apps in The Gambia?',                       body_preview: 'Looking for recommendations. We\'ve been using Smile Identity but it\'s expensive…', author: { name: 'Yusupha Touray' },   replies: 19, upvotes: 67,  last_reply_at: '6 hours ago',  pinned: false },
-  { id: 't4',  category: 'feedback',      product_slug: 'farmlink-gm-a3k9z2',     title: 'Roast my landing page — FarmLink GM redesign',                                      body_preview: 'Pushed a new landing page yesterday. I think the hero is too text-heavy. Thoughts?', author: { name: 'Musa Jallow' },      replies: 14, upvotes: 45,  last_reply_at: '8 hours ago',  pinned: false },
-  { id: 't5',  category: 'jobs',          product_slug: null,                     title: 'Hiring: React Native dev for ClassMate GM (Banjul or remote)',                      body_preview: 'We\'re building the mobile companion to ClassMate. 2+ years RN experience…',     author: { name: 'Abdul Ikumpanyi' },  replies: 8,  upvotes: 31,  last_reply_at: '12 hours ago', pinned: false },
-  { id: 't6',  category: 'general',       product_slug: null,                     title: 'Anyone else losing customers to slow Wave settlement times?',                       body_preview: 'Had three users complain this week about funds taking 2-3 days to settle…',     author: { name: 'Aminata Touray' },   replies: 22, upvotes: 89,  last_reply_at: '1 day ago',    pinned: false },
-  { id: 't7',  category: 'show-and-tell', product_slug: 'turntable-gm-w7c4r6',    title: 'Just shipped Turntable GM — streaming for Gambian artists',                         body_preview: 'After 18 months, our music platform for local artists is live. Demo + AMA inside.',  author: { name: 'DJ Latir' },         replies: 41, upvotes: 156, last_reply_at: '1 day ago',    pinned: false },
-  { id: 't8',  category: 'help',          product_slug: null,                     title: 'Best way to send SMS to all four mobile networks?',                                 body_preview: 'Comium, Africell, QCell, Gamtel — building a notification system that hits all…', author: { name: 'Lamin Touray' },     replies: 11, upvotes: 38,  last_reply_at: '2 days ago',   pinned: false },
-  { id: 't9',  category: 'general',       product_slug: null,                     title: 'Should LaunchedChit add a "Built in Banjul" badge?',                                body_preview: 'Some founders are based in Dakar / London but build for The Gambia. Should we…',  author: { name: 'Fatim Singhateh' },  replies: 28, upvotes: 73,  last_reply_at: '2 days ago',   pinned: false },
-  { id: 't10', category: 'off-topic',     product_slug: null,                     title: 'Best ataya spots in Serekunda for a long coding session?',                          body_preview: 'Need somewhere with wifi, plug points, and ataya. Recommendations welcome.',     author: { name: 'Sankung Jammeh' },   replies: 35, upvotes: 84,  last_reply_at: '3 days ago',   pinned: false },
-  { id: 't11', category: 'feedback',      product_slug: 'banjul-eats-d8h3k1',     title: 'Banjul Eats checkout flow — 3 of 5 testers gave up',                                body_preview: 'Did a small usability test, attaching the recordings. Anyone want to help debug?',  author: { name: 'Fatou Ceesay' },     replies: 18, upvotes: 52,  last_reply_at: '4 days ago',   pinned: false },
-  { id: 't12', category: 'general',       product_slug: null,                     title: 'Kombo founder dinner — who\'s in for next month?',                                  body_preview: 'Trying to organise a casual dinner for builders in the Kombo area. RSVP inside.',  author: { name: 'Mariama Kah' },      replies: 24, upvotes: 61,  last_reply_at: '5 days ago',   pinned: false },
+type ThreadReply = { id: string; author: { name: string }; body: string; created_at: string; upvotes: number }
+type Thread = {
+  id: string
+  category: string
+  product_slug: string | null
+  title: string
+  body_preview: string
+  body: string
+  author: { name: string; bio?: string }
+  replies: number
+  upvotes: number
+  last_reply_at: string
+  pinned: boolean
+  follower_count: number
+  reply_list: ThreadReply[]
+}
+
+function makeReplies(authors: string[]): ThreadReply[] {
+  const samples = [
+    'Great question. I\'ve been thinking about this too — the network effects in The Gambia favour whoever ships first.',
+    'Have you tried partnering with a local NGO? They tend to have distribution already.',
+    'Counterpoint: building for the diaspora first might unlock more capital. Once you have revenue, the local play gets easier.',
+    'Echoing the others — focus on one cohort, win it, then expand.',
+    'I went through this same loop last year. Happy to share what worked / didn\'t. DM me.',
+    'The thing nobody mentions: customer support is the bottleneck. Building is the easy part.',
+  ]
+  return authors.map((name, i) => ({
+    id: `r${i + 1}`,
+    author: { name },
+    body: samples[i % samples.length],
+    created_at: `${i + 1}h ago`,
+    upvotes: 12 - i,
+  }))
+}
+
+const mockThreads: Thread[] = [
+  { id: 't1',  category: 'general',       product_slug: null,                     title: 'What is the biggest blocker for Gambian startups in 2026?',                          body_preview: 'I keep hearing the same three things — payments, distribution, talent…',  body: 'I keep hearing the same three things from every founder I talk to: payments are unreliable, distribution is hard, and talent is hard to find / retain.\n\nIs that everyone\'s experience? What would unlock the next 10x of activity for our ecosystem?', author: { name: 'Musa Jallow', bio: 'Founder at FarmLink GM' }, replies: 47, upvotes: 124, last_reply_at: '2 hours ago',  pinned: true,  follower_count: 89, reply_list: makeReplies(['Momodou Jatta', 'Aminata Touray', 'Yusupha Touray', 'Fatim Singhateh']) },
+  { id: 't2',  category: 'show-and-tell', product_slug: 'paygam-b7x2m1',          title: 'PayGam — we hit 10,000 transactions yesterday 🎉',                                  body_preview: 'Took us 8 months and 14 rewrites of the QR flow. Here\'s what we learned…', body: 'Took us 8 months and 14 rewrites of the QR flow.\n\nWhat worked:\n• Going to the market and watching people fail to use the app, on repeat\n• Removing 4 of the 6 fields in the signup\n• Adding USSD as a fallback\n\nWhat didn\'t:\n• Cold outreach (~0.5% conversion)\n• Paid Facebook ads (CAC made no sense)\n\nHappy to answer questions.', author: { name: 'Momodou Jatta', bio: 'Co-founder at PayGam' }, replies: 32, upvotes: 98,  last_reply_at: '4 hours ago',  pinned: false, follower_count: 54, reply_list: makeReplies(['Lamin Touray', 'Babucarr Sowe', 'Awa Mboge']) },
+  { id: 't3',  category: 'help',          product_slug: null,                     title: 'How are people handling KYC for fintech apps in The Gambia?',                       body_preview: 'Looking for recommendations. We\'ve been using Smile Identity but it\'s expensive…', body: 'We\'ve been using Smile Identity for ID verification but the per-call cost is killing our unit economics.\n\nIs there a cheaper provider that works reliably with Gambian national IDs and passports? Open to building something in-house if the volume justifies it.', author: { name: 'Yusupha Touray', bio: 'iWallet GM' }, replies: 19, upvotes: 67,  last_reply_at: '6 hours ago',  pinned: false, follower_count: 41, reply_list: makeReplies(['Modou Saine', 'Lamin Touray']) },
+  { id: 't4',  category: 'feedback',      product_slug: 'farmlink-gm-a3k9z2',     title: 'Roast my landing page — FarmLink GM redesign',                                      body_preview: 'Pushed a new landing page yesterday. I think the hero is too text-heavy. Thoughts?', body: 'Pushed a new landing page yesterday. URL inside. Honest feedback welcome.\n\nMy suspicion is:\n• Hero is too text-heavy\n• The pricing section is confusing\n• Mobile layout breaks on small Tecno phones', author: { name: 'Musa Jallow' }, replies: 14, upvotes: 45,  last_reply_at: '8 hours ago',  pinned: false, follower_count: 22, reply_list: makeReplies(['Fatou Ceesay', 'Mariama Kah']) },
+  { id: 't5',  category: 'jobs',          product_slug: null,                     title: 'Hiring: React Native dev for ClassMate GM (Banjul or remote)',                      body_preview: 'We\'re building the mobile companion to ClassMate. 2+ years RN experience…',     body: 'We\'re hiring a React Native dev to lead the ClassMate mobile build.\n\nMust-haves:\n• 2+ years RN in production\n• Comfortable with offline-first patterns\n• Based in The Gambia or West Africa timezone\n\nBudget: D40k–D60k/month plus equity. Apply with a Github + portfolio.', author: { name: 'Abdul Ikumpanyi', bio: 'Founder at ClassMate GM' }, replies: 8,  upvotes: 31,  last_reply_at: '12 hours ago', pinned: false, follower_count: 18, reply_list: makeReplies(['Sankung Jammeh']) },
+  { id: 't6',  category: 'general',       product_slug: null,                     title: 'Anyone else losing customers to slow Wave settlement times?',                       body_preview: 'Had three users complain this week about funds taking 2-3 days to settle…',     body: 'Three users complained this week about Wave settlements taking 2-3 days. Has anyone built a buffer / pre-funded float to bridge the gap? Curious what others are doing.', author: { name: 'Aminata Touray' }, replies: 22, upvotes: 89,  last_reply_at: '1 day ago',    pinned: false, follower_count: 34, reply_list: makeReplies(['Momodou Jatta', 'Yusupha Touray', 'Saikou Camara']) },
+  { id: 't7',  category: 'show-and-tell', product_slug: 'turntable-gm-w7c4r6',    title: 'Just shipped Turntable GM — streaming for Gambian artists',                         body_preview: 'After 18 months, our music platform for local artists is live. Demo + AMA inside.',  body: 'After 18 months and one rebrand, Turntable GM is finally live.\n\nWe pay 70% of revenue back to artists, no minimum streams required. We have 240 songs from 38 artists at launch.\n\nAMA — happy to talk product, music industry, or technical questions about streaming infra in West Africa.', author: { name: 'DJ Latir' }, replies: 41, upvotes: 156, last_reply_at: '1 day ago',    pinned: false, follower_count: 67, reply_list: makeReplies(['Awa Mboge', 'Fatim Singhateh', 'Modou Saine']) },
+  { id: 't8',  category: 'help',          product_slug: null,                     title: 'Best way to send SMS to all four mobile networks?',                                 body_preview: 'Comium, Africell, QCell, Gamtel — building a notification system that hits all…', body: 'Building a notification system that needs to reach all four Gambian mobile networks. Africa\'s Talking covers Africell and QCell well, but Gamtel is hit-or-miss.\n\nAnyone found a clean solution?', author: { name: 'Lamin Touray' }, replies: 11, upvotes: 38,  last_reply_at: '2 days ago',   pinned: false, follower_count: 14, reply_list: makeReplies(['Babucarr Sowe', 'Yusupha Touray']) },
+  { id: 't9',  category: 'general',       product_slug: null,                     title: 'Should LaunchedChit add a "Built in Banjul" badge?',                                body_preview: 'Some founders are based in Dakar / London but build for The Gambia. Should we…',  body: 'Right now we don\'t distinguish between products built in The Gambia vs built elsewhere for the Gambian market. Should there be a "Built in Banjul" / "Built in Brikama" badge for products with operations on the ground?', author: { name: 'Fatim Singhateh' }, replies: 28, upvotes: 73,  last_reply_at: '2 days ago',   pinned: false, follower_count: 25, reply_list: makeReplies(['Musa Jallow', 'Aminata Touray']) },
+  { id: 't10', category: 'off-topic',     product_slug: null,                     title: 'Best ataya spots in Serekunda for a long coding session?',                          body_preview: 'Need somewhere with wifi, plug points, and ataya. Recommendations welcome.',     body: 'Need somewhere with reliable wifi, plug points, and an endless supply of ataya. Bonus points if it doesn\'t blast football all day.', author: { name: 'Sankung Jammeh' }, replies: 35, upvotes: 84,  last_reply_at: '3 days ago',   pinned: false, follower_count: 12, reply_list: makeReplies(['Pa Modou Faal', 'Ousainou Jagne']) },
+  { id: 't11', category: 'feedback',      product_slug: 'banjul-eats-d8h3k1',     title: 'Banjul Eats checkout flow — 3 of 5 testers gave up',                                body_preview: 'Did a small usability test, attaching the recordings. Anyone want to help debug?',  body: 'Ran 5 unmoderated tests on the checkout flow. 3 of 5 dropped off at the address picker. Recordings + observations inside. Fresh eyes welcome.', author: { name: 'Fatou Ceesay' }, replies: 18, upvotes: 52,  last_reply_at: '4 days ago',   pinned: false, follower_count: 9,  reply_list: makeReplies(['Lamin Saho', 'Awa Mboge']) },
+  { id: 't12', category: 'general',       product_slug: null,                     title: 'Kombo founder dinner — who\'s in for next month?',                                  body_preview: 'Trying to organise a casual dinner for builders in the Kombo area. RSVP inside.',  body: 'Casual dinner for Gambian builders in the Kombo area. Thinking 12-15 people, simple venue, everyone pays for their own food. Reply if interested and I\'ll send a poll for the date.', author: { name: 'Mariama Kah' }, replies: 24, upvotes: 61,  last_reply_at: '5 days ago',   pinned: false, follower_count: 31, reply_list: makeReplies(['Adama Saidy', 'Saikou Camara']) },
 ]
 
-const mockEvents = [
-  {
-    id: 'e1',
-    title: 'Builders Meetup — Banjul Edition',
-    date: '2026-05-08T18:00:00',
-    location: 'Café Touba, Bertil Harding Highway',
-    mode: 'In person',
-    host: 'Musa Jallow',
-    description: 'Casual evening for Gambian makers. Bring a demo, leave with feedback. Drinks on us for the first 30 RSVPs.',
-    attendees: 47,
-    capacity: 60,
-    color: '#1B4332',
-  },
-  {
-    id: 'e2',
-    title: 'Mobile Money APIs — Workshop',
-    date: '2026-05-15T15:00:00',
-    location: 'Online · Google Meet',
-    mode: 'Online',
-    host: 'Momodou Jatta (PayGam)',
-    description: 'Hands-on workshop on integrating Wave, QMoney, and Africell Money APIs. Live coding, no slides.',
-    attendees: 124,
-    capacity: 200,
-    color: '#7C5CBF',
-  },
-  {
-    id: 'e3',
-    title: 'Demo Night — May Cohort',
-    date: '2026-05-22T19:00:00',
-    location: 'TechHub Brikama',
-    mode: 'In person',
-    host: 'LaunchedChit',
-    description: 'Five Gambian startups demo what they shipped this month. 5 minutes each. 5 questions each. Audience votes.',
-    attendees: 89,
-    capacity: 100,
-    color: '#DC4A22',
-  },
-  {
-    id: 'e4',
-    title: 'Designing for Low Bandwidth — Talk',
-    date: '2026-06-03T17:00:00',
-    location: 'Online · YouTube Live',
-    mode: 'Online',
-    host: 'Lamin Saho',
-    description: 'How we got Banjul Eats to load in <2s on a 3G connection. Practical performance tips.',
-    attendees: 56,
-    capacity: 500,
-    color: '#2563EB',
-  },
+type Event = {
+  id: string
+  slug: string
+  title: string
+  start: string
+  end: string
+  location: string
+  address?: string
+  mode: 'In person' | 'Online'
+  host: string
+  host_bio?: string
+  description: string
+  agenda?: Array<{ time: string; item: string }>
+  attendees: number
+  capacity: number
+  color: string
+  cover_color: string
+  topics?: string[]
+}
+
+const eventColors = ['#1B4332', '#7C5CBF', '#2563EB', '#DC4A22', '#0891B2', '#B45309', '#065F46', '#9D174D']
+
+function evt(
+  i: number,
+  base: Omit<Event, 'id' | 'slug' | 'color' | 'cover_color' | 'end'> & { duration_h?: number }
+): Event {
+  const start = new Date(base.start)
+  const end = new Date(start.getTime() + (base.duration_h ?? 2) * 3600000)
+  return {
+    id: `e${i}`,
+    slug: base.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    color: eventColors[i % eventColors.length],
+    cover_color: eventColors[(i + 3) % eventColors.length],
+    end: end.toISOString(),
+    ...base,
+  }
+}
+
+const mockEvents: Event[] = [
+  evt(1,  { title: 'Builders Meetup — Banjul Edition',                   start: '2026-05-08T18:00:00', duration_h: 3, location: 'Café Touba, Bertil Harding Highway', address: 'Bertil Harding Hwy, Senegambia, The Gambia', mode: 'In person', host: 'Musa Jallow',          host_bio: 'Founder, FarmLink GM',         description: 'Casual evening for Gambian makers. Bring a demo, leave with feedback. Drinks on us for the first 30 RSVPs.', attendees: 47,  capacity: 60,  topics: ['Networking', 'Show & Tell'], agenda: [{ time: '18:00', item: 'Welcome + drinks' }, { time: '18:30', item: 'Lightning demos (5 min each)' }, { time: '19:30', item: 'Open mingling' }] }),
+  evt(2,  { title: 'Mobile Money APIs — Workshop',                       start: '2026-05-15T15:00:00', duration_h: 2, location: 'Online · Google Meet',                  mode: 'Online',    host: 'Momodou Jatta',         host_bio: 'Co-founder, PayGam',           description: 'Hands-on workshop on integrating Wave, QMoney, and Africell Money APIs. Live coding, no slides.',         attendees: 124, capacity: 200, topics: ['Fintech', 'APIs'] }),
+  evt(3,  { title: 'Demo Night — May Cohort',                            start: '2026-05-22T19:00:00', duration_h: 2, location: 'TechHub Brikama',                       address: 'Brikama, West Coast Region',           mode: 'In person', host: 'LaunchedChit',          description: 'Five Gambian startups demo what they shipped this month. 5 minutes each. 5 questions each. Audience votes.', attendees: 89,  capacity: 100, topics: ['Demo Day'] }),
+  evt(4,  { title: 'Designing for Low Bandwidth — Talk',                 start: '2026-06-03T17:00:00', duration_h: 1, location: 'Online · YouTube Live',                 mode: 'Online',    host: 'Lamin Saho',            host_bio: 'Designer at Banjul Eats',      description: 'How we got Banjul Eats to load in <2s on a 3G connection. Practical performance tips.',                       attendees: 56,  capacity: 500, topics: ['Engineering', 'Design'] }),
+  evt(5,  { title: 'Founder Coffee — Kombo Mornings',                    start: '2026-05-04T08:00:00', duration_h: 2, location: 'Sandele Eco Café, Kololi',              address: 'Kololi, The Gambia',                   mode: 'In person', host: 'Aminata Touray',                                                  description: 'Weekly informal coffee for Gambian founders. No agenda. Just early-morning honesty about what\'s working and what isn\'t.', attendees: 14, capacity: 20, topics: ['Networking'] }),
+  evt(6,  { title: 'Pitch Practice — Pre-YC Workshop',                   start: '2026-05-12T14:00:00', duration_h: 3, location: 'Online · Zoom',                         mode: 'Online',    host: 'Abdul Ikumpanyi',                                                 description: 'Got a YC application coming up? We\'ll do live mock pitches with a panel of seasoned operators. 8 slots, first come first served.',                                                                attendees: 8,  capacity: 8,   topics: ['Fundraising'] }),
+  evt(7,  { title: 'Tabaski Build Sprint',                               start: '2026-05-25T10:00:00', duration_h: 8, location: 'Innovarx Hub, Fajara',                  address: 'Fajara, KMC',                          mode: 'In person', host: 'Fatou Ceesay',                                                    description: 'One-day build sprint focused on Tabaski-related tools. Ship something useful by 18:00 or your money back (it\'s free).',                                                                            attendees: 32, capacity: 40,  topics: ['Hackathon'] }),
+  evt(8,  { title: 'Designing Inclusive Forms in Wolof',                 start: '2026-06-10T16:00:00', duration_h: 1, location: 'Online · Google Meet',                  mode: 'Online',    host: 'Mariama Kah',                                                     description: 'Form UX patterns that don\'t assume English literacy. Worked examples from KYC, banking, and government services.',                                                                                  attendees: 41, capacity: 100, topics: ['Design', 'Localisation'] }),
+  evt(9,  { title: 'Maker Show & Tell — Live AMA',                       start: '2026-06-17T18:30:00', duration_h: 2, location: 'Café Touba, Senegambia',                address: 'Senegambia, KMC',                      mode: 'In person', host: 'LaunchedChit',                                                    description: 'Three featured makers talk through their build, money, and lessons. Audience Q&A throughout.',                                                                                                       attendees: 23, capacity: 50,  topics: ['Show & Tell'] }),
+  evt(10, { title: 'Securing Your App — OWASP for African Startups',     start: '2026-06-24T15:00:00', duration_h: 2, location: 'Online · YouTube Live',                 mode: 'Online',    host: 'Saikou Camara',                                                   description: 'Practical security primer: auth, secrets, rate-limiting, and what gets exploited in West African web apps.',                                                                                          attendees: 67, capacity: 300, topics: ['Engineering', 'Security'] }),
+  evt(11, { title: 'Fish-Tech Roundtable',                               start: '2026-07-02T11:00:00', duration_h: 2, location: 'Tanji Fish Landing Site',                address: 'Tanji, West Coast Region',             mode: 'In person', host: 'Pa Sait Jallow',        host_bio: 'Founder, FishMarket',          description: 'Operators in fishing, cold-chain, and logistics meet to talk problems and partnerships. Lunch provided.',                                                                                          attendees: 18, capacity: 30,  topics: ['Agritech', 'Logistics'] }),
+  evt(12, { title: 'Builders × Banks — A Conversation',                  start: '2026-07-09T14:00:00', duration_h: 2, location: 'Bank of The Gambia, Banjul',            address: '1/2 Ecowas Ave, Banjul',               mode: 'In person', host: 'Yusupha Touray',                                                  description: 'Open conversation between builders and BoG / commercial bank reps on regulation, sandbox access, and licensing.',                                                                                  attendees: 38, capacity: 60,  topics: ['Fintech', 'Policy'] }),
+  evt(13, { title: 'Wolof × English UX Copy Workshop',                   start: '2026-07-16T17:00:00', duration_h: 2, location: 'Online · Zoom',                         mode: 'Online',    host: 'Modou Lamin Joof',      host_bio: 'WolofTranslate',               description: 'Write product copy that flips between Wolof and English without losing voice. Bring a screen of your own product.',                                                                                attendees: 29, capacity: 80,  topics: ['Localisation', 'Design'] }),
+  evt(14, { title: 'Demo Night — June Cohort',                           start: '2026-06-26T19:00:00', duration_h: 2, location: 'TechHub Brikama',                       address: 'Brikama',                              mode: 'In person', host: 'LaunchedChit',                                                    description: 'Six Gambian startups present. Same format as May. New makers, fresh demos.',                                                                                                                         attendees: 51, capacity: 100, topics: ['Demo Day'] }),
+  evt(15, { title: 'Postgres for Product Engineers',                     start: '2026-07-23T15:00:00', duration_h: 2, location: 'Online · Google Meet',                  mode: 'Online',    host: 'Lamin Touray',                                                    description: 'Indexes, JSONB, partial indexes, RLS. The 80% you actually need on a small team.',                                                                                                                  attendees: 44, capacity: 200, topics: ['Engineering'] }),
+  evt(16, { title: 'Women in Gambian Tech — Quarterly Meetup',           start: '2026-07-29T18:00:00', duration_h: 3, location: 'Coco Ocean Resort, Bijilo',             address: 'Bijilo, KMC',                          mode: 'In person', host: 'Awa Mboge',                                                       description: 'Quarterly gathering of women builders, designers, engineers, and operators in Gambian tech. Drinks + speed-mentoring.',                                                                              attendees: 56, capacity: 80,  topics: ['Networking'] }),
+  evt(17, { title: 'Going Multi-Region — Architecture Talk',             start: '2026-08-05T16:00:00', duration_h: 1, location: 'Online · YouTube Live',                 mode: 'Online',    host: 'Babucarr Sowe',                                                   description: 'How Serekunda Rent expanded into Senegal in two months without rewriting the backend. Architecture decisions and trade-offs.',                                                                       attendees: 22, capacity: 500, topics: ['Engineering'] }),
+  evt(18, { title: 'Hackathon — 24 Hours, One Tool for Tabaski',         start: '2026-08-12T09:00:00', duration_h: 24, location: 'Innovarx Hub, Fajara',                 address: 'Fajara, KMC',                          mode: 'In person', host: 'LaunchedChit',                                                    description: 'Build a tool that makes Tabaski easier — for buyers, sellers, or anyone in between. Best three teams win Wave gift cards and a feature on LaunchedChit.',                                            attendees: 78, capacity: 100, topics: ['Hackathon'] }),
+  evt(19, { title: 'Office Hours with Wave (Public)',                    start: '2026-08-20T14:00:00', duration_h: 2, location: 'Online · Zoom',                         mode: 'Online',    host: 'Wave team',                                                       description: 'The Wave dev relations team takes questions on integrations, settlement, and the API roadmap.',                                                                                                       attendees: 113, capacity: 500, topics: ['Fintech', 'APIs'] }),
+  evt(20, { title: 'End-of-Summer Builders Cookout',                    start: '2026-08-29T17:00:00', duration_h: 4, location: 'Cape Point Beach, Bakau',                address: 'Bakau, KMC',                           mode: 'In person', host: 'LaunchedChit',                                                    description: 'Sundowner on the beach with the Gambian builder community. Bring family. We\'ll handle the food.',                                                                                                  attendees: 92, capacity: 150, topics: ['Networking'] }),
 ]
 
 const mockRequests = [
@@ -507,25 +552,89 @@ export const handlers = [
     return HttpResponse.json(threads)
   }),
 
-  // GET /community/events
-  http.get(`${BASE}/community/events`, () => {
-    return HttpResponse.json(mockEvents)
+  // GET /community/threads/:id — MUST be before generic threads handler? No — it's /threads/:id vs /threads,
+  // so the route patterns are distinct enough; but we keep it above for safety.
+  http.get(`${BASE}/community/threads/:id`, ({ params }) => {
+    const thread = mockThreads.find((t) => t.id === params.id)
+    if (!thread) return new HttpResponse(null, { status: 404 })
+    return HttpResponse.json(thread)
   }),
 
-  // GET /community/requests — supports ?sort=
+  // POST /community/threads/:id/follow — toggle follow
+  http.post(`${BASE}/community/threads/:id/follow`, ({ params }) => {
+    const thread = mockThreads.find((t) => t.id === params.id)
+    if (!thread) return new HttpResponse(null, { status: 404 })
+    thread.follower_count += 1
+    return HttpResponse.json({ follower_count: thread.follower_count, following: true })
+  }),
+
+  // GET /community/events  — supports ?view=grid|calendar &month=YYYY-MM &page=&page_size=&mode=
+  http.get(`${BASE}/community/events`, ({ request }) => {
+    const url = new URL(request.url)
+    const view = url.searchParams.get('view') ?? 'grid'
+    const month = url.searchParams.get('month')
+    const mode = url.searchParams.get('mode')
+
+    let list = [...mockEvents]
+    if (mode && mode !== 'all') list = list.filter((e) => e.mode.toLowerCase().replace(' ', '-') === mode)
+    if (view === 'calendar' && month) {
+      const filtered = list.filter((e) => e.start.slice(0, 7) === month)
+      filtered.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+      return HttpResponse.json({ items: filtered, total: filtered.length, view, month })
+    }
+
+    // Grid view → paginated
+    list.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+    const page = Math.max(1, Number(url.searchParams.get('page') ?? '1'))
+    const pageSize = Math.max(1, Number(url.searchParams.get('page_size') ?? '6'))
+    const start = (page - 1) * pageSize
+    return HttpResponse.json({
+      items: list.slice(start, start + pageSize),
+      total: list.length,
+      page,
+      page_size: pageSize,
+      view,
+    })
+  }),
+
+  // GET /community/events/:id
+  http.get(`${BASE}/community/events/:id`, ({ params }) => {
+    const event = mockEvents.find((e) => e.id === params.id || e.slug === params.id)
+    if (!event) return new HttpResponse(null, { status: 404 })
+    return HttpResponse.json(event)
+  }),
+
+  // GET /community/requests — supports ?sort=&page=&page_size=
   http.get(`${BASE}/community/requests`, ({ request }) => {
     const url = new URL(request.url)
     const sort = url.searchParams.get('sort') ?? 'popular'
+    const page = Math.max(1, Number(url.searchParams.get('page') ?? '1'))
+    const pageSize = Math.max(1, Number(url.searchParams.get('page_size') ?? '10'))
     const list = [...mockRequests]
     if (sort === 'popular') list.sort((a, b) => b.upvotes - a.upvotes)
-    return HttpResponse.json(list)
+    const start = (page - 1) * pageSize
+    return HttpResponse.json({
+      items: list.slice(start, start + pageSize),
+      total: list.length,
+      page,
+      page_size: pageSize,
+    })
   }),
 
-  // POST /community/requests — increment upvote
+  // POST /community/requests/:id/upvote — increment upvote
   http.post(`${BASE}/community/requests/:id/upvote`, ({ params }) => {
     const req = mockRequests.find((r) => r.id === params.id)
     if (!req) return new HttpResponse(null, { status: 404 })
     req.upvotes += 1
     return HttpResponse.json({ upvotes: req.upvotes })
+  }),
+
+  // POST /community/subscribe — newsletter
+  http.post(`${BASE}/community/subscribe`, async ({ request }) => {
+    const body = (await request.json()) as { email?: string; topics?: string[] }
+    if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+      return new HttpResponse(JSON.stringify({ error: 'Invalid email' }), { status: 400 })
+    }
+    return new HttpResponse(null, { status: 204 })
   }),
 ]

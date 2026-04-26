@@ -22,18 +22,29 @@ const navLinks = [
   { label: 'Products', href: '/' },
   { label: 'Topics', href: '/topics' },
   { label: 'Leaderboard', href: '/leaderboard' },
-  { label: 'Community', href: '/community' },
+]
+
+const communitySubMenu = [
+  { label: 'Forums', href: '/community?tab=forums', desc: 'Discussions across categories and product forums' },
+  { label: 'Events', href: '/community?tab=events', desc: 'Meetups, workshops, demos and hackathons' },
+  { label: 'Software Requests', href: '/community?tab=requests', desc: 'Vote for tools you wish existed' },
+  { label: 'Mailing List', href: '/community?tab=mailing-list', desc: 'Weekly digest in your inbox' },
 ]
 
 export function Header({ user }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [communityOpen, setCommunityOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const communityRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false)
+      }
+      if (communityRef.current && !communityRef.current.contains(e.target as Node)) {
+        setCommunityOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -65,6 +76,37 @@ export function Header({ user }: Props) {
               {l.label}
             </a>
           ))}
+
+          {/* Community dropdown */}
+          <div className="relative" ref={communityRef}>
+            <button
+              onClick={() => setCommunityOpen((o) => !o)}
+              aria-expanded={communityOpen}
+              className="flex items-center gap-1 text-white/70 hover:text-white text-sm font-medium px-3 py-1.5 rounded-button transition-colors hover:bg-white/10"
+            >
+              Community
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${communityOpen ? 'rotate-180' : ''}`}>
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            {communityOpen && (
+              <div
+                className="absolute left-0 top-10 bg-surface rounded-card py-2 w-72 z-50"
+                style={{ boxShadow: '0 8px 24px -4px rgb(0 0 0 / 0.18)' }}
+              >
+                {communitySubMenu.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="block px-4 py-3 hover:bg-surface-subtle transition-colors"
+                  >
+                    <div className="text-sm font-semibold text-foreground">{item.label}</div>
+                    <div className="text-xs text-foreground-muted mt-0.5">{item.desc}</div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Right actions */}
