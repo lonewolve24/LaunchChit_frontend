@@ -4,6 +4,16 @@ _Completed features will be logged here._
 
 ---
 
+## F17 — Auth callback route (`/auth/callback`)
+- Reads `?token=` from URL via `useSearch`
+- Calls `GET /auth/callback?token=` — backend sets cookie and redirects
+- On success (ok or redirected): navigate to `/`
+- On failure or missing token: navigate to `/login?error=invalid_token`
+- Renders spinner (`role="status"`) + "Signing you in…" text while in flight
+- Tests: 2/2 ✓
+
+---
+
 ## F16 — Login route (`/login`)
 - Two steps: email input → confirmation state
 - Client-side validation: empty + invalid format → InlineError
