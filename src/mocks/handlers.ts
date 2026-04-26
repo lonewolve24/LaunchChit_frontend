@@ -535,6 +535,131 @@ const adminUsersStore = (() => {
   }
 })()
 
+// Admin editorial stores -----------------------------------------------------
+
+type AdminStory = {
+  id: string
+  title: string
+  category: 'Founder Story' | 'Industry' | 'Field Notes' | 'Deep Dive'
+  author: string
+  status: 'published' | 'draft'
+  created_at: string
+  updated_at: string
+}
+const adminStoriesStore = (() => {
+  const items: AdminStory[] = [
+    { id: 'st1', title: 'How FarmLink GM went from a paper notebook to 3,000 farmers in 14 months', category: 'Founder Story', author: 'Aminata Touray', status: 'published', created_at: '2026-04-22', updated_at: '2026-04-22' },
+    { id: 'st2', title: 'The state of mobile money rails in The Gambia, 2026',                       category: 'Industry',      author: 'Lamin Jobe',     status: 'published', created_at: '2026-04-18', updated_at: '2026-04-19' },
+    { id: 'st3', title: 'Shipping on 3G: design notes from five Gambian apps that work offline',     category: 'Field Notes',   author: 'Fatou Ceesay',   status: 'published', created_at: '2026-04-12', updated_at: '2026-04-12' },
+    { id: 'st4', title: 'Why we open-sourced our dispatch engine after a year of keeping it secret', category: 'Founder Story', author: 'Ebrima Sanneh',  status: 'published', created_at: '2026-04-05', updated_at: '2026-04-05' },
+    { id: 'st5', title: 'Building with government data: a draft from the API team',                  category: 'Deep Dive',     author: 'Ndey Sosseh',    status: 'draft',     created_at: '2026-04-24', updated_at: '2026-04-25' },
+    { id: 'st6', title: 'Untitled — meetup recap (rough notes)',                                       category: 'Field Notes',   author: 'Editorial',      status: 'draft',     created_at: '2026-04-26', updated_at: '2026-04-26' },
+  ]
+  let id = items.length + 1
+  function today() { return new Date().toISOString().slice(0, 10) }
+  return {
+    list: () => items,
+    create: (title: string, category: string, author: string) => {
+      const created: AdminStory = { id: `st${id++}`, title, category: category as AdminStory['category'], author, status: 'draft', created_at: today(), updated_at: today() }
+      items.unshift(created)
+      return created
+    },
+    setStatus: (id: string, status: AdminStory['status']) => {
+      const item = items.find((x) => x.id === id)
+      if (item) { item.status = status; item.updated_at = today() }
+    },
+    remove: (id: string) => {
+      const i = items.findIndex((x) => x.id === id)
+      if (i !== -1) items.splice(i, 1)
+    },
+  }
+})()
+
+type AdminTopic = {
+  id: string
+  slug: string
+  name: string
+  description: string
+  product_count: number
+  featured: boolean
+}
+const adminTopicsStore = (() => {
+  const items: AdminTopic[] = [
+    { id: 't1', slug: 'fintech',     name: 'Fintech',     description: 'Payments, wallets, lending and finance.',  product_count: 8, featured: true },
+    { id: 't2', slug: 'agri-tech',   name: 'Agri-Tech',   description: 'Farming, supply chain and rural tools.',   product_count: 5, featured: true },
+    { id: 't3', slug: 'edtech',      name: 'EdTech',      description: 'Schools, learning apps, tutoring.',        product_count: 6, featured: false },
+    { id: 't4', slug: 'healthtech',  name: 'HealthTech',  description: 'Clinics, pharmacies, mobile health.',       product_count: 3, featured: false },
+    { id: 't5', slug: 'logistics',   name: 'Logistics',   description: 'Delivery, transport and routing.',         product_count: 5, featured: true },
+    { id: 't6', slug: 'ecommerce',   name: 'E-commerce',  description: 'Marketplaces and online retail.',          product_count: 6, featured: false },
+    { id: 't7', slug: 'govtech',     name: 'Gov Tech',    description: 'Civic and government-facing tools.',       product_count: 4, featured: false },
+    { id: 't8', slug: 'social',      name: 'Social',      description: 'Community, networking, communication.',     product_count: 7, featured: false },
+  ]
+  let id = items.length + 1
+  return {
+    list: () => items,
+    create: (name: string, description: string) => {
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+      const created: AdminTopic = { id: `t${id++}`, slug, name, description, product_count: 0, featured: false }
+      items.push(created)
+      return created
+    },
+    update: (id: string, patch: Partial<Pick<AdminTopic, 'name' | 'description' | 'featured'>>) => {
+      const item = items.find((x) => x.id === id)
+      if (item) Object.assign(item, patch)
+    },
+    remove: (id: string) => {
+      const i = items.findIndex((x) => x.id === id)
+      if (i !== -1) items.splice(i, 1)
+    },
+  }
+})()
+
+type AdminEvent = {
+  id: string
+  title: string
+  start: string
+  mode: string
+  location: string
+  attendees: number
+  status: 'upcoming' | 'past' | 'draft'
+}
+const adminEventsStore = (() => {
+  const items: AdminEvent[] = [
+    { id: 'ev1', title: 'Banjul Builders Meetup #14',     start: '2026-05-08T18:00', mode: 'In person', location: 'KMC Innovation Hub, Kanifing',          attendees: 42, status: 'upcoming' },
+    { id: 'ev2', title: 'Fintech Founders Roundtable',    start: '2026-05-15T16:00', mode: 'Online',    location: 'Zoom (link sent on RSVP)',              attendees: 18, status: 'upcoming' },
+    { id: 'ev3', title: 'Brikama Demo Day',               start: '2026-06-01T14:00', mode: 'In person', location: 'GTSC Brikama, Brikama',                 attendees: 7,  status: 'upcoming' },
+    { id: 'ev4', title: 'EdTech panel — back-to-school',  start: '2026-04-12T17:30', mode: 'In person', location: 'University of The Gambia, Kanifing',    attendees: 60, status: 'past' },
+    { id: 'ev5', title: 'Hackathon — Health for All',     start: '2026-07-04T09:00', mode: 'In person', location: 'TBC',                                    attendees: 0,  status: 'draft' },
+  ]
+  let id = items.length + 1
+  return {
+    list: () => items,
+    create: (title: string, start: string, mode: string, location: string) => {
+      const created: AdminEvent = { id: `ev${id++}`, title, start, mode, location, attendees: 0, status: 'draft' }
+      items.unshift(created)
+      return created
+    },
+    publish: (id: string) => {
+      const item = items.find((x) => x.id === id)
+      if (item) item.status = 'upcoming'
+    },
+    remove: (id: string) => {
+      const i = items.findIndex((x) => x.id === id)
+      if (i !== -1) items.splice(i, 1)
+    },
+  }
+})()
+
+const adminFeaturedStore = (() => {
+  const set = new Set<string>(['prod-001', 'prod-002', 'prod-004'])
+  return {
+    list: () => Array.from(set),
+    has: (id: string) => set.has(id),
+    add: (id: string) => set.add(id),
+    remove: (id: string) => set.delete(id),
+  }
+})()
+
 type ProductEditExtras = Partial<{
   description: string
   website_url: string
@@ -1064,6 +1189,126 @@ export const handlers = [
   http.post(`${BASE}/admin/users/:id/unsuspend`, ({ params }) => {
     if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
     adminUsersStore.setSuspended(String(params.id), false)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // === Editorial / CMS ====================================================
+
+  // GET /admin/stories
+  http.get(`${BASE}/admin/stories`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const status = new URL(request.url).searchParams.get('status') ?? 'all'
+    const list = adminStoriesStore.list().filter((s) => status === 'all' || s.status === status)
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all: adminStoriesStore.list().length,
+        published: adminStoriesStore.list().filter((s) => s.status === 'published').length,
+        draft: adminStoriesStore.list().filter((s) => s.status === 'draft').length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/stories`, async ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { title?: string; category?: string; author?: string }
+    if (!body.title || !body.category) return new HttpResponse(JSON.stringify({ error: 'Missing fields' }), { status: 400 })
+    const created = adminStoriesStore.create(body.title.trim(), body.category, body.author?.trim() || 'Editorial')
+    return HttpResponse.json(created, { status: 201 })
+  }),
+  http.post(`${BASE}/admin/stories/:id/publish`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminStoriesStore.setStatus(String(params.id), 'published')
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/stories/:id/unpublish`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminStoriesStore.setStatus(String(params.id), 'draft')
+    return HttpResponse.json({ ok: true })
+  }),
+  http.delete(`${BASE}/admin/stories/:id`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminStoriesStore.remove(String(params.id))
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/topics
+  http.get(`${BASE}/admin/topics`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({ items: adminTopicsStore.list() })
+  }),
+  http.post(`${BASE}/admin/topics`, async ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { name?: string; description?: string }
+    if (!body.name) return new HttpResponse(JSON.stringify({ error: 'Name required' }), { status: 400 })
+    const created = adminTopicsStore.create(body.name.trim(), body.description?.trim() ?? '')
+    return HttpResponse.json(created, { status: 201 })
+  }),
+  http.patch(`${BASE}/admin/topics/:id`, async ({ params, request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { name?: string; description?: string; featured?: boolean }
+    adminTopicsStore.update(String(params.id), body)
+    return HttpResponse.json({ ok: true })
+  }),
+  http.delete(`${BASE}/admin/topics/:id`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminTopicsStore.remove(String(params.id))
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/events
+  http.get(`${BASE}/admin/events`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const status = new URL(request.url).searchParams.get('status') ?? 'all'
+    const list = adminEventsStore.list().filter((e) => status === 'all' || e.status === status)
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all: adminEventsStore.list().length,
+        upcoming: adminEventsStore.list().filter((e) => e.status === 'upcoming').length,
+        past: adminEventsStore.list().filter((e) => e.status === 'past').length,
+        draft: adminEventsStore.list().filter((e) => e.status === 'draft').length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/events`, async ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { title?: string; start?: string; mode?: string; location?: string }
+    if (!body.title || !body.start) return new HttpResponse(JSON.stringify({ error: 'Missing fields' }), { status: 400 })
+    const created = adminEventsStore.create(body.title.trim(), body.start, body.mode ?? 'In person', body.location?.trim() ?? '')
+    return HttpResponse.json(created, { status: 201 })
+  }),
+  http.post(`${BASE}/admin/events/:id/publish`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminEventsStore.publish(String(params.id))
+    return HttpResponse.json({ ok: true })
+  }),
+  http.delete(`${BASE}/admin/events/:id`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminEventsStore.remove(String(params.id))
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/featured
+  http.get(`${BASE}/admin/featured`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({
+      featured: adminFeaturedStore.list().map((id) => {
+        const p = products.find((x) => x.id === id)
+        return p ? { id: p.id, slug: p.slug, name: p.name, tagline: p.tagline, vote_count: p.vote_count } : null
+      }).filter(Boolean),
+      candidates: products.slice(0, 12)
+        .filter((p) => !adminFeaturedStore.has(p.id))
+        .map((p) => ({ id: p.id, slug: p.slug, name: p.name, tagline: p.tagline, vote_count: p.vote_count })),
+    })
+  }),
+  http.post(`${BASE}/admin/featured/:id`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminFeaturedStore.add(String(params.id))
+    return HttpResponse.json({ ok: true })
+  }),
+  http.delete(`${BASE}/admin/featured/:id`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminFeaturedStore.remove(String(params.id))
     return HttpResponse.json({ ok: true })
   }),
 

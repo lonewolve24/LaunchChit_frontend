@@ -59,10 +59,10 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   {
     label: 'Editorial',
     items: [
-      { label: 'Stories',   to: '/admin', icon: 'package', upcoming: true },
-      { label: 'Topics',    to: '/admin', icon: 'package', upcoming: true },
-      { label: 'Events',    to: '/admin', icon: 'package', upcoming: true },
-      { label: 'Featured',  to: '/admin', icon: 'package', upcoming: true },
+      { label: 'Stories',   to: '/admin/stories',  icon: 'package' },
+      { label: 'Topics',    to: '/admin/topics',   icon: 'package' },
+      { label: 'Events',    to: '/admin/events',   icon: 'package' },
+      { label: 'Featured',  to: '/admin/featured', icon: 'package' },
     ],
   },
   {
