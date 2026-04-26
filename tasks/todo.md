@@ -1,8 +1,8 @@
 # TODO
 
-## F11 — Toast component
+## F12 — Skeleton component
 
 Steps:
-1. Write failing tests: renders message, success/error/info variants, auto-dismiss after 4s, manual dismiss
-2. Create `src/components/Toast.tsx`
+1. Write failing tests: renders correct number of skeleton rows, applies pulse animation class
+2. Create `src/components/Skeleton.tsx`
 3. Pass all tests (green)

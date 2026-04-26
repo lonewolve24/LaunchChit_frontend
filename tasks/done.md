@@ -4,6 +4,15 @@ _Completed features will be logged here._
 
 ---
 
+## F11 — Toast component
+- Props: `message`, `variant: success | error | info`, `onDismiss`
+- Auto-dismisses after 4s via `useEffect` + `setTimeout`
+- Dismiss button clears timer and calls `onDismiss`
+- Fake timers scoped per-test (not globally) to avoid `userEvent` timeout conflict
+- Tests: 6/6 ✓
+
+---
+
 ## F10 — EmptyState component
 - Props: `heading`, `body?`, `cta?: { label, onClick }`
 - CTA button only rendered when `cta` is provided
