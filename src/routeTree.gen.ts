@@ -31,6 +31,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as TopicsSlugRouteImport } from './routes/topics_.$slug'
 import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as DashboardProductsRouteImport } from './routes/dashboard/products'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
 import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
@@ -145,6 +146,11 @@ const PSlugRoute = PSlugRouteImport.update({
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardProductsRoute = DashboardProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/products': typeof DashboardProductsRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/products': typeof DashboardProductsRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/products': typeof DashboardProductsRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics_/$slug': typeof TopicsSlugRoute
@@ -264,6 +273,7 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/products'
     | '/p/$slug'
     | '/profile/$username'
     | '/topics/$slug'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/products'
     | '/p/$slug'
     | '/profile/$username'
     | '/topics/$slug'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/products'
     | '/p/$slug'
     | '/profile/$username'
     | '/topics_/$slug'
@@ -508,6 +520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/products': {
+      id: '/dashboard/products'
+      path: '/products'
+      fullPath: '/dashboard/products'
+      preLoaderRoute: typeof DashboardProductsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -533,10 +552,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteRouteChildren {
+  DashboardProductsRoute: typeof DashboardProductsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardProductsRoute: DashboardProductsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
