@@ -564,7 +564,7 @@ export const handlers = [
       website: `https://${handle}.gm`,
       github: `https://github.com/${handle}`,
       twitter: `https://twitter.com/${handle}`,
-      linkedin: null,
+      linkedin: `https://linkedin.com/in/${handle}`,
       email: null,
       followers: Math.round(totalUpvotes * 1.3),
       following: 24,
