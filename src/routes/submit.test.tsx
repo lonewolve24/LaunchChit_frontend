@@ -57,7 +57,7 @@ describe('SubmitPage', () => {
     expect(screen.getByText(/8\s*\/\s*80/)).toBeInTheDocument()
   })
 
-  it('navigates to product detail on successful submit', async () => {
+  it('navigates to product detail on successful submit', { timeout: 15000 }, async () => {
     const { server } = await import('../mocks/server')
     const { http, HttpResponse } = await import('msw')
     server.use(

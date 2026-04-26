@@ -5,6 +5,10 @@ import { ProductCard } from '../components/ProductCard'
 import { PageError } from '../components/PageError'
 import { Skeleton } from '../components/Skeleton'
 import { Toast } from '../components/Toast'
+import { Sparkline } from '../components/Sparkline'
+import { KpiTile } from '../components/KpiTile'
+import { EditProfileModal, type EditableProfile } from '../components/EditProfileModal'
+import { getMe } from '../lib/auth'
 
 export const Route = createFileRoute('/profile/$username')({ component: ProfilePage })
 
@@ -16,9 +20,9 @@ type Profile = {
   id: string
   username: string
   name: string
-  tagline?: string
+  tagline?: string | null
   bio: string
-  location?: string
+  location?: string | null
   joined_at?: string
   avatar_url: string | null
   cover_color?: string
@@ -27,6 +31,7 @@ type Profile = {
   twitter?: string | null
   linkedin?: string | null
   email?: string | null
+  phone?: string | null
   followers?: number
   following?: number
   total_upvotes?: number
@@ -47,7 +52,23 @@ type Profile = {
   }>
 }
 
-type Tab = 'launches' | 'upvoted' | 'about'
+type Tab = 'launches' | 'upvoted' | 'about' | 'analytics'
+
+type AnalyticsResponse = {
+  period: '30d' | '90d' | '1y'
+  totals: { upvotes: number; waitlist: number }
+  aggregate_upvotes: Array<{ date: string; value: number }>
+  aggregate_waitlist: Array<{ date: string; value: number }>
+  products: Array<{
+    product_id: string
+    product_slug: string
+    product_name: string
+    total_upvotes: number
+    total_waitlist: number
+    upvotes_trend: Array<{ date: string; value: number }>
+    waitlist_trend: Array<{ date: string; value: number }>
+  }>
+}
 
 function formatJoined(iso?: string) {
   if (!iso) return ''
@@ -63,6 +84,11 @@ export function ProfilePage() {
   const [tab, setTab] = useState<Tab>('launches')
   const [following, setFollowing] = useState(false)
   const [toast, setToast] = useState<{ message: string; variant: 'success' | 'error' } | null>(null)
+  const [isOwn, setIsOwn] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null)
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [analyticsPeriod, setAnalyticsPeriod] = useState<'30d' | '90d' | '1y'>('30d')
 
   useEffect(() => {
     fetch(`${API}/profile/${username}`)
@@ -70,6 +96,29 @@ export function ProfilePage() {
       .then((data) => { if (data) { setProfile(data); setLoading(false) } })
       .catch(() => setLoading(false))
   }, [username])
+
+  // Detect own-profile by comparing the URL slug against the signed-in user.
+  useEffect(() => {
+    let cancelled = false
+    getMe().then((me) => {
+      if (cancelled || !me?.name) return
+      const meSlug = me.name.toLowerCase().replace(/\s+/g, '-')
+      setIsOwn(meSlug === username.toLowerCase())
+    })
+    return () => { cancelled = true }
+  }, [username])
+
+  // Load analytics on demand when the tab is opened or period changes.
+  useEffect(() => {
+    if (!isOwn || tab !== 'analytics') return
+    let cancelled = false
+    setAnalyticsLoading(true)
+    fetch(`${API}/profile/${username}/analytics?period=${analyticsPeriod}`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: AnalyticsResponse | null) => { if (!cancelled) { setAnalytics(data); setAnalyticsLoading(false) } })
+      .catch(() => { if (!cancelled) setAnalyticsLoading(false) })
+    return () => { cancelled = true }
+  }, [isOwn, tab, analyticsPeriod, username])
 
   async function handleVote(id: string) {
     if (!profile) return
@@ -134,15 +183,27 @@ export function ProfilePage() {
                 {profile.tagline && <p className="text-sm text-foreground-muted mt-1">{profile.tagline}</p>}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <button
-                  onClick={() => { setFollowing((f) => !f); setToast({ message: following ? 'Unfollowed.' : 'Following — you\'ll see their new launches.', variant: 'success' }) }}
-                  className={`text-sm font-semibold px-5 py-2 rounded-button transition-colors border ${
-                    following ? 'bg-primary text-white border-primary' : 'bg-surface text-foreground border-border hover:border-border-strong'
-                  }`}
-                >
-                  {following ? '✓ Following' : '+ Follow'}
-                </button>
-                {profile.email && (
+                {isOwn ? (
+                  <button
+                    onClick={() => setEditOpen(true)}
+                    className="text-sm font-semibold px-5 py-2 rounded-button transition-colors border border-border bg-surface text-foreground hover:border-border-strong inline-flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                    </svg>
+                    Edit profile
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setFollowing((f) => !f); setToast({ message: following ? 'Unfollowed.' : 'Following — you\'ll see their new launches.', variant: 'success' }) }}
+                    className={`text-sm font-semibold px-5 py-2 rounded-button transition-colors border ${
+                      following ? 'bg-primary text-white border-primary' : 'bg-surface text-foreground border-border hover:border-border-strong'
+                    }`}
+                  >
+                    {following ? '✓ Following' : '+ Follow'}
+                  </button>
+                )}
+                {!isOwn && profile.email && (
                   <a
                     href={`mailto:${profile.email}`}
                     className="text-sm font-semibold px-4 py-2 rounded-button transition-colors border border-border bg-surface text-foreground hover:border-border-strong"
@@ -178,12 +239,12 @@ export function ProfilePage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-1 mt-6 border-b border-border -mx-6 md:-mx-8 px-6 md:px-8">
-              {(['launches', 'upvoted', 'about'] as Tab[]).map((t) => (
+            <div className="flex items-center gap-1 mt-6 border-b border-border -mx-6 md:-mx-8 px-6 md:px-8 overflow-x-auto">
+              {((isOwn ? ['launches', 'upvoted', 'about', 'analytics'] : ['launches', 'upvoted', 'about']) as Tab[]).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`px-4 py-2.5 text-sm font-semibold capitalize border-b-2 -mb-[1px] transition-colors ${
+                  className={`px-4 py-2.5 text-sm font-semibold capitalize border-b-2 -mb-[1px] transition-colors whitespace-nowrap cursor-pointer ${
                     tab === t ? 'border-primary text-primary' : 'border-transparent text-foreground-muted hover:text-foreground'
                   }`}
                 >
@@ -219,6 +280,88 @@ export function ProfilePage() {
               <div className="bg-surface rounded-card p-6 md:p-8" style={{ boxShadow: cardShadow }}>
                 <h2 className="text-base font-bold text-foreground mb-4">About</h2>
                 <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{profile.bio}</p>
+              </div>
+            )}
+
+            {tab === 'analytics' && isOwn && (
+              <div className="space-y-4">
+                {/* Period toggle */}
+                <div className="flex items-center justify-between">
+                  <h2 className="text-base font-bold text-foreground">Your performance</h2>
+                  <div className="inline-flex bg-surface rounded-button p-0.5 border border-border" style={{ boxShadow: cardShadow }}>
+                    {(['30d', '90d', '1y'] as const).map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setAnalyticsPeriod(p)}
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-button transition-colors cursor-pointer ${
+                          analyticsPeriod === p ? 'bg-surface-subtle text-primary' : 'text-foreground-muted hover:text-foreground'
+                        }`}
+                      >
+                        {p === '1y' ? '1 year' : p}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {analyticsLoading || !analytics ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Skeleton className="h-24 rounded-card" />
+                      <Skeleton className="h-24 rounded-card" />
+                    </div>
+                    <Skeleton className="h-44 rounded-card" />
+                    <Skeleton className="h-44 rounded-card" />
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <KpiTile label="Total upvotes"  value={analytics.totals.upvotes.toLocaleString()}  hint={`across ${analytics.products.length} ${analytics.products.length === 1 ? 'product' : 'products'}`} />
+                      <KpiTile label="Total waitlist" value={analytics.totals.waitlist.toLocaleString()} hint={`across ${analytics.products.length} ${analytics.products.length === 1 ? 'product' : 'products'}`} />
+                    </div>
+
+                    <div className="bg-surface rounded-card p-5" style={{ boxShadow: cardShadow }}>
+                      <p className="text-sm font-bold text-foreground">Upvotes — all products</p>
+                      <p className="text-xs text-foreground-faint mt-0.5">Daily totals over the last {analyticsPeriod === '1y' ? 'year' : analyticsPeriod}.</p>
+                      <div className="mt-3"><Sparkline data={analytics.aggregate_upvotes} ariaLabel="Aggregate upvotes trend" /></div>
+                    </div>
+
+                    <div className="bg-surface rounded-card p-5" style={{ boxShadow: cardShadow }}>
+                      <p className="text-sm font-bold text-foreground">Waitlist signups — all products</p>
+                      <p className="text-xs text-foreground-faint mt-0.5">Daily totals over the last {analyticsPeriod === '1y' ? 'year' : analyticsPeriod}.</p>
+                      <div className="mt-3"><Sparkline data={analytics.aggregate_waitlist} ariaLabel="Aggregate waitlist trend" /></div>
+                    </div>
+
+                    {/* Per-product breakdown */}
+                    <div className="bg-surface rounded-card p-5" style={{ boxShadow: cardShadow }}>
+                      <p className="text-sm font-bold text-foreground mb-4">Per-product</p>
+                      <ul className="space-y-5">
+                        {analytics.products.map((p) => (
+                          <li key={p.product_id} className="border-b border-border last:border-0 pb-5 last:pb-0">
+                            <div className="flex items-baseline justify-between gap-3 mb-2">
+                              <a href={`/p/${p.product_slug}`} className="text-sm font-bold text-foreground hover:text-primary truncate">
+                                {p.product_name}
+                              </a>
+                              <span className="text-xs text-foreground-faint flex-shrink-0">
+                                {p.total_upvotes.toLocaleString()} upvotes · {p.total_waitlist.toLocaleString()} waitlist
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <p className="text-[11px] font-bold text-foreground-faint uppercase tracking-wider mb-1">Upvotes</p>
+                                <Sparkline data={p.upvotes_trend} ariaLabel={`${p.product_name} upvotes`} />
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-bold text-foreground-faint uppercase tracking-wider mb-1">Waitlist</p>
+                                <Sparkline data={p.waitlist_trend} ariaLabel={`${p.product_name} waitlist`} />
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -321,6 +464,41 @@ export function ProfilePage() {
           </aside>
         </div>
       </main>
+
+      {isOwn && profile && (
+        <EditProfileModal
+          open={editOpen}
+          initial={{
+            name: profile.name,
+            tagline: profile.tagline ?? '',
+            bio: profile.bio,
+            location: profile.location ?? '',
+            website: profile.website ?? '',
+            github: profile.github ?? '',
+            twitter: profile.twitter ?? '',
+            linkedin: profile.linkedin ?? '',
+            email: profile.email ?? '',
+            phone: profile.phone ?? '',
+          }}
+          onClose={() => setEditOpen(false)}
+          onSaved={(next: EditableProfile) => {
+            setProfile((prev) => prev ? {
+              ...prev,
+              name: next.name,
+              tagline: next.tagline ?? null,
+              bio: next.bio,
+              location: next.location ?? null,
+              website: next.website ?? null,
+              github: next.github ?? null,
+              twitter: next.twitter ?? null,
+              linkedin: next.linkedin ?? null,
+              email: next.email ?? null,
+              phone: next.phone ?? null,
+            } : prev)
+            setToast({ message: 'Profile updated.', variant: 'success' })
+          }}
+        />
+      )}
 
       {toast && (
         <div className="fixed bottom-4 right-4 w-80">

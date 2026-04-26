@@ -181,7 +181,7 @@ export function SubmitPage() {
     <div className="min-h-screen bg-surface-subtle">
       <Header />
       <main className="max-w-3xl mx-auto px-6 lg:px-10 py-10">
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Ship something</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Share something</h1>
         <p className="text-foreground-muted mt-1">The more detail you provide, the richer your product page will look.</p>
 
         <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-10">

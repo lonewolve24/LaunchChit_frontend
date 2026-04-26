@@ -232,7 +232,8 @@ const mockProfile = {
   github: 'https://github.com/musajallow',
   twitter: 'https://twitter.com/musajallow',
   linkedin: 'https://linkedin.com/in/musajallow',
-  email: 'musa@example.com',
+  email: 'musa@example.com' as string | null,
+  phone: null as string | null,
   followers: 412,
   following: 67,
   total_upvotes: 318,
@@ -699,6 +700,80 @@ export const handlers = [
       following: 24,
       total_upvotes: totalUpvotes,
       products: productsByMaker.map(withLicense),
+    })
+  }),
+
+  // PATCH /profile/me — update the signed-in user's profile.
+  http.patch(`${BASE}/profile/me`, async ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json()) as Partial<typeof mockProfile>
+    if (typeof body.name === 'string' && body.name.trim()) mockProfile.name = body.name.trim()
+    if (typeof body.tagline !== 'undefined') mockProfile.tagline = (body.tagline ?? '') as string
+    if (typeof body.bio === 'string') mockProfile.bio = body.bio
+    if (typeof body.location !== 'undefined') mockProfile.location = (body.location ?? '') as string
+    if (typeof body.website !== 'undefined') mockProfile.website = body.website ?? null
+    if (typeof body.github !== 'undefined') mockProfile.github = body.github ?? null
+    if (typeof body.twitter !== 'undefined') mockProfile.twitter = body.twitter ?? null
+    if (typeof body.linkedin !== 'undefined') mockProfile.linkedin = body.linkedin ?? null
+    if (typeof body.email !== 'undefined') mockProfile.email = body.email ?? null
+    if (typeof (body as { phone?: string | null }).phone !== 'undefined') {
+      mockProfile.phone = (body as { phone?: string | null }).phone ?? null
+    }
+    return HttpResponse.json(mockProfile)
+  }),
+
+  // GET /profile/:username/analytics?period=30d|90d|1y
+  http.get(`${BASE}/profile/:username/analytics`, ({ params, request }) => {
+    const username = String(params.username).toLowerCase()
+    const period = new URL(request.url).searchParams.get('period') ?? '30d'
+    const days = period === '1y' ? 365 : period === '90d' ? 90 : 30
+
+    let userProducts = mockProducts.filter((p) => p.maker.name.toLowerCase().replace(/\s+/g, '-') === username)
+    if (username === mockProfile.username) userProducts = mockProducts.slice(0, 4)
+    if (userProducts.length === 0) return new HttpResponse(null, { status: 404 })
+
+    // Deterministic per-product time series: use product index in the seed.
+    const series = userProducts.map((p, idx) => ({
+      product_id: p.id,
+      product_slug: p.slug,
+      product_name: p.name,
+      total_upvotes: p.vote_count,
+      total_waitlist: p.waitlist_count ?? 0,
+      upvotes_trend: Array.from({ length: days }, (_, i) => ({
+        date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+        value: Math.max(0, Math.round(2 + Math.sin((i + idx * 5) / 4) * 3 + (i % 7))),
+      })),
+      waitlist_trend: Array.from({ length: days }, (_, i) => ({
+        date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+        value: Math.max(0, Math.round(1 + Math.cos((i + idx * 3) / 5) * 2 + (i % 4))),
+      })),
+    }))
+
+    const totals = series.reduce(
+      (acc, s) => {
+        acc.upvotes += s.total_upvotes
+        acc.waitlist += s.total_waitlist
+        return acc
+      },
+      { upvotes: 0, waitlist: 0 },
+    )
+
+    // Aggregate trend across all products for the headline charts.
+    const aggregateUpvotes = Array.from({ length: days }, (_, i) => ({
+      date: series[0].upvotes_trend[i].date,
+      value: series.reduce((s, p) => s + p.upvotes_trend[i].value, 0),
+    }))
+    const aggregateWaitlist = Array.from({ length: days }, (_, i) => ({
+      date: series[0].waitlist_trend[i].date,
+      value: series.reduce((s, p) => s + p.waitlist_trend[i].value, 0),
+    }))
+
+    return HttpResponse.json({
+      period,
+      totals,
+      aggregate_upvotes: aggregateUpvotes,
+      aggregate_waitlist: aggregateWaitlist,
+      products: series,
     })
   }),
 
