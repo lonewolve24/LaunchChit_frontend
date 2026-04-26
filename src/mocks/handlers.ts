@@ -241,7 +241,26 @@ const mockProfile = {
 
 let products = [...mockProducts]
 let votes = new Set<string>()
-let sessionActive = false
+
+/*
+  Persist session across page reloads via localStorage so the MSW
+  module-level state isn't reset every time window.location.href changes.
+  Without this, login -> reload to /submit -> MSW reinit -> sessionActive=false
+  bounces the user right back to /login. SSR-safe via the typeof check.
+*/
+const SESSION_KEY = 'launchedchit:mock-session'
+const STORAGE_AVAILABLE = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+
+let sessionActive: boolean = STORAGE_AVAILABLE
+  ? window.localStorage.getItem(SESSION_KEY) === 'active'
+  : false
+
+function setSessionActive(active: boolean): void {
+  sessionActive = active
+  if (!STORAGE_AVAILABLE) return
+  if (active) window.localStorage.setItem(SESSION_KEY, 'active')
+  else window.localStorage.removeItem(SESSION_KEY)
+}
 
 export const handlers = [
   // POST /auth/magic-link
@@ -258,7 +277,7 @@ export const handlers = [
       return new HttpResponse(null, { status: 401 })
     }
     if (!body.email && !body.phone) return new HttpResponse(null, { status: 400 })
-    sessionActive = true
+    setSessionActive(true)
     return HttpResponse.json(mockUser)
   }),
 
@@ -268,7 +287,7 @@ export const handlers = [
     if (!body.name || (!body.email && !body.phone)) return new HttpResponse(null, { status: 400 })
     if (body.name) mockUser.name = body.name
     if (body.email) mockUser.email = body.email
-    sessionActive = true
+    setSessionActive(true)
     return HttpResponse.json(mockUser)
   }),
 
@@ -291,7 +310,7 @@ export const handlers = [
     if (body.purpose === 'reset') {
       return HttpResponse.json({ token: 'demo-reset-token' })
     }
-    sessionActive = true
+    setSessionActive(true)
     return new HttpResponse(null, { status: 204 })
   }),
 
@@ -300,13 +319,13 @@ export const handlers = [
 
   // GET /auth/callback
   http.get(`${BASE}/auth/callback`, () => {
-    sessionActive = true
+    setSessionActive(true)
     return HttpResponse.redirect('http://localhost:3000/', 302)
   }),
 
   // POST /auth/logout
   http.post(`${BASE}/auth/logout`, () => {
-    sessionActive = false
+    setSessionActive(false)
     return new HttpResponse(null, { status: 204 })
   }),
 
