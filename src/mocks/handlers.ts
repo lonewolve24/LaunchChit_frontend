@@ -233,6 +233,17 @@ type CommentInboxItem = {
   created_at: string
   status: 'unread' | 'replied' | 'archived'
 }
+type ProductEditExtras = Partial<{
+  description: string
+  website_url: string
+  pricing: string
+  license: 'open-source' | 'commercial' | 'free'
+  ios_url: string | null
+  android_url: string | null
+  source_url: string | null
+}>
+const productEditExtras = new Map<string, ProductEditExtras>()
+
 const commentInboxStore = (() => {
   const map = new Map<string, CommentInboxItem>()
   return {
@@ -447,6 +458,127 @@ export const handlers = [
     return HttpResponse.json({ items, total, page, page_size: pageSize })
   }),
 
+  // PATCH /me/products/:slug — edit own product (name/tagline/description/etc.)
+  http.patch(`${BASE}/me/products/:slug`, async ({ params, request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const slug = String(params.slug)
+    const product = products.find((p) => p.slug === slug)
+    if (!product) return new HttpResponse(null, { status: 404 })
+
+    const body = (await request.json().catch(() => ({}))) as Partial<{
+      name: string
+      tagline: string
+      description: string
+      website_url: string
+      logo_url: string | null
+      pricing: string
+      license: 'open-source' | 'commercial' | 'free'
+      platforms: string[]
+      ios_url: string | null
+      android_url: string | null
+      source_url: string | null
+    }>
+
+    if (typeof body.name === 'string' && body.name.trim()) product.name = body.name.trim()
+    if (typeof body.tagline === 'string') product.tagline = body.tagline.trim()
+    if (typeof body.logo_url !== 'undefined') (product as { logo_url: string | null }).logo_url = body.logo_url
+    if (Array.isArray(body.platforms)) {
+      (product as { platforms: string[] }).platforms = body.platforms.filter((p) => ['web', 'mobile', 'desktop'].includes(p))
+    }
+    // Persist editable extras on a per-product side store so the GET handler
+    // can pick them up next time the public detail is fetched.
+    productEditExtras.set(slug, {
+      ...(productEditExtras.get(slug) ?? {}),
+      ...(body.description !== undefined ? { description: body.description } : {}),
+      ...(body.website_url !== undefined ? { website_url: body.website_url } : {}),
+      ...(body.pricing !== undefined ? { pricing: body.pricing } : {}),
+      ...(body.license !== undefined ? { license: body.license } : {}),
+      ...(body.ios_url !== undefined ? { ios_url: body.ios_url } : {}),
+      ...(body.android_url !== undefined ? { android_url: body.android_url } : {}),
+      ...(body.source_url !== undefined ? { source_url: body.source_url } : {}),
+    })
+    return HttpResponse.json({ slug, ok: true })
+  }),
+
+  // GET /me/products/:slug/analytics?period=7d|30d|90d|1y — per-product drilldown
+  http.get(`${BASE}/me/products/:slug/analytics`, ({ params, request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const period = new URL(request.url).searchParams.get('period') ?? '30d'
+    const days = period === '1y' ? 365 : period === '90d' ? 90 : period === '7d' ? 7 : 30
+
+    const myProducts = products.slice(0, 4)
+    const product = myProducts.find((p) => p.slug === String(params.slug))
+    if (!product) return new HttpResponse(null, { status: 404 })
+
+    const idx = myProducts.indexOf(product)
+    const seed = product.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+
+    const upvotes_trend = Array.from({ length: days }, (_, i) => ({
+      date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+      value: Math.max(0, Math.round(2 + Math.sin((i + idx * 5) / 4) * 3 + (i % 7))),
+    }))
+    const waitlist_trend = Array.from({ length: days }, (_, i) => ({
+      date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+      value: Math.max(0, Math.round(1 + Math.cos((i + idx * 3) / 5) * 2 + (i % 4))),
+    }))
+    const views_trend = Array.from({ length: days }, (_, i) => ({
+      date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+      value: Math.max(0, Math.round(40 + Math.sin((i + idx * 2) / 3) * 25 + (i % 11) * 4)),
+    }))
+    const comments_trend = Array.from({ length: days }, (_, i) => ({
+      date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+      value: Math.max(0, Math.round(Math.cos((i + idx) / 6) * 1.5 + (i % 5))),
+    }))
+
+    const totals = {
+      upvotes: upvotes_trend.reduce((s, d) => s + d.value, 0),
+      waitlist: waitlist_trend.reduce((s, d) => s + d.value, 0),
+      views: views_trend.reduce((s, d) => s + d.value, 0),
+      comments: comments_trend.reduce((s, d) => s + d.value, 0),
+    }
+
+    // Compare against the previous period of the same length.
+    const prevTotals = {
+      upvotes: Math.round(totals.upvotes * (0.7 + ((seed % 5) / 10))),
+      waitlist: Math.round(totals.waitlist * (0.6 + ((seed % 7) / 10))),
+      views: Math.round(totals.views * (0.85 + ((seed % 4) / 10))),
+      comments: Math.round(totals.comments * (0.55 + ((seed % 9) / 10))),
+    }
+
+    // Rough acquisition mix
+    const sources = [
+      { source: 'Direct',      pct: 38 + (seed % 7) },
+      { source: 'Search',      pct: 22 + (seed % 5) },
+      { source: 'Social',      pct: 14 + (seed % 6) },
+      { source: 'Referral',    pct: 12 + (seed % 4) },
+      { source: 'Newsletter',  pct: 8  + (seed % 3) },
+      { source: 'Other',       pct: 6 },
+    ]
+
+    // Top 5 referrers (deterministic)
+    const referrers = [
+      { host: 'twitter.com',           visits: 220 + ((seed * 11) % 200) },
+      { host: 't.me',                  visits: 140 + ((seed * 7) % 160) },
+      { host: 'launchedchit.gm',       visits: 95  + ((seed * 5) % 120) },
+      { host: 'github.com',            visits: 60  + ((seed * 13) % 80) },
+      { host: 'dev.to',                visits: 28  + ((seed * 17) % 50) },
+    ]
+
+    return HttpResponse.json({
+      product: { id: product.id, slug: product.slug, name: product.name, tagline: product.tagline, status: 'live' },
+      period,
+      days,
+      totals,
+      previous_totals: prevTotals,
+      upvotes_trend,
+      waitlist_trend,
+      views_trend,
+      comments_trend,
+      sources,
+      referrers,
+    })
+  }),
+
   // GET /me/comments/inbox — comments left on the signed-in maker's products
   http.get(`${BASE}/me/comments/inbox`, ({ request }) => {
     if (!sessionActive) return new HttpResponse(null, { status: 401 })
@@ -604,13 +736,16 @@ export const handlers = [
       .slice(0, 4)
 
     const license = (product as { license?: string }).license ?? productLicense(product.slug)
+    const extras = productEditExtras.get(product.slug) ?? {}
     return HttpResponse.json({
       ...product,
-      license,
-      source_url: license === 'open-source' ? `https://github.com/launchedchit/${product.slug}` : null,
-      description: `${product.tagline}.\n\n${product.name} was built to solve a specific problem for the Gambian market. After months of working with users in Banjul, Brikama, and the rural Kombo areas, the team shipped a first version that focuses on three things: simplicity, offline reliability, and a price point that works for the market.\n\nThe team is small but committed — every feature you see has been requested by at least three real users. There's no growth-hacking, no fake testimonials, no "AI-powered" buzzwords thrown in for fundraising. Just a tool that works.\n\nWhat's next: we're rolling out support for additional regions, integrating with local payment providers, and (in beta) a partnership with two ministries to scale distribution.`,
-      website_url: `https://${product.slug.replace(/-/g, '')}.gm`,
-      pricing: 'Free during beta · Paid plans from D200/month',
+      license: extras.license ?? license,
+      source_url: 'source_url' in extras
+        ? extras.source_url
+        : (license === 'open-source' ? `https://github.com/launchedchit/${product.slug}` : null),
+      description: extras.description ?? `${product.tagline}.\n\n${product.name} was built to solve a specific problem for the Gambian market. After months of working with users in Banjul, Brikama, and the rural Kombo areas, the team shipped a first version that focuses on three things: simplicity, offline reliability, and a price point that works for the market.\n\nThe team is small but committed — every feature you see has been requested by at least three real users. There's no growth-hacking, no fake testimonials, no "AI-powered" buzzwords thrown in for fundraising. Just a tool that works.\n\nWhat's next: we're rolling out support for additional regions, integrating with local payment providers, and (in beta) a partnership with two ministries to scale distribution.`,
+      website_url: extras.website_url ?? `https://${product.slug.replace(/-/g, '')}.gm`,
+      pricing: extras.pricing ?? 'Free during beta · Paid plans from D200/month',
       platforms: (product.platforms ?? ['web']).map((p) =>
         p === 'web' ? 'Web' : p === 'mobile' ? 'Mobile (iOS + Android)' : p === 'desktop' ? 'Desktop' : p
       ),
@@ -618,8 +753,8 @@ export const handlers = [
       launch_date: '2026-04-26',
       day_rank: dayRank,
       maker: { id: 'user-001', name: product.maker.name, avatar_url: null, bio: `Building ${product.name} and other tools for The Gambia.`, username: product.maker.name.toLowerCase().replace(/\s+/g, '-') },
-      ios_url: (product.platforms ?? []).includes('mobile') ? 'https://apps.apple.com/gm/app/' + product.slug : null,
-      android_url: (product.platforms ?? []).includes('mobile') ? 'https://play.google.com/store/apps/details?id=gm.launchedchit.' + product.slug.replace(/-/g, '') : null,
+      ios_url: 'ios_url' in extras ? extras.ios_url : ((product.platforms ?? []).includes('mobile') ? 'https://apps.apple.com/gm/app/' + product.slug : null),
+      android_url: 'android_url' in extras ? extras.android_url : ((product.platforms ?? []).includes('mobile') ? 'https://play.google.com/store/apps/details?id=gm.launchedchit.' + product.slug.replace(/-/g, '') : null),
       topics: product.topics ?? [],
       gallery: [
         { color: '#1E40AF', label: 'Dashboard' },

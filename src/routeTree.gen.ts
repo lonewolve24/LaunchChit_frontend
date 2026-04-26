@@ -38,6 +38,8 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
 import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
 import { Route as CommunityRequestsIdRouteImport } from './routes/community.requests.$id'
+import { Route as DashboardProductsSlugEditRouteImport } from './routes/dashboard/products.$slug.edit'
+import { Route as DashboardProductsSlugAnalyticsRouteImport } from './routes/dashboard/products.$slug.analytics'
 
 const VerifyOtpRoute = VerifyOtpRouteImport.update({
   id: '/verify-otp',
@@ -184,6 +186,18 @@ const CommunityRequestsIdRoute = CommunityRequestsIdRouteImport.update({
   path: '/requests/$id',
   getParentRoute: () => CommunityRoute,
 } as any)
+const DashboardProductsSlugEditRoute =
+  DashboardProductsSlugEditRouteImport.update({
+    id: '/$slug/edit',
+    path: '/$slug/edit',
+    getParentRoute: () => DashboardProductsRoute,
+  } as any)
+const DashboardProductsSlugAnalyticsRoute =
+  DashboardProductsSlugAnalyticsRouteImport.update({
+    id: '/$slug/analytics',
+    path: '/$slug/analytics',
+    getParentRoute: () => DashboardProductsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -206,7 +220,7 @@ export interface FileRoutesByFullPath {
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
-  '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/products': typeof DashboardProductsRouteWithChildren
   '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
@@ -215,6 +229,8 @@ export interface FileRoutesByFullPath {
   '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community/events/$id': typeof CommunityEventsIdRoute
   '/community/threads/$id': typeof CommunityThreadsIdRoute
+  '/dashboard/products/$slug/analytics': typeof DashboardProductsSlugAnalyticsRoute
+  '/dashboard/products/$slug/edit': typeof DashboardProductsSlugEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,7 +252,7 @@ export interface FileRoutesByTo {
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
-  '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/products': typeof DashboardProductsRouteWithChildren
   '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
@@ -245,6 +261,8 @@ export interface FileRoutesByTo {
   '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community/events/$id': typeof CommunityEventsIdRoute
   '/community/threads/$id': typeof CommunityThreadsIdRoute
+  '/dashboard/products/$slug/analytics': typeof DashboardProductsSlugAnalyticsRoute
+  '/dashboard/products/$slug/edit': typeof DashboardProductsSlugEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -268,7 +286,7 @@ export interface FileRoutesById {
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
-  '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/products': typeof DashboardProductsRouteWithChildren
   '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
@@ -277,6 +295,8 @@ export interface FileRoutesById {
   '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community_/events/$id': typeof CommunityEventsIdRoute
   '/community_/threads/$id': typeof CommunityThreadsIdRoute
+  '/dashboard/products/$slug/analytics': typeof DashboardProductsSlugAnalyticsRoute
+  '/dashboard/products/$slug/edit': typeof DashboardProductsSlugEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -310,6 +330,8 @@ export interface FileRouteTypes {
     | '/community/requests/$id'
     | '/community/events/$id'
     | '/community/threads/$id'
+    | '/dashboard/products/$slug/analytics'
+    | '/dashboard/products/$slug/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -340,6 +362,8 @@ export interface FileRouteTypes {
     | '/community/requests/$id'
     | '/community/events/$id'
     | '/community/threads/$id'
+    | '/dashboard/products/$slug/analytics'
+    | '/dashboard/products/$slug/edit'
   id:
     | '__root__'
     | '/'
@@ -371,6 +395,8 @@ export interface FileRouteTypes {
     | '/community/requests/$id'
     | '/community_/events/$id'
     | '/community_/threads/$id'
+    | '/dashboard/products/$slug/analytics'
+    | '/dashboard/products/$slug/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -605,19 +631,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityRequestsIdRouteImport
       parentRoute: typeof CommunityRoute
     }
+    '/dashboard/products/$slug/edit': {
+      id: '/dashboard/products/$slug/edit'
+      path: '/$slug/edit'
+      fullPath: '/dashboard/products/$slug/edit'
+      preLoaderRoute: typeof DashboardProductsSlugEditRouteImport
+      parentRoute: typeof DashboardProductsRoute
+    }
+    '/dashboard/products/$slug/analytics': {
+      id: '/dashboard/products/$slug/analytics'
+      path: '/$slug/analytics'
+      fullPath: '/dashboard/products/$slug/analytics'
+      preLoaderRoute: typeof DashboardProductsSlugAnalyticsRouteImport
+      parentRoute: typeof DashboardProductsRoute
+    }
   }
 }
 
+interface DashboardProductsRouteChildren {
+  DashboardProductsSlugAnalyticsRoute: typeof DashboardProductsSlugAnalyticsRoute
+  DashboardProductsSlugEditRoute: typeof DashboardProductsSlugEditRoute
+}
+
+const DashboardProductsRouteChildren: DashboardProductsRouteChildren = {
+  DashboardProductsSlugAnalyticsRoute: DashboardProductsSlugAnalyticsRoute,
+  DashboardProductsSlugEditRoute: DashboardProductsSlugEditRoute,
+}
+
+const DashboardProductsRouteWithChildren =
+  DashboardProductsRoute._addFileChildren(DashboardProductsRouteChildren)
+
 interface DashboardRouteRouteChildren {
   DashboardInboxRoute: typeof DashboardInboxRoute
-  DashboardProductsRoute: typeof DashboardProductsRoute
+  DashboardProductsRoute: typeof DashboardProductsRouteWithChildren
   DashboardWaitlistRoute: typeof DashboardWaitlistRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardInboxRoute: DashboardInboxRoute,
-  DashboardProductsRoute: DashboardProductsRoute,
+  DashboardProductsRoute: DashboardProductsRouteWithChildren,
   DashboardWaitlistRoute: DashboardWaitlistRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

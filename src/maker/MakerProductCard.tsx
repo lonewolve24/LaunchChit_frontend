@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { StatusChip, type ProductStatus } from '../components/StatusChip'
 
 const PLACEHOLDER_COLOR = '#1E293B'
@@ -72,12 +71,12 @@ export function MakerProductCard({ product }: { product: MakerProduct }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Link
-          to="/submit"
+        <a
+          href={`/dashboard/products/${product.slug}/edit`}
           className="flex-1 text-center text-sm font-semibold text-foreground border border-border bg-surface hover:bg-surface-subtle px-3 py-2 rounded-button transition-colors"
         >
           Edit
-        </Link>
+        </a>
         <a
           href={`/p/${product.slug}`}
           target="_blank"
@@ -88,9 +87,7 @@ export function MakerProductCard({ product }: { product: MakerProduct }) {
         </a>
         <a
           href={`/dashboard/products/${product.slug}/analytics`}
-          aria-disabled="true"
-          className="flex-1 text-center text-sm font-semibold text-foreground-faint border border-border bg-surface px-3 py-2 rounded-button cursor-not-allowed"
-          title="Analytics drilldown lands in Phase 2"
+          className="flex-1 text-center text-sm font-semibold text-foreground border border-border bg-surface hover:bg-surface-subtle px-3 py-2 rounded-button transition-colors"
         >
           Analytics
         </a>
