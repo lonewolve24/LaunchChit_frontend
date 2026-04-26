@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+.output/
+.vinxi/
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Personal references
+musaajallo/
