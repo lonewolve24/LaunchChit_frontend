@@ -26,7 +26,7 @@
 - [x] F19 — Product detail route (`/p/[slug]`) — SSR
 
 ## End-to-End (Playwright)
-- [ ] F20 — Submit flow: login → submit → redirect to detail page
+- [x] F20 — Submit flow: login → submit → redirect to detail page
 - [ ] F21 — Upvote toggle: vote → count increments → vote again → count decrements
 - [ ] F22 — Auth redirect: unauthenticated user hitting `/submit` → redirected to `/login`
 - [ ] F23 — Feed renders products ordered by vote count

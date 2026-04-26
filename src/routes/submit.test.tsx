@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { SubmitPage } from './submit'
 
 const mockNavigate = vi.fn()
@@ -9,23 +9,41 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
   return { ...actual, useNavigate: () => mockNavigate, createFileRoute: actual.createFileRoute }
 })
 
+const mockMeUser = { id: 'user-001', email: 'musa@example.com', name: 'Musa Jallow', avatar_url: null }
+
+async function setupAuthenticatedSession() {
+  const { server } = await import('../mocks/server')
+  const { http, HttpResponse } = await import('msw')
+  server.use(http.get('http://localhost:8000/me', () => HttpResponse.json(mockMeUser)))
+}
+
+async function waitForForm() {
+  await waitFor(() => expect(screen.getByLabelText(/product name/i)).toBeInTheDocument())
+}
+
 describe('SubmitPage', () => {
-  it('renders all required fields', () => {
+  beforeEach(async () => {
+    await setupAuthenticatedSession()
+  })
+
+  it('renders all required fields', async () => {
     render(<SubmitPage />)
-    expect(screen.getByLabelText(/product name/i)).toBeInTheDocument()
+    await waitForForm()
     expect(screen.getByLabelText(/tagline/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/description/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/website url/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/logo url/i)).toBeInTheDocument()
   })
 
-  it('renders the submit button', () => {
+  it('renders the submit button', async () => {
     render(<SubmitPage />)
+    await waitForForm()
     expect(screen.getByRole('button', { name: /launch it/i })).toBeInTheDocument()
   })
 
   it('shows errors when submitting empty form', async () => {
     render(<SubmitPage />)
+    await waitForForm()
     await userEvent.click(screen.getByRole('button', { name: /launch it/i }))
     await waitFor(() => {
       expect(screen.getAllByRole('alert').length).toBeGreaterThan(0)
@@ -34,6 +52,7 @@ describe('SubmitPage', () => {
 
   it('shows char counter for name field', async () => {
     render(<SubmitPage />)
+    await waitForForm()
     await userEvent.type(screen.getByLabelText(/product name/i), 'FarmLink')
     expect(screen.getByText(/8\s*\/\s*80/)).toBeInTheDocument()
   })
@@ -47,6 +66,7 @@ describe('SubmitPage', () => {
       )
     )
     render(<SubmitPage />)
+    await waitForForm()
     await userEvent.type(screen.getByLabelText(/product name/i), 'FarmLink GM')
     await userEvent.type(screen.getByLabelText(/tagline/i), 'Connecting farmers to buyers')
     await userEvent.type(screen.getByLabelText(/description/i), 'A platform that helps farmers.')

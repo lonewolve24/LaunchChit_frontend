@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Header } from '../components/Header'
 import { InlineError } from '../components/InlineError'
 import { Toast } from '../components/Toast'
@@ -36,10 +36,18 @@ function validate(fields: Fields): Errors {
 
 export function SubmitPage() {
   const navigate = useNavigate()
+  const [authChecked, setAuthChecked] = useState(false)
   const [fields, setFields] = useState<Fields>({ name: '', tagline: '', description: '', website_url: '', logo_url: '' })
   const [errors, setErrors] = useState<Errors>({})
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch(`${API}/me`, { credentials: 'include' }).then((r) => {
+      if (r.status === 401) { window.location.href = '/login?next=/submit'; return }
+      setAuthChecked(true)
+    }).catch(() => setAuthChecked(true))
+  }, [])
 
   function set(key: keyof Fields) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -70,6 +78,14 @@ export function SubmitPage() {
     } else {
       setToast('Could not submit product. Please try again.')
     }
+  }
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-surface-subtle flex items-center justify-center">
+        <span role="status" className="text-sm text-foreground-muted">Loading…</span>
+      </div>
+    )
   }
 
   return (

@@ -4,6 +4,14 @@ _Completed features will be logged here._
 
 ---
 
+## F20 — E2E: Submit flow
+- Playwright test: visit `/` → click Submit (header) → auth check redirects to `/login?next=/submit` → enter email → confirmation state
+- Added mount-time `GET /me` auth check to `/submit` route; 401 → redirect to `/login?next=/submit`
+- Updated unit tests to override `/me` handler and wait for form to appear after auth check
+- Test: 1/1 ✓
+
+---
+
 ## F19 — Product detail route (`/p/[slug]`)
 - Fetches `GET /products/:slug`, skeleton while loading
 - Renders: logo, name (h1), tagline, description, maker name, vote count, UpvoteButton (lg), Visit website link
