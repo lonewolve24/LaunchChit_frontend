@@ -27,7 +27,7 @@
 
 ## End-to-End (Playwright)
 - [x] F20 — Submit flow: login → submit → redirect to detail page
-- [ ] F21 — Upvote toggle: vote → count increments → vote again → count decrements
+- [x] F21 — Upvote toggle: vote → count increments → vote again → count decrements
 - [ ] F22 — Auth redirect: unauthenticated user hitting `/submit` → redirected to `/login`
 - [ ] F23 — Feed renders products ordered by vote count
 - [ ] F24 — Detail page SSR: product name present in raw HTML response

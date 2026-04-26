@@ -4,6 +4,13 @@ _Completed features will be logged here._
 
 ---
 
+## F21 — E2E: Upvote toggle
+- Playwright test: auth callback → feed → click upvote → count increments → click again → count decrements
+- Uses `/auth/callback?token=valid-token` to activate MSW session before voting
+- Test: 1/1 ✓
+
+---
+
 ## F20 — E2E: Submit flow
 - Playwright test: visit `/` → click Submit (header) → auth check redirects to `/login?next=/submit` → enter email → confirmation state
 - Added mount-time `GET /me` auth check to `/submit` route; 401 → redirect to `/login?next=/submit`

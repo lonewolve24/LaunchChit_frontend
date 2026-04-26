@@ -1,7 +1,7 @@
 # TODO
 
-## F21 — E2E: Upvote toggle
+## F22 — E2E: Auth redirect
 
 Steps:
-1. Write Playwright test: vote → count increments → vote again → count decrements
+1. Write Playwright test: unauthenticated user hits `/submit` → redirected to `/login`
 2. Pass test (green)
