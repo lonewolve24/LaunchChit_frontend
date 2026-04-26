@@ -20,7 +20,7 @@ import { Route as CommunityRouteImport } from './routes/community'
 import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
+import { Route as TopicsSlugRouteImport } from './routes/topics_.$slug'
 import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -81,9 +81,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const TopicsSlugRoute = TopicsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => TopicsRoute,
+  id: '/topics_/$slug',
+  path: '/topics/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileUsernameRoute = ProfileUsernameRouteImport.update({
   id: '/profile/$username',
@@ -112,7 +112,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/submit': typeof SubmitRoute
   '/terms': typeof TermsRoute
-  '/topics': typeof TopicsRouteWithChildren
+  '/topics': typeof TopicsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
@@ -129,7 +129,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/submit': typeof SubmitRoute
   '/terms': typeof TermsRoute
-  '/topics': typeof TopicsRouteWithChildren
+  '/topics': typeof TopicsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
@@ -147,11 +147,11 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/submit': typeof SubmitRoute
   '/terms': typeof TermsRoute
-  '/topics': typeof TopicsRouteWithChildren
+  '/topics': typeof TopicsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
-  '/topics/$slug': typeof TopicsSlugRoute
+  '/topics_/$slug': typeof TopicsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -204,7 +204,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/p/$slug'
     | '/profile/$username'
-    | '/topics/$slug'
+    | '/topics_/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,10 +218,11 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SubmitRoute: typeof SubmitRoute
   TermsRoute: typeof TermsRoute
-  TopicsRoute: typeof TopicsRouteWithChildren
+  TopicsRoute: typeof TopicsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   PSlugRoute: typeof PSlugRoute
   ProfileUsernameRoute: typeof ProfileUsernameRoute
+  TopicsSlugRoute: typeof TopicsSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -303,12 +304,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/topics/$slug': {
-      id: '/topics/$slug'
-      path: '/$slug'
+    '/topics_/$slug': {
+      id: '/topics_/$slug'
+      path: '/topics/$slug'
       fullPath: '/topics/$slug'
       preLoaderRoute: typeof TopicsSlugRouteImport
-      parentRoute: typeof TopicsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/profile/$username': {
       id: '/profile/$username'
@@ -334,17 +335,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface TopicsRouteChildren {
-  TopicsSlugRoute: typeof TopicsSlugRoute
-}
-
-const TopicsRouteChildren: TopicsRouteChildren = {
-  TopicsSlugRoute: TopicsSlugRoute,
-}
-
-const TopicsRouteWithChildren =
-  TopicsRoute._addFileChildren(TopicsRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -356,10 +346,11 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SubmitRoute: SubmitRoute,
   TermsRoute: TermsRoute,
-  TopicsRoute: TopicsRouteWithChildren,
+  TopicsRoute: TopicsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   PSlugRoute: PSlugRoute,
   ProfileUsernameRoute: ProfileUsernameRoute,
+  TopicsSlugRoute: TopicsSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

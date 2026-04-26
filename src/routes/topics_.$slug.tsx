@@ -6,7 +6,7 @@ import { SkeletonCard } from '../components/Skeleton'
 import { PageError } from '../components/PageError'
 import { Toast } from '../components/Toast'
 
-export const Route = createFileRoute('/topics/$slug')({ component: TopicFeedPage })
+export const Route = createFileRoute('/topics_/$slug')({ component: TopicFeedPage })
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -26,7 +26,7 @@ function formatTopicName(slug: string) {
 }
 
 export function TopicFeedPage() {
-  const { slug } = useParams({ from: '/topics/$slug' })
+  const { slug } = useParams({ from: '/topics_/$slug' })
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
