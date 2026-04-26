@@ -3,12 +3,21 @@ import { useState, useEffect } from 'react'
 import { Header } from '../components/Header'
 import { ProductCard } from '../components/ProductCard'
 import { SkeletonCard } from '../components/Skeleton'
+import { Skeleton } from '../components/Skeleton'
 import { PageError } from '../components/PageError'
 import { Toast } from '../components/Toast'
 
 export const Route = createFileRoute('/topics_/$slug')({ component: TopicFeedPage })
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+
+type Topic = {
+  id: string
+  slug: string
+  name: string
+  description: string
+  product_count: number
+}
 
 type Product = {
   id: string
@@ -19,23 +28,40 @@ type Product = {
   vote_count: number
   has_voted: boolean
   maker: { name: string }
+  topics?: Array<{ slug: string; name: string }>
 }
 
-function formatTopicName(slug: string) {
-  return slug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+const TOPIC_COLORS: Record<string, string> = {
+  fintech: '#2563EB',
+  'agri-tech': '#065F46',
+  edtech: '#7C5CBF',
+  healthtech: '#DC4A22',
+  logistics: '#0891B2',
+  ecommerce: '#B45309',
+  govtech: '#9D174D',
+  social: '#1B4332',
 }
 
 export function TopicFeedPage() {
   const { slug } = useParams({ from: '/topics_/$slug' })
+  const [topic, setTopic] = useState<Topic | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [toast, setToast] = useState<{ message: string; variant: 'success' | 'error' } | null>(null)
 
   useEffect(() => {
-    fetch(`${API}/topics/${slug}/products`)
-      .then((r) => { if (r.status === 404) { setNotFound(true); setLoading(false); return null } return r.json() })
-      .then((data) => { if (data) { setProducts(data); setLoading(false) } })
+    setLoading(true)
+    Promise.all([
+      fetch(`${API}/topics/${slug}`).then((r) => (r.status === 404 ? null : r.json())),
+      fetch(`${API}/topics/${slug}/products`).then((r) => (r.status === 404 ? null : r.json())),
+    ])
+      .then(([topicData, productsData]) => {
+        if (!topicData) { setNotFound(true); setLoading(false); return }
+        setTopic(topicData)
+        setProducts(productsData ?? [])
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [slug])
 
@@ -55,46 +81,95 @@ export function TopicFeedPage() {
 
   if (notFound) return <><Header user={null} /><PageError status={404} message="That topic does not exist." /></>
 
-  const topicName = formatTopicName(slug)
+  const topicColor = topic ? TOPIC_COLORS[topic.slug] ?? '#1B4332' : '#1B4332'
 
   return (
     <div className="min-h-screen bg-surface-subtle">
       <Header user={null} />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
-        <div className="flex items-center gap-3 mb-2">
-          <a href="/topics" className="text-sm text-foreground-faint hover:text-foreground transition-colors">Topics</a>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-4 text-sm">
+          <a href="/" className="text-foreground-faint hover:text-foreground transition-colors">Home</a>
           <span className="text-foreground-faint">›</span>
-          <span className="text-sm text-foreground-muted">{topicName}</span>
+          <a href="/topics" className="text-foreground-faint hover:text-foreground transition-colors">Topics</a>
+          <span className="text-foreground-faint">›</span>
+          <span className="text-foreground-muted">{topic?.name ?? slug}</span>
         </div>
 
-        <div className="flex items-start justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">{topicName}</h1>
-            <p className="text-foreground-muted mt-1">Products tagged with {topicName}</p>
+        {/* Topic header card */}
+        {loading || !topic ? (
+          <div className="bg-surface rounded-card p-8 mb-8" style={{ boxShadow: '0 1px 4px 0 rgb(0 0 0 / 0.08)' }}>
+            <div className="flex items-center gap-5">
+              <Skeleton className="w-16 h-16 rounded-card" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-7 w-1/3" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div
+            className="bg-surface rounded-card p-8 mb-8 flex items-start gap-6"
+            style={{ boxShadow: '0 1px 4px 0 rgb(0 0 0 / 0.08)' }}
+          >
+            <div
+              className="w-16 h-16 rounded-card flex items-center justify-center text-white font-bold text-2xl flex-shrink-0"
+              style={{ backgroundColor: topicColor }}
+            >
+              {topic.name[0]}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-foreground">{topic.name}</h1>
+              <p className="text-foreground-muted mt-1.5 text-[15px]">{topic.description}</p>
+              <div className="flex items-center gap-4 mt-4 text-xs text-foreground-faint">
+                <span>{topic.product_count} {topic.product_count === 1 ? 'product' : 'products'}</span>
+                <span>·</span>
+                <span>Curated for Gambian builders</span>
+              </div>
+            </div>
+          </div>
+        )}
 
+        {/* Products + sidebar */}
         <div className="flex gap-8">
-          <div className="flex-1 min-w-0 space-y-4">
-            {loading ? (
-              <SkeletonCard count={3} />
-            ) : (
-              products.map((p) => <ProductCard key={p.id} product={p} onVote={handleVote} />)
-            )}
+          <div className="flex-1 min-w-0">
+            <h2 className="text-base font-bold text-foreground mb-4">Top products in {topic?.name ?? 'this topic'}</h2>
+            <div className="space-y-4">
+              {loading ? (
+                <SkeletonCard count={3} />
+              ) : products.length === 0 ? (
+                <p className="text-sm text-foreground-muted">No products in this topic yet.</p>
+              ) : (
+                products.map((p) => <ProductCard key={p.id} product={p} onVote={handleVote} />)
+              )}
+            </div>
           </div>
 
           <aside className="hidden lg:block w-64 flex-shrink-0">
             <div className="bg-surface rounded-card p-5" style={{ boxShadow: '0 1px 4px 0 rgb(0 0 0 / 0.08)' }}>
               <p className="text-sm font-bold text-foreground mb-3">Browse Topics</p>
               <div className="space-y-1">
-                {['Fintech', 'Agri-Tech', 'EdTech', 'HealthTech', 'Logistics', 'E-commerce', 'Gov Tech', 'Social'].map((t) => (
+                {[
+                  { name: 'Fintech', slug: 'fintech' },
+                  { name: 'Agri-Tech', slug: 'agri-tech' },
+                  { name: 'EdTech', slug: 'edtech' },
+                  { name: 'HealthTech', slug: 'healthtech' },
+                  { name: 'Logistics', slug: 'logistics' },
+                  { name: 'E-commerce', slug: 'ecommerce' },
+                  { name: 'Gov Tech', slug: 'govtech' },
+                  { name: 'Social', slug: 'social' },
+                ].map((t) => (
                   <a
-                    key={t}
-                    href={`/topics/${t.toLowerCase().replace(/\s+/g, '-').replace('/', '-')}`}
-                    className="block text-sm text-foreground-muted hover:text-foreground hover:bg-surface-subtle px-2 py-1.5 rounded-button transition-colors"
+                    key={t.slug}
+                    href={`/topics/${t.slug}`}
+                    className={`block text-sm px-2 py-1.5 rounded-button transition-colors ${
+                      t.slug === slug
+                        ? 'bg-primary text-white font-semibold'
+                        : 'text-foreground-muted hover:text-foreground hover:bg-surface-subtle'
+                    }`}
                   >
-                    {t}
+                    {t.name}
                   </a>
                 ))}
               </div>

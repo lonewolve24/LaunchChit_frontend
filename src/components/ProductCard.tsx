@@ -7,6 +7,8 @@ function placeholderColor(name: string): string {
   return PLACEHOLDER_COLORS[idx]
 }
 
+type Topic = { slug: string; name: string }
+
 type Product = {
   id: string
   slug: string
@@ -16,6 +18,7 @@ type Product = {
   vote_count: number
   has_voted: boolean
   maker: { name: string }
+  topics?: Topic[]
 }
 
 type Props = {
@@ -76,7 +79,26 @@ export function ProductCard({ product, onVote }: Props) {
           {product.name}
         </a>
         <p className="text-sm text-foreground-muted mt-0.5 truncate">{product.tagline}</p>
-        <p className="text-xs text-foreground-faint mt-1.5">by {product.maker.name}</p>
+        <div className="flex items-center gap-2 mt-2 flex-wrap">
+          <span className="text-xs text-foreground-faint">by {product.maker.name}</span>
+          {product.topics && product.topics.length > 0 && (
+            <>
+              <span className="text-foreground-faint text-xs">·</span>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {product.topics.map((topic) => (
+                  <a
+                    key={topic.slug}
+                    href={`/topics/${topic.slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs font-medium text-foreground-muted bg-surface-subtle hover:bg-primary hover:text-white px-2 py-0.5 rounded-full border border-border transition-colors"
+                  >
+                    {topic.name}
+                  </a>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )

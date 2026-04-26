@@ -21,6 +21,7 @@ type Product = {
   vote_count: number
   has_voted: boolean
   maker: { id: string; name: string; avatar_url: string | null }
+  topics?: Array<{ slug: string; name: string }>
 }
 
 export function ProductDetailPage() {
@@ -87,6 +88,19 @@ export function ProductDetailPage() {
                       {product.maker.name}
                     </a>
                   </p>
+                  {product.topics && product.topics.length > 0 && (
+                    <div className="flex items-center gap-1.5 flex-wrap mt-3">
+                      {product.topics.map((topic) => (
+                        <a
+                          key={topic.slug}
+                          href={`/topics/${topic.slug}`}
+                          className="text-xs font-medium text-foreground-muted bg-surface-subtle hover:bg-primary hover:text-white px-2.5 py-1 rounded-full border border-border transition-colors"
+                        >
+                          {topic.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

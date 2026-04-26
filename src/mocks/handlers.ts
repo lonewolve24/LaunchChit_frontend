@@ -19,6 +19,7 @@ const mockProducts = [
     vote_count: 24,
     has_voted: false,
     maker: { name: 'Musa Jallow' },
+    topics: [{ slug: 'agri-tech', name: 'Agri-Tech' }, { slug: 'logistics', name: 'Logistics' }],
     created_at: new Date().toISOString(),
   },
   {
@@ -30,6 +31,7 @@ const mockProducts = [
     vote_count: 18,
     has_voted: false,
     maker: { name: 'Momodou Jatta' },
+    topics: [{ slug: 'fintech', name: 'Fintech' }, { slug: 'ecommerce', name: 'E-commerce' }],
     created_at: new Date().toISOString(),
   },
   {
@@ -41,6 +43,7 @@ const mockProducts = [
     vote_count: 11,
     has_voted: false,
     maker: { name: 'Abdul Ikumpanyi' },
+    topics: [{ slug: 'edtech', name: 'EdTech' }],
     created_at: new Date().toISOString(),
   },
 ]
@@ -129,6 +132,7 @@ export const handlers = [
       description: 'A detailed description of this product goes here.',
       website_url: 'https://example.com',
       maker: { id: 'user-001', name: 'Musa Jallow', avatar_url: null },
+      topics: product.topics ?? [],
     })
   }),
 
@@ -181,6 +185,13 @@ export const handlers = [
   // GET /topics
   http.get(`${BASE}/topics`, () => {
     return HttpResponse.json(mockTopics)
+  }),
+
+  // GET /topics/:slug — MUST be before /topics/:slug/products
+  http.get(`${BASE}/topics/:slug`, ({ params }) => {
+    const topic = mockTopics.find((t) => t.slug === params.slug)
+    if (!topic) return new HttpResponse(null, { status: 404 })
+    return HttpResponse.json(topic)
   }),
 
   // GET /topics/:slug/products
