@@ -208,6 +208,14 @@ const mockEvents: Event[] = [
   evt(20, { title: 'End-of-Summer Builders Cookout',                    start: '2026-08-29T17:00:00', duration_h: 4, location: 'Cape Point Beach, Bakau',                address: 'Bakau, KMC',                           mode: 'In person', host: 'LaunchedChit',                                                    description: 'Sundowner on the beach with the Gambian builder community. Bring family. We\'ll handle the food.',                                                                                                  attendees: 92, capacity: 150, topics: ['Networking'] }),
 ]
 
+type RequestExtras = {
+  audience: string | null
+  requester_email: string | null
+  requester_phones: string[]
+  pay_pledges: Array<{ amount: number; currency: 'GMD' | 'USD' }>
+}
+const requestExtras = new Map<string, RequestExtras>()
+
 const mockRequests = [
   { id: 'r1', title: 'A reliable WhatsApp broadcast scheduler', body: 'We run an osusu group of 200 people. Sending weekly updates to everyone is painful. Need a tool that schedules and sends WhatsApp messages.', requester: { name: 'Aminata Touray' }, upvotes: 142, responses: 4, status: 'open',     created_at: '3 days ago' },
   { id: 'r2', title: 'Bus schedule for the Brikama–Banjul route',    body: 'No app shows me when the next gele-gele leaves. Just a simple schedule + ETA would change my life.',                                                          requester: { name: 'Ousman Bah' },     upvotes: 98,  responses: 2, status: 'in-progress', created_at: '5 days ago' },
@@ -227,7 +235,7 @@ const mockProfile = {
   location: 'Banjul, The Gambia',
   joined_at: '2024-08-12',
   avatar_url: null,
-  cover_color: '#1B4332',
+  cover_color: '#2563EB',
   website: 'https://musajallow.com',
   github: 'https://github.com/musajallow',
   twitter: 'https://twitter.com/musajallow',
@@ -503,14 +511,14 @@ export const handlers = [
       android_url: (product.platforms ?? []).includes('mobile') ? 'https://play.google.com/store/apps/details?id=gm.launchedchit.' + product.slug.replace(/-/g, '') : null,
       topics: product.topics ?? [],
       gallery: [
-        { color: '#1B4332', label: 'Dashboard' },
+        { color: '#1E40AF', label: 'Dashboard' },
         { color: '#2563EB', label: 'Onboarding flow' },
-        { color: '#7C5CBF', label: 'Mobile app' },
-        { color: '#DC4A22', label: 'Reports view' },
-        { color: '#0891B2', label: 'Settings panel' },
+        { color: '#3B82F6', label: 'Mobile app' },
+        { color: '#60A5FA', label: 'Reports view' },
+        { color: '#1D4ED8', label: 'Settings panel' },
       ],
       team: [
-        { name: product.maker.name, role: 'Founder · CEO', avatar_color: '#1B4332', bio: 'Shipping for The Gambia' },
+        { name: product.maker.name, role: 'Founder · CEO', avatar_color: '#2563EB', bio: 'Shipping for The Gambia' },
         { name: 'Awa Touray', role: 'Engineering Lead', avatar_color: '#7C5CBF', bio: 'Builds backend systems' },
         { name: 'Lamin Saho', role: 'Product Designer', avatar_color: '#2563EB', bio: 'Obsessed with details' },
         { name: 'Binta Ceesay', role: 'Community', avatar_color: '#DC4A22', bio: 'Talks to every user' },
@@ -777,6 +785,53 @@ export const handlers = [
     })
   }),
 
+  // GET /profile/:username/waitlist — list of people on the waitlists for this maker's products.
+  http.get(`${BASE}/profile/:username/waitlist`, ({ params }) => {
+    const username = String(params.username).toLowerCase()
+
+    let userProducts = mockProducts.filter((p) => p.maker.name.toLowerCase().replace(/\s+/g, '-') === username)
+    if (username === mockProfile.username) userProducts = mockProducts.slice(0, 4)
+    if (userProducts.length === 0) return new HttpResponse(null, { status: 404 })
+
+    // Deterministic fake signups so the page is stable across reloads.
+    const firstNames = ['Awa', 'Modou', 'Fatou', 'Lamin', 'Isatou', 'Ousman', 'Mariama', 'Babucarr', 'Adama', 'Sulayman', 'Ndey', 'Pa Modou', 'Haddy', 'Ebrima', 'Aminata', 'Yusupha', 'Fatim', 'Saikou', 'Binta', 'Dawda']
+    const lastNames = ['Jallow', 'Touray', 'Ceesay', 'Bah', 'Ndoye', 'Sanyang', 'Saine', 'Joof', 'Drammeh', 'Manneh', 'Singhateh', 'Camara', 'Kah', 'Mboge', 'Faal', 'Sowe', 'Dibba', 'Sanneh', 'Jatta', 'Suso']
+    const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'qcell.gm', 'africell.gm']
+    const sources: Array<'organic' | 'referral' | 'twitter' | 'newsletter'> = ['organic', 'referral', 'twitter', 'newsletter']
+
+    const groups = userProducts.map((p, pi) => {
+      const total = p.waitlist_count ?? 0
+      const shown = Math.min(total, 50)
+      const signups = Array.from({ length: shown }, (_, i) => {
+        const seed = pi * 31 + i
+        const first = firstNames[seed % firstNames.length]
+        const last = lastNames[(seed * 7) % lastNames.length]
+        const domain = domains[(seed * 3) % domains.length]
+        const handle = `${first.toLowerCase().replace(/\s+/g, '')}.${last.toLowerCase()}`
+        const hasPhone = (seed % 3) === 0
+        const phoneTail = String(7000000 + ((seed * 991) % 999999)).padStart(7, '0')
+        return {
+          id: `wl-${p.id}-${i}`,
+          name: `${first} ${last}`,
+          email: `${handle}@${domain}`,
+          phone: hasPhone ? `+220 ${phoneTail.slice(0, 3)} ${phoneTail.slice(3)}` : null,
+          source: sources[seed % sources.length],
+          joined_at: new Date(Date.now() - ((i * 86400000) + (pi * 3600000))).toISOString(),
+        }
+      })
+      return {
+        product_id: p.id,
+        product_slug: p.slug,
+        product_name: p.name,
+        total,
+        signups,
+      }
+    })
+
+    const totalAll = groups.reduce((s, g) => s + g.total, 0)
+    return HttpResponse.json({ total: totalAll, products: groups })
+  }),
+
   // GET /community/categories
   http.get(`${BASE}/community/categories`, () => {
     const withCounts = mockForumCategories.map((c) => ({
@@ -885,6 +940,135 @@ export const handlers = [
       page,
       page_size: pageSize,
     })
+  }),
+
+  // POST /community/requests — create a new product request
+  http.post(`${BASE}/community/requests`, async ({ request }) => {
+    const body = (await request.json()) as {
+      title?: string
+      body?: string
+      audience?: string | null
+      requester_name?: string
+      requester_email?: string | null
+      requester_phones?: string[]
+      would_pay?: boolean
+      pay_amount?: number | null
+      pay_currency?: 'GMD' | 'USD' | null
+    }
+    if (!body.title || !body.body || !body.requester_name) {
+      return new HttpResponse(JSON.stringify({ error: 'Missing required fields' }), { status: 400 })
+    }
+    const id = `r-${Date.now().toString(36)}`
+    const created = {
+      id,
+      title: body.title.trim(),
+      body: body.body.trim(),
+      requester: { name: body.requester_name.trim() },
+      upvotes: body.would_pay ? 1 : 0,
+      responses: 0,
+      status: 'open' as const,
+      created_at: 'just now',
+    }
+    mockRequests.unshift(created)
+    requestExtras.set(id, {
+      audience: body.audience ?? null,
+      requester_email: body.requester_email ?? null,
+      requester_phones: (body.requester_phones ?? []).filter((p) => p && p.trim()).slice(0, 2),
+      pay_pledges: body.would_pay && body.pay_amount
+        ? [{ amount: body.pay_amount, currency: (body.pay_currency ?? 'GMD') as 'GMD' | 'USD' }]
+        : [],
+    })
+    return HttpResponse.json(created, { status: 201 })
+  }),
+
+  // GET /community/requests/:id — full detail with audience, pay summary, makers, responses
+  http.get(`${BASE}/community/requests/:id`, ({ params }) => {
+    const r = mockRequests.find((x) => x.id === params.id)
+    if (!r) return new HttpResponse(null, { status: 404 })
+
+    const extras = requestExtras.get(r.id)
+    const seed = r.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+
+    // Audience: from creator-supplied extras when available, else generated.
+    const audiencePool = [
+      'Osusu organisers and small chama groups',
+      'Daily commuters in the Greater Banjul Area',
+      'Land buyers, lawyers, and surveyors',
+      'Diaspora and observant Muslims abroad',
+      'Voters across all seven regions',
+      'Wedding planners, families, and event organisers',
+      'Accountants, small businesses, and tax consultants',
+    ]
+    const audience = extras?.audience ?? audiencePool[seed % audiencePool.length]
+
+    // Pay pledges: combine user-submitted pledges with deterministic mocks.
+    const generatedPledges = Array.from({ length: Math.min(8, Math.max(0, Math.floor(r.upvotes / 25))) }, (_, i) => ({
+      amount: 100 + ((seed + i * 37) % 9) * 50,
+      currency: (i % 4 === 0 ? 'USD' : 'GMD') as 'GMD' | 'USD',
+    }))
+    const allPledges = [...(extras?.pay_pledges ?? []), ...generatedPledges]
+    const gmdPledges = allPledges.filter((p) => p.currency === 'GMD')
+    const usdPledges = allPledges.filter((p) => p.currency === 'USD')
+    const pay_summary = allPledges.length === 0 ? null : {
+      supporters: allPledges.length,
+      gmd_avg: gmdPledges.length ? Math.round(gmdPledges.reduce((s, p) => s + p.amount, 0) / gmdPledges.length) : 0,
+      usd_avg: usdPledges.length ? Math.round(usdPledges.reduce((s, p) => s + p.amount, 0) / usdPledges.length) : 0,
+      gmd_count: gmdPledges.length,
+      usd_count: usdPledges.length,
+    }
+
+    // Makers interested: deterministic slice from a builder pool.
+    const makerPool = [
+      { name: 'Musa Jallow',     username: 'musa-jallow',     avatar_color: '#2563EB', note: 'Already prototyping a v0 — ping me.' },
+      { name: 'Awa Touray',      username: 'awa-touray',      avatar_color: '#0891B2', note: 'Could ship this in 2 weekends.' },
+      { name: 'Lamin Saho',      username: 'lamin-saho',      avatar_color: '#1D4ED8', note: 'Interested if we can get 50 paying users.' },
+      { name: 'Fatou Ceesay',    username: 'fatou-ceesay',    avatar_color: '#06B6D4', note: 'Has the SMS rails for this.' },
+      { name: 'Modou Jatta',     username: 'modou-jatta',     avatar_color: '#3B82F6' },
+      { name: 'Binta Ceesay',    username: 'binta-ceesay',    avatar_color: '#0E7490' },
+      { name: 'Pa Modou Faal',   username: 'pa-modou-faal',   avatar_color: '#1E40AF' },
+    ]
+    const interested_makers = makerPool.slice(0, Math.min(makerPool.length, r.responses))
+
+    // Responses (lightweight discussion thread)
+    const responseTemplates = [
+      'Looked into this last quarter — happy to share what I learned.',
+      'I think the hardest part is distribution, not the build.',
+      'Has anyone validated this with actual users yet?',
+      'I would absolutely use this. Take my money.',
+      'Available on web AND offline-first SMS would be the dream.',
+      'Could pair on a v0 if anyone is interested.',
+    ]
+    const responses_list = Array.from({ length: r.responses }, (_, i) => ({
+      id: `${r.id}-c${i + 1}`,
+      author: makerPool[(seed + i) % makerPool.length].name,
+      avatar_color: makerPool[(seed + i) % makerPool.length].avatar_color,
+      body: responseTemplates[(seed + i * 11) % responseTemplates.length],
+      created_at: `${i + 1} day${i === 0 ? '' : 's'} ago`,
+    }))
+
+    // 3 related requests by status, excluding current
+    const related = mockRequests.filter((x) => x.id !== r.id).slice(0, 3).map((x) => ({
+      id: x.id, title: x.title, upvotes: x.upvotes, status: x.status,
+    }))
+
+    return HttpResponse.json({
+      ...r,
+      audience,
+      requester_email: extras?.requester_email ?? null,
+      requester_phones: extras?.requester_phones ?? [],
+      pay_summary,
+      interested_makers,
+      responses_list,
+      related,
+    })
+  }),
+
+  // POST /community/requests/:id/interested — maker signals "I'd build this"
+  http.post(`${BASE}/community/requests/:id/interested`, ({ params }) => {
+    const r = mockRequests.find((x) => x.id === params.id)
+    if (!r) return new HttpResponse(null, { status: 404 })
+    r.responses += 1
+    return HttpResponse.json({ responses: r.responses })
   }),
 
   // POST /community/requests/:id/upvote — increment upvote

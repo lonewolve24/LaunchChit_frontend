@@ -78,7 +78,7 @@ export function ThreadDetailPage() {
     return (
       <div className="min-h-screen bg-surface-subtle">
         <Header />
-        <main className="max-w-4xl mx-auto px-6 lg:px-10 py-10 space-y-4">
+        <main className="max-w-7xl mx-auto px-6 lg:px-10 py-10 space-y-4">
           <Skeleton className="h-32 w-full rounded-card" />
           <Skeleton className="h-72 w-full rounded-card" />
         </main>
@@ -99,7 +99,7 @@ export function ThreadDetailPage() {
     <div className="min-h-screen bg-surface-subtle">
       <Header />
 
-      <main className="max-w-4xl mx-auto px-6 lg:px-10 py-8">
+      <main className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-5 text-sm">
           <a href="/community" className="text-foreground-faint hover:text-foreground transition-colors">Community</a>

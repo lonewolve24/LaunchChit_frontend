@@ -35,6 +35,7 @@ import { Route as DashboardProductsRouteImport } from './routes/dashboard/produc
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
 import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
+import { Route as CommunityRequestsIdRouteImport } from './routes/community.requests.$id'
 
 const VerifyOtpRoute = VerifyOtpRouteImport.update({
   id: '/verify-otp',
@@ -166,6 +167,11 @@ const CommunityEventsIdRoute = CommunityEventsIdRouteImport.update({
   path: '/community/events/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityRequestsIdRoute = CommunityRequestsIdRouteImport.update({
+  id: '/requests/$id',
+  path: '/requests/$id',
+  getParentRoute: () => CommunityRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -173,7 +179,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/archive': typeof ArchiveRoute
   '/collections': typeof CollectionsRoute
-  '/community': typeof CommunityRoute
+  '/community': typeof CommunityRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community/events/$id': typeof CommunityEventsIdRoute
   '/community/threads/$id': typeof CommunityThreadsIdRoute
 }
@@ -200,7 +207,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/archive': typeof ArchiveRoute
   '/collections': typeof CollectionsRoute
-  '/community': typeof CommunityRoute
+  '/community': typeof CommunityRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community/events/$id': typeof CommunityEventsIdRoute
   '/community/threads/$id': typeof CommunityThreadsIdRoute
 }
@@ -229,7 +237,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/archive': typeof ArchiveRoute
   '/collections': typeof CollectionsRoute
-  '/community': typeof CommunityRoute
+  '/community': typeof CommunityRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics_/$slug': typeof TopicsSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community_/events/$id': typeof CommunityEventsIdRoute
   '/community_/threads/$id': typeof CommunityThreadsIdRoute
 }
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/profile/$username'
     | '/topics/$slug'
     | '/dashboard/'
+    | '/community/requests/$id'
     | '/community/events/$id'
     | '/community/threads/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/profile/$username'
     | '/topics/$slug'
     | '/dashboard'
+    | '/community/requests/$id'
     | '/community/events/$id'
     | '/community/threads/$id'
   id:
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/profile/$username'
     | '/topics_/$slug'
     | '/dashboard/'
+    | '/community/requests/$id'
     | '/community_/events/$id'
     | '/community_/threads/$id'
   fileRoutesById: FileRoutesById
@@ -343,7 +355,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ArchiveRoute: typeof ArchiveRoute
   CollectionsRoute: typeof CollectionsRoute
-  CommunityRoute: typeof CommunityRoute
+  CommunityRoute: typeof CommunityRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
@@ -548,6 +560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityEventsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community/requests/$id': {
+      id: '/community/requests/$id'
+      path: '/requests/$id'
+      fullPath: '/community/requests/$id'
+      preLoaderRoute: typeof CommunityRequestsIdRouteImport
+      parentRoute: typeof CommunityRoute
+    }
   }
 }
 
@@ -565,13 +584,25 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 )
 
+interface CommunityRouteChildren {
+  CommunityRequestsIdRoute: typeof CommunityRequestsIdRoute
+}
+
+const CommunityRouteChildren: CommunityRouteChildren = {
+  CommunityRequestsIdRoute: CommunityRequestsIdRoute,
+}
+
+const CommunityRouteWithChildren = CommunityRoute._addFileChildren(
+  CommunityRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ArchiveRoute: ArchiveRoute,
   CollectionsRoute: CollectionsRoute,
-  CommunityRoute: CommunityRoute,
+  CommunityRoute: CommunityRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,

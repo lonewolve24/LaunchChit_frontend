@@ -1,18 +1,8 @@
 import ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
+import { RouterProvider } from '@tanstack/react-router'
+import { getRouter } from './router'
 
-const router = createRouter({
-  routeTree,
-  defaultPreload: 'intent',
-  scrollRestoration: true,
-})
-
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
-}
+const router = getRouter()
 
 async function bootstrap() {
   if (import.meta.env.DEV) {
@@ -21,10 +11,11 @@ async function bootstrap() {
   }
 
   const rootElement = document.getElementById('app')!
-  if (!rootElement.innerHTML) {
-    const root = ReactDOM.createRoot(rootElement)
-    root.render(<RouterProvider router={router} />)
-  }
+  // Don't pre-clear the boot shell — React's first commit will replace
+  // it atomically. Manually emptying #app first causes a one-frame flash
+  // of the page background that reads as a header border / glitch.
+  const root = ReactDOM.createRoot(rootElement)
+  root.render(<RouterProvider router={router} />)
 }
 
 bootstrap()

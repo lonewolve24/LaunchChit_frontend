@@ -4,6 +4,7 @@ const discover = [
   { label: 'Topics', href: '/topics' },
   { label: 'Archive', href: '/archive' },
   { label: 'Community', href: '/community' },
+  { label: 'Mailing List', href: '/community?tab=mailing-list' },
 ]
 
 const topics = [
@@ -19,6 +20,7 @@ const topics = [
 
 const company = [
   { label: 'Submit Product', href: '/submit' },
+  { label: 'Request Product', href: '/community?tab=requests' },
   { label: 'About', href: '/about' },
   { label: 'Privacy Policy', href: '/privacy' },
   { label: 'Terms of Service', href: '/terms' },

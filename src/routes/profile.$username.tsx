@@ -52,7 +52,7 @@ type Profile = {
   }>
 }
 
-type Tab = 'launches' | 'upvoted' | 'about' | 'analytics'
+type Tab = 'launches' | 'upvoted' | 'waitlists' | 'analytics' | 'about'
 
 type AnalyticsResponse = {
   period: '30d' | '90d' | '1y'
@@ -67,6 +67,26 @@ type AnalyticsResponse = {
     total_waitlist: number
     upvotes_trend: Array<{ date: string; value: number }>
     waitlist_trend: Array<{ date: string; value: number }>
+  }>
+}
+
+type WaitlistSignup = {
+  id: string
+  name: string
+  email: string
+  phone: string | null
+  source: 'organic' | 'referral' | 'twitter' | 'newsletter'
+  joined_at: string
+}
+
+type WaitlistResponse = {
+  total: number
+  products: Array<{
+    product_id: string
+    product_slug: string
+    product_name: string
+    total: number
+    signups: WaitlistSignup[]
   }>
 }
 
@@ -89,6 +109,10 @@ export function ProfilePage() {
   const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [analyticsPeriod, setAnalyticsPeriod] = useState<'30d' | '90d' | '1y'>('30d')
+  const [waitlistData, setWaitlistData] = useState<WaitlistResponse | null>(null)
+  const [waitlistLoading, setWaitlistLoading] = useState(false)
+  const [waitlistProductFilter, setWaitlistProductFilter] = useState<string>('all')
+  const [waitlistQuery, setWaitlistQuery] = useState('')
 
   useEffect(() => {
     fetch(`${API}/profile/${username}`)
@@ -119,6 +143,18 @@ export function ProfilePage() {
       .catch(() => { if (!cancelled) setAnalyticsLoading(false) })
     return () => { cancelled = true }
   }, [isOwn, tab, analyticsPeriod, username])
+
+  // Load waitlist signups on demand for the waitlists tab.
+  useEffect(() => {
+    if (!isOwn || tab !== 'waitlists') return
+    let cancelled = false
+    setWaitlistLoading(true)
+    fetch(`${API}/profile/${username}/waitlist`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: WaitlistResponse | null) => { if (!cancelled) { setWaitlistData(data); setWaitlistLoading(false) } })
+      .catch(() => { if (!cancelled) setWaitlistLoading(false) })
+    return () => { cancelled = true }
+  }, [isOwn, tab, username])
 
   async function handleVote(id: string) {
     if (!profile) return
@@ -152,6 +188,7 @@ export function ProfilePage() {
 
   const totalProducts = profile.products.length
   const totalUpvotes = profile.total_upvotes ?? profile.products.reduce((s, p) => s + p.vote_count, 0)
+  const totalWaitlist = profile.products.reduce((s, p) => s + (p.waitlist_count ?? 0), 0)
 
   return (
     <div className="min-h-screen bg-surface-subtle">
@@ -162,13 +199,13 @@ export function ProfilePage() {
         <div className="bg-surface rounded-card overflow-hidden mb-6" style={{ boxShadow: cardShadow }}>
           {/* Cover band — avatar overlaps it, name sits below on the light card */}
           <div
-            className="h-32 md:h-40 relative"
-            style={{ background: `linear-gradient(135deg, ${profile.cover_color ?? '#1B4332'} 0%, #0F2D20 100%)` }}
+            className="h-20 relative"
+            style={{ background: `linear-gradient(135deg, ${profile.cover_color ?? '#2563EB'} 0%, #1E40AF 100%)` }}
           >
             <div className="absolute -bottom-12 md:-bottom-14 left-6 md:left-8">
               <div
                 className="w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center text-white font-bold text-4xl md:text-5xl border-4 border-surface"
-                style={{ backgroundColor: profile.cover_color ?? '#1E293B' }}
+                style={{ backgroundColor: profile.cover_color ?? '#2563EB' }}
               >
                 {profile.name[0]}
               </div>
@@ -224,6 +261,12 @@ export function ProfilePage() {
                 <span className="text-base font-bold text-foreground">{totalUpvotes}</span>
                 <span className="text-sm text-foreground-muted ml-1.5">upvotes earned</span>
               </div>
+              {isOwn && (
+                <div>
+                  <span className="text-base font-bold text-foreground">{totalWaitlist.toLocaleString()}</span>
+                  <span className="text-sm text-foreground-muted ml-1.5">on waitlists</span>
+                </div>
+              )}
               {profile.followers !== undefined && (
                 <div>
                   <span className="text-base font-bold text-foreground">{profile.followers}</span>
@@ -240,7 +283,9 @@ export function ProfilePage() {
 
             {/* Tabs */}
             <div className="flex items-center gap-1 mt-6 border-b border-border -mx-6 md:-mx-8 px-6 md:px-8 overflow-x-auto">
-              {((isOwn ? ['launches', 'upvoted', 'about', 'analytics'] : ['launches', 'upvoted', 'about']) as Tab[]).map((t) => (
+              {((isOwn
+                ? ['launches', 'upvoted', 'waitlists', 'analytics', 'about']
+                : ['launches', 'upvoted', 'about']) as Tab[]).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
@@ -274,6 +319,18 @@ export function ProfilePage() {
                 <p className="text-base font-bold text-foreground">Upvoted launches</p>
                 <p className="text-sm text-foreground-muted mt-1">Public upvote history coming soon.</p>
               </div>
+            )}
+
+            {tab === 'waitlists' && isOwn && (
+              <WaitlistPanel
+                loading={waitlistLoading}
+                data={waitlistData}
+                productFilter={waitlistProductFilter}
+                onProductFilter={setWaitlistProductFilter}
+                query={waitlistQuery}
+                onQueryChange={setWaitlistQuery}
+                onToast={(message, variant) => setToast({ message, variant })}
+              />
             )}
 
             {tab === 'about' && (
@@ -322,14 +379,14 @@ export function ProfilePage() {
 
                     <div className="bg-surface rounded-card p-5" style={{ boxShadow: cardShadow }}>
                       <p className="text-sm font-bold text-foreground">Upvotes — all products</p>
-                      <p className="text-xs text-foreground-faint mt-0.5">Daily totals over the last {analyticsPeriod === '1y' ? 'year' : analyticsPeriod}.</p>
-                      <div className="mt-3"><Sparkline data={analytics.aggregate_upvotes} ariaLabel="Aggregate upvotes trend" /></div>
+                      <p className="text-xs text-foreground-faint mt-0.5">Daily totals over the last {analyticsPeriod === '1y' ? 'year' : analyticsPeriod}. Hover for daily counts.</p>
+                      <div className="mt-3"><Sparkline data={analytics.aggregate_upvotes} ariaLabel="Aggregate upvotes trend" valueLabel="upvotes" /></div>
                     </div>
 
                     <div className="bg-surface rounded-card p-5" style={{ boxShadow: cardShadow }}>
                       <p className="text-sm font-bold text-foreground">Waitlist signups — all products</p>
-                      <p className="text-xs text-foreground-faint mt-0.5">Daily totals over the last {analyticsPeriod === '1y' ? 'year' : analyticsPeriod}.</p>
-                      <div className="mt-3"><Sparkline data={analytics.aggregate_waitlist} ariaLabel="Aggregate waitlist trend" /></div>
+                      <p className="text-xs text-foreground-faint mt-0.5">Daily totals over the last {analyticsPeriod === '1y' ? 'year' : analyticsPeriod}. Hover for daily counts.</p>
+                      <div className="mt-3"><Sparkline data={analytics.aggregate_waitlist} ariaLabel="Aggregate waitlist trend" valueLabel="signups" /></div>
                     </div>
 
                     {/* Per-product breakdown */}
@@ -349,11 +406,11 @@ export function ProfilePage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <div>
                                 <p className="text-[11px] font-bold text-foreground-faint uppercase tracking-wider mb-1">Upvotes</p>
-                                <Sparkline data={p.upvotes_trend} ariaLabel={`${p.product_name} upvotes`} />
+                                <Sparkline data={p.upvotes_trend} ariaLabel={`${p.product_name} upvotes`} valueLabel="upvotes" />
                               </div>
                               <div>
                                 <p className="text-[11px] font-bold text-foreground-faint uppercase tracking-wider mb-1">Waitlist</p>
-                                <Sparkline data={p.waitlist_trend} ariaLabel={`${p.product_name} waitlist`} />
+                                <Sparkline data={p.waitlist_trend} ariaLabel={`${p.product_name} waitlist`} valueLabel="signups" />
                               </div>
                             </div>
                           </li>
@@ -505,6 +562,273 @@ export function ProfilePage() {
           <Toast message={toast.message} variant={toast.variant} onDismiss={() => setToast(null)} />
         </div>
       )}
+    </div>
+  )
+}
+
+type WaitlistPanelProps = {
+  loading: boolean
+  data: WaitlistResponse | null
+  productFilter: string
+  onProductFilter: (slug: string) => void
+  query: string
+  onQueryChange: (q: string) => void
+  onToast: (message: string, variant: 'success' | 'error') => void
+}
+
+function WaitlistPanel({ loading, data, productFilter, onProductFilter, query, onQueryChange, onToast }: WaitlistPanelProps) {
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const [hasInit, setHasInit] = useState(false)
+
+  // Initial open state: collapse everything when there are multiple products,
+  // auto-expand the first when there's only one. Re-runs after data arrives.
+  useEffect(() => {
+    if (!data || hasInit) return
+    setExpanded(data.products.length === 1 ? new Set([data.products[0].product_id]) : new Set())
+    setHasInit(true)
+  }, [data, hasInit])
+
+  // When the user filters to a single product, auto-expand it. When they
+  // type a search query, expand everything so matches aren't hidden.
+  useEffect(() => {
+    if (!data) return
+    if (query.trim()) {
+      setExpanded(new Set(data.products.map((g) => g.product_id)))
+      return
+    }
+    if (productFilter !== 'all') {
+      const match = data.products.find((g) => g.product_slug === productFilter)
+      if (match) setExpanded(new Set([match.product_id]))
+    }
+  }, [productFilter, query, data])
+
+  function toggle(id: string) {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  if (loading || !data) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-24 rounded-card" />
+        <Skeleton className="h-44 rounded-card" />
+      </div>
+    )
+  }
+
+  if (data.products.length === 0) {
+    return (
+      <div className="bg-surface rounded-card p-10 text-center" style={{ boxShadow: cardShadow }}>
+        <p className="text-base font-bold text-foreground">No waitlist signups yet</p>
+        <p className="text-sm text-foreground-muted mt-1">When people join your product waitlists, they'll show up here.</p>
+      </div>
+    )
+  }
+
+  const filteredGroups = (productFilter === 'all'
+    ? data.products
+    : data.products.filter((g) => g.product_slug === productFilter)
+  ).map((g) => {
+    const q = query.trim().toLowerCase()
+    const signups = q
+      ? g.signups.filter((s) => s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q) || (s.phone ?? '').toLowerCase().includes(q))
+      : g.signups
+    return { ...g, signups }
+  })
+
+  function copyEmails(emails: string[]) {
+    if (emails.length === 0) { onToast('No emails to copy.', 'error'); return }
+    navigator.clipboard.writeText(emails.join(', '))
+      .then(() => onToast(`Copied ${emails.length} ${emails.length === 1 ? 'email' : 'emails'}.`, 'success'))
+      .catch(() => onToast('Could not copy.', 'error'))
+  }
+
+  function downloadCsv(group: { product_name: string; signups: WaitlistSignup[] }) {
+    const header = 'name,email,phone,source,joined_at'
+    const rows = group.signups.map((s) =>
+      [s.name, s.email, s.phone ?? '', s.source, s.joined_at]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+        .join(','),
+    )
+    const blob = new Blob([[header, ...rows].join('\n')], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${group.product_name.toLowerCase().replace(/\s+/g, '-')}-waitlist.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Header / filter bar */}
+      <div className="bg-surface rounded-card p-5" style={{ boxShadow: cardShadow }}>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <h2 className="text-base font-bold text-foreground">Waitlist signups</h2>
+            <p className="text-xs text-foreground-muted mt-0.5">
+              {data.total.toLocaleString()} people across {data.products.length} {data.products.length === 1 ? 'product' : 'products'}.
+              Reach out for market research or launch updates.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+            <select
+              value={productFilter}
+              onChange={(e) => onProductFilter(e.target.value)}
+              className="text-sm border border-border rounded-button px-3 py-1.5 bg-surface focus:outline-none focus:border-primary"
+            >
+              <option value="all">All products</option>
+              {data.products.map((g) => (
+                <option key={g.product_slug} value={g.product_slug}>{g.product_name}</option>
+              ))}
+            </select>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              placeholder="Search name or email…"
+              className="text-sm border border-border rounded-button px-3 py-1.5 bg-surface focus:outline-none focus:border-primary w-48"
+            />
+            {data.products.length > 1 && (
+              <button
+                type="button"
+                onClick={() => {
+                  const allOpen = expanded.size === data.products.length
+                  setExpanded(allOpen ? new Set() : new Set(data.products.map((g) => g.product_id)))
+                }}
+                className="text-xs font-semibold px-3 py-1.5 rounded-button border border-border bg-surface text-foreground hover:border-border-strong cursor-pointer"
+              >
+                {expanded.size === data.products.length ? 'Collapse all' : 'Expand all'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {filteredGroups.map((group) => {
+        const isOpen = expanded.has(group.product_id)
+        return (
+        <div key={group.product_id} className="bg-surface rounded-card overflow-hidden" style={{ boxShadow: cardShadow }}>
+          <header className={`flex items-center justify-between gap-3 px-5 py-3 ${isOpen ? 'border-b border-border' : ''}`}>
+            <button
+              type="button"
+              onClick={() => toggle(group.product_id)}
+              aria-expanded={isOpen}
+              aria-controls={`waitlist-${group.product_id}`}
+              className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer group"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+                className={`flex-shrink-0 text-foreground-faint group-hover:text-foreground transition-transform ${isOpen ? 'rotate-90' : ''}`}
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+              <div className="min-w-0">
+                <span className="text-sm font-bold text-foreground group-hover:text-primary truncate block">
+                  {group.product_name}
+                </span>
+                <span className="text-xs text-foreground-faint mt-0.5 block">
+                  {group.signups.length.toLocaleString()} {query ? 'matching' : 'shown'} · {group.total.toLocaleString()} total
+                </span>
+              </div>
+            </button>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => copyEmails(group.signups.map((s) => s.email))}
+                className="text-xs font-semibold px-3 py-1.5 rounded-button border border-border bg-surface text-foreground hover:border-border-strong cursor-pointer"
+              >
+                Copy emails
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadCsv(group)}
+                className="text-xs font-semibold px-3 py-1.5 rounded-button border border-border bg-surface text-foreground hover:border-border-strong cursor-pointer"
+              >
+                Export CSV
+              </button>
+            </div>
+          </header>
+
+          {isOpen && (
+          <div id={`waitlist-${group.product_id}`}>
+          {group.signups.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-foreground-muted text-center">No matches.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-surface-subtle text-foreground-muted">
+                  <tr className="text-left">
+                    <th className="font-semibold px-5 py-2.5">Name</th>
+                    <th className="font-semibold px-5 py-2.5">Email</th>
+                    <th className="font-semibold px-5 py-2.5">Phone</th>
+                    <th className="font-semibold px-5 py-2.5">Source</th>
+                    <th className="font-semibold px-5 py-2.5">Joined</th>
+                    <th className="font-semibold px-5 py-2.5 text-right">Reach out</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.signups.map((s) => (
+                    <tr key={s.id} className="border-t border-border hover:bg-surface-subtle/60">
+                      <td className="px-5 py-2.5 text-foreground font-medium whitespace-nowrap">{s.name}</td>
+                      <td className="px-5 py-2.5 text-foreground-muted whitespace-nowrap">
+                        <a href={`mailto:${s.email}`} className="hover:text-primary">{s.email}</a>
+                      </td>
+                      <td className="px-5 py-2.5 text-foreground-muted whitespace-nowrap">
+                        {s.phone ? <a href={`tel:${s.phone.replace(/\s+/g, '')}`} className="hover:text-primary">{s.phone}</a> : <span className="text-foreground-faint">—</span>}
+                      </td>
+                      <td className="px-5 py-2.5 whitespace-nowrap">
+                        <span className="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-button bg-surface-subtle text-foreground-muted capitalize border border-border">
+                          {s.source}
+                        </span>
+                      </td>
+                      <td className="px-5 py-2.5 text-foreground-faint whitespace-nowrap">
+                        {new Date(s.joined_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td className="px-5 py-2.5 text-right whitespace-nowrap">
+                        <a
+                          href={`mailto:${s.email}?subject=${encodeURIComponent(`About ${group.product_name}`)}`}
+                          className="text-xs font-semibold text-primary hover:underline"
+                        >
+                          Email
+                        </a>
+                        {s.phone && (
+                          <>
+                            <span className="text-foreground-faint mx-2">·</span>
+                            <a
+                              href={`https://wa.me/${s.phone.replace(/[^\d]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-semibold text-primary hover:underline"
+                            >
+                              WhatsApp
+                            </a>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          </div>
+          )}
+        </div>
+        )
+      })}
     </div>
   )
 }

@@ -30,7 +30,7 @@ const navLinks = [
 const communitySubMenu = [
   { label: 'Forums', href: '/community?tab=forums', desc: 'Discussions across categories and product forums' },
   { label: 'Events', href: '/community?tab=events', desc: 'Meetups, workshops, demos and hackathons' },
-  { label: 'Software Requests', href: '/community?tab=requests', desc: 'Vote for tools you wish existed' },
+  { label: 'Product Requests', href: '/community?tab=requests', desc: 'Vote for products you wish existed' },
   { label: 'Mailing List', href: '/community?tab=mailing-list', desc: 'Weekly digest in your inbox' },
 ]
 

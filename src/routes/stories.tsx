@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '../components/Header'
-import { Footer } from '../components/Footer'
 
 export const Route = createFileRoute('/stories')({ component: StoriesPage })
 
@@ -28,7 +27,7 @@ const stories: Story[] = [
     category: 'Founder Story',
     read_time: '8 min read',
     published_at: '2026-04-22',
-    cover_color: 'linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%)',
+    cover_color: 'linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%)',
   },
   {
     slug: 'mobile-money-rails-gambia-2026',
@@ -39,7 +38,7 @@ const stories: Story[] = [
     category: 'Industry',
     read_time: '12 min read',
     published_at: '2026-04-18',
-    cover_color: 'linear-gradient(135deg, #7C5CBF 0%, #5B3FAE 100%)',
+    cover_color: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
   },
   {
     slug: 'shipping-on-3g-design-notes',
@@ -61,7 +60,7 @@ const stories: Story[] = [
     category: 'Founder Story',
     read_time: '5 min read',
     published_at: '2026-04-05',
-    cover_color: 'linear-gradient(135deg, #DC4A22 0%, #B33A1A 100%)',
+    cover_color: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
   },
   {
     slug: 'gambia-edtech-landscape',
@@ -72,7 +71,7 @@ const stories: Story[] = [
     category: 'Industry',
     read_time: '15 min read',
     published_at: '2026-03-28',
-    cover_color: 'linear-gradient(135deg, #0891B2 0%, #06768F 100%)',
+    cover_color: 'linear-gradient(135deg, #0EA5E9 0%, #0369A1 100%)',
   },
   {
     slug: 'first-100-users-without-paid-ads',
@@ -83,7 +82,7 @@ const stories: Story[] = [
     category: 'Field Notes',
     read_time: '7 min read',
     published_at: '2026-03-20',
-    cover_color: 'linear-gradient(135deg, #B45309 0%, #92400E 100%)',
+    cover_color: 'linear-gradient(135deg, #0E7490 0%, #155E75 100%)',
   },
   {
     slug: 'building-with-gov-tech-deep-dive',
@@ -94,7 +93,7 @@ const stories: Story[] = [
     category: 'Deep Dive',
     read_time: '18 min read',
     published_at: '2026-03-10',
-    cover_color: 'linear-gradient(135deg, #065F46 0%, #064E3B 100%)',
+    cover_color: 'linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%)',
   },
 ]
 
@@ -210,8 +209,6 @@ function StoriesPage() {
           </>
         )}
       </main>
-
-      <Footer />
     </div>
   )
 }

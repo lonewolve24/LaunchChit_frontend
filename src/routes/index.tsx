@@ -201,6 +201,19 @@ export function FeedPage() {
             </div>
 
             <div className="bg-surface rounded-card p-6" style={{ boxShadow: cardShadow }}>
+              <p className="text-base font-bold text-foreground mb-2">Can't find what you need?</p>
+              <p className="text-sm text-foreground-muted leading-relaxed">
+                Post a product request and let Gambian makers know what you'd pay for. Someone might already be building it.
+              </p>
+              <a
+                href="/community?tab=requests"
+                className="mt-5 block text-center bg-primary text-white text-sm font-semibold px-4 py-3 rounded-button hover:bg-primary-dark transition-colors"
+              >
+                Request a product
+              </a>
+            </div>
+
+            <div className="bg-surface rounded-card p-6" style={{ boxShadow: cardShadow }}>
               <p className="text-base font-bold text-foreground mb-3">Popular Topics</p>
               <div className="space-y-1">
                 {[

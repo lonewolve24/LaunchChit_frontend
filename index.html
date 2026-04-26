@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,9 +7,43 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      /* Inline boot shell — shown until React mounts. Avoids a flash of blank
+         white while MSW registers and the route bundle hydrates. */
+      /* Match Tailwind preflight resets so the boot shell does not visibly
+         shift (browsers default body to margin: 8px, which creates an 8px
+         gap around the header band that snaps closed on hydration). */
+      html, body { margin: 0; padding: 0; }
+      body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+      .boot { font-family: inherit; }
+      .boot-bar { background: #2563EB; height: 64px; width: 100%; box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.25); }
+      .boot-bar-inner { max-width: 1280px; height: 100%; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; }
+      @media (min-width: 1024px) { .boot-bar-inner { padding: 0 40px; } }
+      .boot-brand { color: #fff; font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
+      .boot-body { background: #F4F6FB; min-height: calc(100vh - 64px); padding: 32px 24px; }
+      .boot-skeleton { background: #E5E9F2; border-radius: 12px; animation: bootPulse 1.4s ease-in-out infinite; }
+      .boot-skeleton.h-8 { height: 32px; width: 220px; margin-bottom: 12px; }
+      .boot-skeleton.h-4 { height: 16px; width: 360px; max-width: 80%; margin-bottom: 24px; }
+      .boot-skeleton.card { height: 120px; width: 100%; max-width: 960px; margin: 12px auto; }
+      @keyframes bootPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="boot" role="status" aria-live="polite">
+        <div class="boot-bar"><div class="boot-bar-inner"><span class="boot-brand">LaunchedChit</span></div></div>
+        <div class="boot-body">
+          <div style="max-width: 960px; margin: 0 auto;">
+            <div class="boot-skeleton h-8"></div>
+            <div class="boot-skeleton h-4"></div>
+            <div class="boot-skeleton card"></div>
+            <div class="boot-skeleton card"></div>
+            <div class="boot-skeleton card"></div>
+          </div>
+          <span style="position: absolute; left: -9999px;">Loading LaunchedChit…</span>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -3,19 +3,25 @@ import { useState, useEffect } from 'react'
 import { Header } from '../components/Header'
 import { Skeleton } from '../components/Skeleton'
 import { Toast } from '../components/Toast'
+import { SubmitRequestModal } from '../components/SubmitRequestModal'
+
+const VALID_TABS = ['forums', 'events', 'requests', 'mailing-list'] as const
 
 export const Route = createFileRoute('/community')({
-  validateSearch: (s: Record<string, unknown>) => ({
-    tab: (s.tab as 'forums' | 'events' | 'requests' | 'mailing-list' | undefined) ?? undefined,
-    category: (s.category as string | undefined) ?? undefined,
-    product: (s.product as string | undefined) ?? undefined,
-    sort: (s.sort as string | undefined) ?? undefined,
-    view: (s.view as 'grid' | 'calendar' | undefined) ?? undefined,
-    page: (s.page as number | undefined) ?? undefined,
-    page_size: (s.page_size as number | undefined) ?? undefined,
-    month: (s.month as string | undefined) ?? undefined,
-    mode: (s.mode as string | undefined) ?? undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>) => {
+    const rawTab = typeof s.tab === 'string' ? s.tab : undefined
+    return {
+      tab: (VALID_TABS as readonly string[]).includes(rawTab ?? '') ? (rawTab as 'forums' | 'events' | 'requests' | 'mailing-list') : undefined,
+      category: (s.category as string | undefined) ?? undefined,
+      product: (s.product as string | undefined) ?? undefined,
+      sort: (s.sort as string | undefined) ?? undefined,
+      view: (s.view as 'grid' | 'calendar' | undefined) ?? undefined,
+      page: (s.page as number | undefined) ?? undefined,
+      page_size: (s.page_size as number | undefined) ?? undefined,
+      month: (s.month as string | undefined) ?? undefined,
+      mode: (s.mode as string | undefined) ?? undefined,
+    }
+  },
   component: CommunityPage,
 })
 
@@ -82,7 +88,12 @@ function formatEventDate(iso: string) {
 export function CommunityPage() {
   const navigate = useNavigate()
   const search = useSearch({ from: '/community' })
-  const tab: Tab = search.tab ?? 'forums'
+  // Belt and braces: if validateSearch missed it, fall back to the raw URL.
+  const urlTab = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('tab')
+    : null
+  const fromUrl = (VALID_TABS as readonly string[]).includes(urlTab ?? '') ? (urlTab as Tab) : null
+  const tab: Tab = search.tab ?? fromUrl ?? 'forums'
 
   return (
     <div className="min-h-screen bg-surface-subtle">
@@ -105,7 +116,7 @@ export function CommunityPage() {
                 tab === t ? 'border-primary text-primary' : 'border-transparent text-foreground-muted hover:text-foreground'
               }`}
             >
-              {t === 'forums' ? 'Forums' : t === 'events' ? 'Events' : t === 'requests' ? 'Software Requests' : 'Mailing List'}
+              {t === 'forums' ? 'Forums' : t === 'events' ? 'Events' : t === 'requests' ? 'Product Requests' : 'Mailing List'}
             </button>
           ))}
         </div>
@@ -587,6 +598,7 @@ function RequestsTab() {
   const [loading, setLoading] = useState(true)
   const [voted, setVoted] = useState<Set<string>>(new Set())
   const [toast, setToast] = useState<{ message: string; variant: 'success' | 'error' } | null>(null)
+  const [submitOpen, setSubmitOpen] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -629,10 +641,25 @@ function RequestsTab() {
             Upvote requests you'd use. Makers watch this list — popular requests get built. If you'd <em>pay</em> for it, even better.
           </p>
         </div>
-        <button className="bg-accent text-white text-sm font-semibold px-5 py-2.5 rounded-button hover:bg-accent-dark transition-colors flex-shrink-0">
+        <button
+          type="button"
+          onClick={() => setSubmitOpen(true)}
+          className="bg-accent text-white text-sm font-semibold px-5 py-2.5 rounded-button hover:bg-accent-dark transition-colors flex-shrink-0 cursor-pointer"
+        >
           + Submit a request
         </button>
       </div>
+
+      <SubmitRequestModal
+        open={submitOpen}
+        onClose={() => setSubmitOpen(false)}
+        onCreated={(created) => {
+          setRequests((prev) => [created, ...prev])
+          setTotal((t) => t + 1)
+          setToast({ message: 'Request posted — makers will see it now.', variant: 'success' })
+          if (sort !== 'recent') update({ sort: 'recent', page: 1 })
+        }}
+      />
 
       <div className="flex items-center gap-2 justify-end">
         <span className="text-xs text-foreground-muted">Sort:</span>
@@ -672,8 +699,10 @@ function RequestsTab() {
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${statusBadge.cls}`}>{statusBadge.label}</span>
                     </div>
-                    <h3 className="text-base font-bold text-foreground">{r.title}</h3>
-                    <p className="text-sm text-foreground-muted mt-1.5 leading-relaxed">{r.body}</p>
+                    <h3 className="text-base font-bold text-foreground">
+                      <a href={`/community/requests/${r.id}`} className="hover:text-primary transition-colors">{r.title}</a>
+                    </h3>
+                    <p className="text-sm text-foreground-muted mt-1.5 leading-relaxed line-clamp-2">{r.body}</p>
                     <div className="flex items-center gap-3 mt-3 text-xs text-foreground-faint flex-wrap">
                       <span className="flex items-center gap-1.5">
                         <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold" style={{ backgroundColor: avatarColor(r.requester.name) }}>{r.requester.name[0]}</span>
