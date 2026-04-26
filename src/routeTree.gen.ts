@@ -9,16 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TopicsRouteImport } from './routes/topics'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SubmitRouteImport } from './routes/submit'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as CommunityRouteImport } from './routes/community'
+import { Route as ArchiveRouteImport } from './routes/archive'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
+import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
+const TopicsRoute = TopicsRouteImport.update({
+  id: '/topics',
+  path: '/topics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubmitRoute = SubmitRouteImport.update({
   id: '/submit',
   path: '/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -31,9 +60,34 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchiveRoute = ArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TopicsSlugRoute = TopicsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => TopicsRoute,
+} as any)
+const ProfileUsernameRoute = ProfileUsernameRouteImport.update({
+  id: '/profile/$username',
+  path: '/profile/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PSlugRoute = PSlugRouteImport.update({
@@ -49,72 +103,162 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/archive': typeof ArchiveRoute
+  '/community': typeof CommunityRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/settings': typeof SettingsRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
+  '/topics': typeof TopicsRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
+  '/profile/$username': typeof ProfileUsernameRoute
+  '/topics/$slug': typeof TopicsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/archive': typeof ArchiveRoute
+  '/community': typeof CommunityRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/settings': typeof SettingsRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
+  '/topics': typeof TopicsRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
+  '/profile/$username': typeof ProfileUsernameRoute
+  '/topics/$slug': typeof TopicsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/archive': typeof ArchiveRoute
+  '/community': typeof CommunityRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/settings': typeof SettingsRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
+  '/topics': typeof TopicsRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
+  '/profile/$username': typeof ProfileUsernameRoute
+  '/topics/$slug': typeof TopicsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/archive'
+    | '/community'
     | '/leaderboard'
     | '/login'
+    | '/privacy'
+    | '/settings'
     | '/submit'
+    | '/terms'
+    | '/topics'
     | '/auth/callback'
     | '/p/$slug'
+    | '/profile/$username'
+    | '/topics/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/archive'
+    | '/community'
     | '/leaderboard'
     | '/login'
+    | '/privacy'
+    | '/settings'
     | '/submit'
+    | '/terms'
+    | '/topics'
     | '/auth/callback'
     | '/p/$slug'
+    | '/profile/$username'
+    | '/topics/$slug'
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/archive'
+    | '/community'
     | '/leaderboard'
     | '/login'
+    | '/privacy'
+    | '/settings'
     | '/submit'
+    | '/terms'
+    | '/topics'
     | '/auth/callback'
     | '/p/$slug'
+    | '/profile/$username'
+    | '/topics/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ArchiveRoute: typeof ArchiveRoute
+  CommunityRoute: typeof CommunityRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
+  SettingsRoute: typeof SettingsRoute
   SubmitRoute: typeof SubmitRoute
+  TermsRoute: typeof TermsRoute
+  TopicsRoute: typeof TopicsRouteWithChildren
   AuthCallbackRoute: typeof AuthCallbackRoute
   PSlugRoute: typeof PSlugRoute
+  ProfileUsernameRoute: typeof ProfileUsernameRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/topics': {
+      id: '/topics'
+      path: '/topics'
+      fullPath: '/topics'
+      preLoaderRoute: typeof TopicsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/submit': {
       id: '/submit'
       path: '/submit'
       fullPath: '/submit'
       preLoaderRoute: typeof SubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -131,11 +275,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/archive': {
+      id: '/archive'
+      path: '/archive'
+      fullPath: '/archive'
+      preLoaderRoute: typeof ArchiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/topics/$slug': {
+      id: '/topics/$slug'
+      path: '/$slug'
+      fullPath: '/topics/$slug'
+      preLoaderRoute: typeof TopicsSlugRouteImport
+      parentRoute: typeof TopicsRoute
+    }
+    '/profile/$username': {
+      id: '/profile/$username'
+      path: '/profile/$username'
+      fullPath: '/profile/$username'
+      preLoaderRoute: typeof ProfileUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/p/$slug': {
@@ -155,13 +334,32 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface TopicsRouteChildren {
+  TopicsSlugRoute: typeof TopicsSlugRoute
+}
+
+const TopicsRouteChildren: TopicsRouteChildren = {
+  TopicsSlugRoute: TopicsSlugRoute,
+}
+
+const TopicsRouteWithChildren =
+  TopicsRoute._addFileChildren(TopicsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ArchiveRoute: ArchiveRoute,
+  CommunityRoute: CommunityRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
+  SettingsRoute: SettingsRoute,
   SubmitRoute: SubmitRoute,
+  TermsRoute: TermsRoute,
+  TopicsRoute: TopicsRouteWithChildren,
   AuthCallbackRoute: AuthCallbackRoute,
   PSlugRoute: PSlugRoute,
+  ProfileUsernameRoute: ProfileUsernameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
