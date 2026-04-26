@@ -62,9 +62,11 @@ export function FeedPage() {
       <Header user={null} />
 
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-baseline justify-between mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Today's Launches</h1>
-          <span className="text-sm text-foreground-muted">{today}</span>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Today's Launches</h1>
+            <p className="text-sm text-foreground-muted mt-0.5">{today}</p>
+          </div>
         </div>
 
         <div className="flex gap-6">
@@ -84,15 +86,15 @@ export function FeedPage() {
             )}
           </div>
 
-          <aside className="hidden md:block w-56 flex-shrink-0">
-            <div className="bg-surface border border-border rounded-card p-4">
-              <p className="text-sm font-semibold text-foreground mb-1">What is LaunchedChit?</p>
+          <aside className="hidden md:block w-60 flex-shrink-0">
+            <div className="bg-surface border border-border rounded-card p-5 shadow-sm">
+              <p className="text-sm font-bold text-foreground mb-2">What is LaunchedChit?</p>
               <p className="text-xs text-foreground-muted leading-relaxed">
                 A daily feed of products built by Gambian makers. Ship something. Get seen.
               </p>
               <a
                 href="/submit"
-                className="mt-3 block text-center bg-accent text-white text-xs font-semibold px-3 py-2 rounded-button hover:bg-accent-dark transition-colors"
+                className="mt-4 block text-center bg-accent text-white text-sm font-semibold px-3 py-2.5 rounded-button hover:bg-accent-dark transition-colors"
               >
                 Submit your product
               </a>

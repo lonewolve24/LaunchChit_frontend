@@ -16,11 +16,11 @@ function initials(user: User): string {
 
 export function Header({ user }: Props) {
   return (
-    <header className="bg-surface border-b border-border sticky top-0 z-10">
+    <header className="bg-primary sticky top-0 z-10 shadow-md">
       <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
         <a
           href="/"
-          className="text-primary font-bold text-lg tracking-tight"
+          className="text-white font-bold text-lg tracking-tight"
         >
           LaunchedChit
         </a>
@@ -34,13 +34,13 @@ export function Header({ user }: Props) {
           </a>
 
           {user ? (
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
               {initials(user)}
             </div>
           ) : (
             <a
               href="/login"
-              className="text-sm font-medium text-foreground-muted hover:text-foreground transition-colors"
+              className="text-sm font-medium text-white/70 hover:text-white transition-colors"
             >
               Sign in
             </a>

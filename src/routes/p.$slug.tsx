@@ -65,35 +65,38 @@ export function ProductDetailPage() {
             <Skeleton className="h-32 w-full" />
           </div>
         ) : (
-          <div className="flex gap-8">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start gap-4 mb-6">
+          <div className="bg-surface border border-border rounded-card shadow-sm p-8">
+            <div className="flex items-start justify-between gap-6 mb-8">
+              <div className="flex items-start gap-5">
                 {product.logo_url ? (
-                  <img src={product.logo_url} alt={product.name} className="w-20 h-20 rounded-card object-cover flex-shrink-0" />
+                  <img src={product.logo_url} alt={product.name} className="w-20 h-20 rounded-card object-cover flex-shrink-0 shadow-sm" />
                 ) : (
-                  <div className="w-20 h-20 rounded-card bg-surface-raised flex-shrink-0" />
+                  <div className="w-20 h-20 rounded-card flex-shrink-0 bg-primary flex items-center justify-center shadow-sm">
+                    <span className="text-white font-bold text-3xl">{product.name[0]}</span>
+                  </div>
                 )}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0">
                   <h1 className="text-2xl font-bold text-foreground">{product.name}</h1>
-                  <p className="text-foreground-muted mt-1">{product.tagline}</p>
+                  <p className="text-foreground-muted mt-1 text-[15px]">{product.tagline}</p>
                   <p className="text-xs text-foreground-faint mt-2">by {product.maker.name}</p>
                 </div>
               </div>
 
-              <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{product.description}</p>
+              <div className="flex flex-col items-center gap-3 flex-shrink-0">
+                <UpvoteButton voteCount={product.vote_count} hasVoted={product.has_voted} onVote={handleVote} size="lg" />
+                <a
+                  href={product.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-primary border-2 border-primary px-5 py-2 rounded-button hover:bg-primary hover:text-white transition-colors whitespace-nowrap"
+                >
+                  Visit website
+                </a>
+              </div>
             </div>
 
-            <aside className="flex-shrink-0 flex flex-col items-center gap-4 pt-1">
-              <UpvoteButton voteCount={product.vote_count} hasVoted={product.has_voted} onVote={handleVote} size="lg" />
-              <a
-                href={product.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-semibold text-primary border border-primary px-4 py-2 rounded-button hover:bg-primary hover:text-white transition-colors"
-              >
-                Visit website
-              </a>
-            </aside>
+            <hr className="border-border mb-6" />
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{product.description}</p>
           </div>
         )}
       </main>
