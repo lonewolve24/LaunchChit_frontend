@@ -4,6 +4,13 @@ _Completed features will be logged here._
 
 ---
 
+## F23 — E2E: Feed order
+- Playwright test: visit `/` → collect vote counts from all Upvote buttons → assert descending order
+- MSW returns products pre-sorted by `vote_count` descending (24, 18, 11)
+- Test: 1/1 ✓
+
+---
+
 ## F22 — E2E: Auth redirect
 - Playwright test: navigate to `/submit` while unauthenticated → redirected to `/login`
 - Covered by mount-time `GET /me` check implemented in F20
