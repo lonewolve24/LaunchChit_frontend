@@ -4,6 +4,14 @@ _Completed features will be logged here._
 
 ---
 
+## F03 — Vitest + Testing Library
+- Installed: `@testing-library/user-event`, `@testing-library/jest-dom`
+- Configured vitest in `vite.config.ts`: jsdom environment, setupFiles, globals
+- Created `src/test/setup.ts` with jest-dom import
+- Smoke test passes: 1/1 ✓
+
+---
+
 ## F02 — Tailwind semantic CSS variable system and brand tokens
 - Tailwind v4 `@theme` directive in `src/styles.css`
 - Tokens: primary (green), accent (amber), surface, border, foreground, destructive, success
