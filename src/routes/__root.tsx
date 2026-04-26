@@ -11,7 +11,13 @@ export const Route = createRootRoute({
   component: RootComponent,
 })
 
-const HIDE_FOOTER_ON = ['/login', '/signup', '/forgot-password', '/reset-password', '/verify-otp']
+const HIDE_FOOTER_EXACT = ['/login', '/signup', '/forgot-password', '/reset-password', '/verify-otp']
+const HIDE_FOOTER_PREFIX = ['/dashboard', '/admin']
+
+function shouldHideFooter(pathname: string): boolean {
+  if (HIDE_FOOTER_EXACT.includes(pathname)) return true
+  return HIDE_FOOTER_PREFIX.some((p) => pathname === p || pathname.startsWith(p + '/'))
+}
 
 function RouteLoader() {
   const isLoading = useRouterState({ select: (s) => s.status === 'pending' || s.isLoading })
@@ -31,7 +37,7 @@ function RouteLoader() {
 
 function RootComponent() {
   const { pathname } = useLocation()
-  const hideFooter = HIDE_FOOTER_ON.includes(pathname)
+  const hideFooter = shouldHideFooter(pathname)
 
   return (
     <div className="flex flex-col min-h-screen">
