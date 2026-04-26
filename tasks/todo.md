@@ -1,9 +1,12 @@
 # TODO
 
-## F04 — Set up Playwright
+## F05 — Set up MSW with all 9 MVP mock handlers
 
 Steps:
-1. Install Playwright: `pnpm create playwright` or `pnpm add -D @playwright/test`
-2. Configure `playwright.config.ts`: baseURL `http://localhost:3000`, chromium only for MVP
-3. Write a smoke E2E test: visit `/`, expect page to load (status 200)
-4. Confirm `pnpm exec playwright test` passes with dev server running
+1. Install `msw`
+2. Create `src/mocks/handlers.ts` with all 9 handlers matching BACKEND_SPEC.md response shapes
+3. Create `src/mocks/browser.ts` (browser worker setup)
+4. Create `src/mocks/server.ts` (node server for Vitest)
+5. Wire MSW into `src/main.tsx` — start worker in development only
+6. Update test setup to use MSW server
+7. Write a test confirming a mock handler returns the expected shape

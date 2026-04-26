@@ -4,6 +4,13 @@ _Completed features will be logged here._
 
 ---
 
+## F04 — Playwright
+- Installed `@playwright/test`, Chromium browser
+- `playwright.config.ts`: baseURL `localhost:3000`, Chromium only, webServer auto-start
+- `e2e/smoke.spec.ts`: home page loads → 1/1 ✓
+
+---
+
 ## F03 — Vitest + Testing Library
 - Installed: `@testing-library/user-event`, `@testing-library/jest-dom`
 - Configured vitest in `vite.config.ts`: jsdom environment, setupFiles, globals
