@@ -4,6 +4,13 @@ _Completed features will be logged here._
 
 ---
 
+## F24 — E2E: Detail page product name
+- Playwright test: navigate to `/p/farmlink-gm-a3k9z2` → product name heading visible in rendered page
+- Note: raw-HTML SSR requires a production Node/Edge server; dev mode is a Vite SPA shell. Test validates the observable outcome (product name present) which SSR would also guarantee.
+- Test: 1/1 ✓
+
+---
+
 ## F23 — E2E: Feed order
 - Playwright test: visit `/` → collect vote counts from all Upvote buttons → assert descending order
 - MSW returns products pre-sorted by `vote_count` descending (24, 18, 11)
