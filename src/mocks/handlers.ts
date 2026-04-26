@@ -138,12 +138,76 @@ export const handlers = [
   http.get(`${BASE}/products/:slug`, ({ params }) => {
     const product = products.find((p) => p.slug === params.slug)
     if (!product) return new HttpResponse(null, { status: 404 })
+
+    // Build a "rank" based on vote position
+    const ranked = [...products].sort((a, b) => b.vote_count - a.vote_count)
+    const dayRank = ranked.findIndex((p) => p.id === product.id) + 1
+
+    // Find similar products (overlapping topic), up to 4
+    const productTopicSlugs = new Set((product.topics ?? []).map((t) => t.slug))
+    const similar = products
+      .filter((p) => p.id !== product.id && p.topics?.some((t) => productTopicSlugs.has(t.slug)))
+      .slice(0, 4)
+
     return HttpResponse.json({
       ...product,
-      description: 'A detailed description of this product goes here.',
-      website_url: 'https://example.com',
-      maker: { id: 'user-001', name: 'Musa Jallow', avatar_url: null },
+      description: `${product.tagline}.\n\n${product.name} was built to solve a specific problem for the Gambian market. After months of working with users in Banjul, Brikama, and the rural Kombo areas, the team shipped a first version that focuses on three things: simplicity, offline reliability, and a price point that works for the market.\n\nThe team is small but committed — every feature you see has been requested by at least three real users. There's no growth-hacking, no fake testimonials, no "AI-powered" buzzwords thrown in for fundraising. Just a tool that works.\n\nWhat's next: we're rolling out support for additional regions, integrating with local payment providers, and (in beta) a partnership with two ministries to scale distribution.`,
+      website_url: `https://${product.slug.replace(/-/g, '')}.gm`,
+      pricing: 'Free during beta · Paid plans from D200/month',
+      platforms: ['Web', 'Android', 'iOS'],
+      launch_date: '2026-04-26',
+      day_rank: dayRank,
+      maker: { id: 'user-001', name: product.maker.name, avatar_url: null, bio: `Building ${product.name} and other tools for The Gambia.` },
       topics: product.topics ?? [],
+      gallery: [
+        { color: '#1B4332', label: 'Dashboard' },
+        { color: '#2563EB', label: 'Onboarding' },
+        { color: '#7C5CBF', label: 'Mobile' },
+      ],
+      similar_products: similar.map((p) => ({ id: p.id, slug: p.slug, name: p.name, tagline: p.tagline, vote_count: p.vote_count })),
+      stats: { followers: Math.round(product.vote_count * 4.2), reviews: Math.max(2, Math.round(product.vote_count / 6)) },
+      comments: [
+        {
+          id: 'c1',
+          author: { name: product.maker.name, role: 'Maker' },
+          body: `Hey LaunchedChit 👋 — ${product.maker.name} here, founder of ${product.name}. Excited to launch today! Happy to answer any questions about how we built this and what's next on the roadmap.`,
+          created_at: '2 hours ago',
+          upvotes: 12,
+          replies: [
+            {
+              id: 'c1r1',
+              author: { name: 'Fatou Ceesay' },
+              body: 'Congrats on the launch! How long did it take you to go from idea to MVP?',
+              created_at: '1 hour ago',
+              upvotes: 3,
+            },
+          ],
+        },
+        {
+          id: 'c2',
+          author: { name: 'Ousman Bah' },
+          body: 'Tried this last week — really clean experience. The offline mode is what sold me. So many products break the moment your network drops, and yours just kept working. Bookmarked.',
+          created_at: '4 hours ago',
+          upvotes: 8,
+          replies: [],
+        },
+        {
+          id: 'c3',
+          author: { name: 'Aminata Touray' },
+          body: 'This is exactly what the market needed. Sent it to two NGOs I work with. Quick question — do you have a Wolof interface planned?',
+          created_at: '5 hours ago',
+          upvotes: 6,
+          replies: [
+            {
+              id: 'c3r1',
+              author: { name: product.maker.name, role: 'Maker' },
+              body: '@aminata Wolof is on the roadmap for Q3, alongside Mandinka and Pulaar. We\'re partnering with the Wolof Translate team for that work.',
+              created_at: '4 hours ago',
+              upvotes: 5,
+            },
+          ],
+        },
+      ],
     })
   }),
 

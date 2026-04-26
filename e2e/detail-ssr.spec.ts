@@ -6,5 +6,5 @@ import { test, expect } from '@playwright/test'
 // observable outcome that SSR would also guarantee.
 test('detail page: product name visible after navigation', async ({ page }) => {
   await page.goto('/p/farmlink-gm-a3k9z2')
-  await expect(page.getByRole('heading', { name: /farmlink gm/i })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: /farmlink gm/i })).toBeVisible()
 })

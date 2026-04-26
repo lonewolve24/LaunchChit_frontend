@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { ProductDetailPage } from './p.$slug'
 
@@ -15,17 +14,17 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
 describe('ProductDetailPage', () => {
   it('renders product name', async () => {
     render(<ProductDetailPage />)
-    await waitFor(() => expect(screen.getByRole('heading', { name: /farmlink gm/i })).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: /farmlink gm/i })).toBeInTheDocument())
   })
 
   it('renders product tagline', async () => {
     render(<ProductDetailPage />)
-    await waitFor(() => expect(screen.getByText(/connecting gambian farmers/i)).toBeInTheDocument())
+    await waitFor(() => expect(screen.getAllByText(/connecting gambian farmers/i).length).toBeGreaterThan(0))
   })
 
   it('renders product description', async () => {
     render(<ProductDetailPage />)
-    await waitFor(() => expect(screen.getByText(/a detailed description/i)).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText(/was built to solve a specific problem/i)).toBeInTheDocument())
   })
 
   it('renders a Visit website link', async () => {
@@ -38,13 +37,13 @@ describe('ProductDetailPage', () => {
 
   it('renders the maker name', async () => {
     render(<ProductDetailPage />)
-    await waitFor(() => expect(screen.getByText(/musa jallow/i)).toBeInTheDocument())
+    await waitFor(() => expect(screen.getAllByText(/musa jallow/i).length).toBeGreaterThan(0))
   })
 
   it('renders the upvote button with vote count', async () => {
     render(<ProductDetailPage />)
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /upvote/i })).toBeInTheDocument()
+      expect(screen.getAllByRole('button', { name: /upvote/i }).length).toBeGreaterThan(0)
     })
   })
 
