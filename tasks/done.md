@@ -4,6 +4,15 @@ _Completed features will be logged here._
 
 ---
 
+## F07 — Avatar component
+- Props: `name`, `email`, `avatarUrl?`, `size: sm | md`
+- Renders initials (two-word name → two initials, single name → one, null name → email initial)
+- Renders `<img>` when `avatarUrl` provided
+- Size variants: `sm` (w-7) and `md` (w-9, default)
+- Tests: 6/6 ✓
+
+---
+
 ## F06 — Header component
 - Props: `user: { name, email } | null`
 - Logged out: logo + Submit link + Sign in link
