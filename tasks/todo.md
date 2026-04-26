@@ -1,8 +1,8 @@
 # TODO
 
-## F15 — Feed route (`/`)
+## F16 — Login route (`/login`)
 
 Steps:
-1. Write failing tests: renders product list from MSW, shows skeleton while loading, shows EmptyState when list is empty, renders Header
-2. Implement `src/routes/index.tsx` — fetch `/products/today`, render ProductCard list
+1. Write failing tests: renders email input, submit button, confirmation state after send, resend link, error on invalid email
+2. Create `src/routes/login.tsx` and export `LoginPage`
 3. Pass all tests (green)

@@ -4,6 +4,17 @@ _Completed features will be logged here._
 
 ---
 
+## F15 — Feed route (`/`)
+- `FeedPage` exported for testing, connected to route via `createFileRoute`
+- Fetches `GET /products/today`, shows `SkeletonCard` while loading
+- Renders `ProductCard` list ordered by vote count (from API)
+- `EmptyState` shown when list is empty
+- `handleVote` toggles upvote, redirects to `/login` on 401, shows Toast on error
+- Desktop sidebar: "What is LaunchedChit?" blurb + Submit CTA
+- Tests: 5/5 ✓
+
+---
+
 ## F14 — PageError component
 - Props: `status: 404 | 500`, `message?`
 - Built-in copy for 404 ("Page Not Found") and 500 ("Something Went Wrong")
