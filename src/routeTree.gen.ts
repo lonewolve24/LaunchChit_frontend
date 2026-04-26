@@ -33,7 +33,11 @@ import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as DashboardWaitlistRouteImport } from './routes/dashboard/waitlist'
 import { Route as DashboardProductsRouteImport } from './routes/dashboard/products'
+import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
+import { Route as DashboardMentionsRouteImport } from './routes/dashboard/mentions'
 import { Route as DashboardInboxRouteImport } from './routes/dashboard/inbox'
+import { Route as DashboardFollowersRouteImport } from './routes/dashboard/followers'
+import { Route as DashboardAccountRouteImport } from './routes/dashboard/account'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
 import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
@@ -161,9 +165,29 @@ const DashboardProductsRoute = DashboardProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardMentionsRoute = DashboardMentionsRouteImport.update({
+  id: '/mentions',
+  path: '/mentions',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardInboxRoute = DashboardInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardFollowersRoute = DashboardFollowersRouteImport.update({
+  id: '/followers',
+  path: '/followers',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardAccountRoute = DashboardAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -219,7 +243,11 @@ export interface FileRoutesByFullPath {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/followers': typeof DashboardFollowersRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
+  '/dashboard/mentions': typeof DashboardMentionsRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/products': typeof DashboardProductsRouteWithChildren
   '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
@@ -251,7 +279,11 @@ export interface FileRoutesByTo {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/followers': typeof DashboardFollowersRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
+  '/dashboard/mentions': typeof DashboardMentionsRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/products': typeof DashboardProductsRouteWithChildren
   '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
@@ -285,7 +317,11 @@ export interface FileRoutesById {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/followers': typeof DashboardFollowersRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
+  '/dashboard/mentions': typeof DashboardMentionsRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/products': typeof DashboardProductsRouteWithChildren
   '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
@@ -320,7 +356,11 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/account'
+    | '/dashboard/followers'
     | '/dashboard/inbox'
+    | '/dashboard/mentions'
+    | '/dashboard/notifications'
     | '/dashboard/products'
     | '/dashboard/waitlist'
     | '/p/$slug'
@@ -352,7 +392,11 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/account'
+    | '/dashboard/followers'
     | '/dashboard/inbox'
+    | '/dashboard/mentions'
+    | '/dashboard/notifications'
     | '/dashboard/products'
     | '/dashboard/waitlist'
     | '/p/$slug'
@@ -385,7 +429,11 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/account'
+    | '/dashboard/followers'
     | '/dashboard/inbox'
+    | '/dashboard/mentions'
+    | '/dashboard/notifications'
     | '/dashboard/products'
     | '/dashboard/waitlist'
     | '/p/$slug'
@@ -596,11 +644,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProductsRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/notifications': {
+      id: '/dashboard/notifications'
+      path: '/notifications'
+      fullPath: '/dashboard/notifications'
+      preLoaderRoute: typeof DashboardNotificationsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/mentions': {
+      id: '/dashboard/mentions'
+      path: '/mentions'
+      fullPath: '/dashboard/mentions'
+      preLoaderRoute: typeof DashboardMentionsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/inbox': {
       id: '/dashboard/inbox'
       path: '/inbox'
       fullPath: '/dashboard/inbox'
       preLoaderRoute: typeof DashboardInboxRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/followers': {
+      id: '/dashboard/followers'
+      path: '/followers'
+      fullPath: '/dashboard/followers'
+      preLoaderRoute: typeof DashboardFollowersRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/account': {
+      id: '/dashboard/account'
+      path: '/account'
+      fullPath: '/dashboard/account'
+      preLoaderRoute: typeof DashboardAccountRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/auth/callback': {
@@ -662,14 +738,22 @@ const DashboardProductsRouteWithChildren =
   DashboardProductsRoute._addFileChildren(DashboardProductsRouteChildren)
 
 interface DashboardRouteRouteChildren {
+  DashboardAccountRoute: typeof DashboardAccountRoute
+  DashboardFollowersRoute: typeof DashboardFollowersRoute
   DashboardInboxRoute: typeof DashboardInboxRoute
+  DashboardMentionsRoute: typeof DashboardMentionsRoute
+  DashboardNotificationsRoute: typeof DashboardNotificationsRoute
   DashboardProductsRoute: typeof DashboardProductsRouteWithChildren
   DashboardWaitlistRoute: typeof DashboardWaitlistRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardAccountRoute: DashboardAccountRoute,
+  DashboardFollowersRoute: DashboardFollowersRoute,
   DashboardInboxRoute: DashboardInboxRoute,
+  DashboardMentionsRoute: DashboardMentionsRoute,
+  DashboardNotificationsRoute: DashboardNotificationsRoute,
   DashboardProductsRoute: DashboardProductsRouteWithChildren,
   DashboardWaitlistRoute: DashboardWaitlistRoute,
   DashboardIndexRoute: DashboardIndexRoute,

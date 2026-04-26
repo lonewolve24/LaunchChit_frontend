@@ -34,6 +34,20 @@ export const MAKER_NAV: MakerNavGroup[] = [
     items: [
       { label: 'Waitlist', to: '/dashboard/waitlist', icon: 'users' },
       { label: 'Comment inbox', to: '/dashboard/inbox', icon: 'comment' },
+      { label: 'Followers', to: '/dashboard/followers', icon: 'users' },
+    ],
+  },
+  {
+    label: 'Activity',
+    items: [
+      { label: 'Notifications', to: '/dashboard/notifications', icon: 'bell' },
+      { label: 'Mentions', to: '/dashboard/mentions', icon: 'comment' },
+    ],
+  },
+  {
+    label: 'Account',
+    items: [
+      { label: 'Account & settings', to: '/dashboard/account', icon: 'settings' },
     ],
   },
 ]

@@ -233,6 +233,121 @@ type CommentInboxItem = {
   created_at: string
   status: 'unread' | 'replied' | 'archived'
 }
+// Maker engagement stores ----------------------------------------------------
+
+type Notification = {
+  id: string
+  kind: 'comment' | 'upvote' | 'waitlist' | 'follow' | 'mention' | 'system'
+  title: string
+  body: string
+  actor: { name: string; username: string; avatar_color: string } | null
+  href: string
+  created_at: string
+  read: boolean
+}
+const notificationsStore = (() => {
+  const seedNames = ['Awa Touray', 'Modou Jatta', 'Lamin Saho', 'Fatou Ceesay', 'Binta Ceesay', 'Yusupha Touray', 'Mariama Kah', 'Pa Modou Faal']
+  const seedColors = ['#2563EB', '#0891B2', '#1E40AF', '#06B6D4', '#0E7490', '#3B82F6', '#1D4ED8', '#0EA5E9']
+  const items: Notification[] = [
+    { id: 'n1', kind: 'comment',  title: 'New comment on FarmLink GM', body: '"How does this handle offline sync?"', actor: { name: seedNames[0], username: 'awa-touray', avatar_color: seedColors[0] }, href: '/dashboard/inbox', created_at: '12 min ago', read: false },
+    { id: 'n2', kind: 'waitlist', title: '12 new waitlist signups',     body: 'Across PayGam (8) and FarmLink GM (4).',                                       actor: null,                                                                                                  href: '/dashboard/waitlist', created_at: '1 hour ago',  read: false },
+    { id: 'n3', kind: 'upvote',   title: '+47 upvotes on PayGam',       body: 'You\'re #2 in Fintech today.',                                                  actor: null,                                                                                                  href: '/p/paygam-b7x2m1', created_at: '3 hours ago', read: false },
+    { id: 'n4', kind: 'follow',   title: 'Modou Jatta followed you',    body: 'They build PayGam and Maano Savings.',                                          actor: { name: seedNames[1], username: 'modou-jatta', avatar_color: seedColors[1] }, href: '/dashboard/followers', created_at: '6 hours ago', read: false },
+    { id: 'n5', kind: 'mention',  title: 'You were mentioned in a thread', body: '"…@musa-jallow shipped FarmLink in 14 months — talk to him."',              actor: { name: seedNames[2], username: 'lamin-saho', avatar_color: seedColors[2] }, href: '/dashboard/mentions', created_at: 'yesterday', read: true },
+    { id: 'n6', kind: 'system',   title: 'Weekly digest is ready',      body: 'Highlights from your products this week.',                                       actor: null,                                                                                                  href: '/dashboard', created_at: '2 days ago', read: true },
+    { id: 'n7', kind: 'comment',  title: 'New comment on Banjul Eats',  body: '"Tested the iOS build. Crashes on Android 11."',                                actor: { name: seedNames[3], username: 'fatou-ceesay', avatar_color: seedColors[3] }, href: '/dashboard/inbox', created_at: '3 days ago', read: true },
+    { id: 'n8', kind: 'follow',   title: 'Binta Ceesay followed you',   body: 'They write about Gambian community tools.',                                       actor: { name: seedNames[4], username: 'binta-ceesay', avatar_color: seedColors[4] }, href: '/dashboard/followers', created_at: '4 days ago', read: true },
+  ]
+  return {
+    list: () => items,
+    setRead: (id: string, read: boolean) => { const n = items.find((x) => x.id === id); if (n) n.read = read },
+    markAllRead: () => { items.forEach((n) => { n.read = true }) },
+  }
+})()
+
+type Follower = {
+  username: string
+  name: string
+  bio: string
+  avatar_color: string
+  product_count: number
+  is_following: boolean
+  followed_at: string
+}
+const followersStore = (() => {
+  const followers: Follower[] = [
+    { username: 'awa-touray',     name: 'Awa Touray',      bio: 'Engineering Lead, Kombo Health',          avatar_color: '#2563EB', product_count: 2, is_following: true,  followed_at: '4 days ago' },
+    { username: 'modou-jatta',    name: 'Modou Jatta',     bio: 'Co-founder, PayGam',                      avatar_color: '#0891B2', product_count: 1, is_following: true,  followed_at: '1 week ago' },
+    { username: 'lamin-saho',     name: 'Lamin Saho',      bio: 'Designer & developer in Banjul',          avatar_color: '#1E40AF', product_count: 0, is_following: false, followed_at: '2 weeks ago' },
+    { username: 'fatou-ceesay',   name: 'Fatou Ceesay',    bio: 'Founder, Banjul Eats',                    avatar_color: '#06B6D4', product_count: 1, is_following: true,  followed_at: '3 weeks ago' },
+    { username: 'binta-ceesay',   name: 'Binta Ceesay',    bio: 'Writer · maker · ataya enthusiast',       avatar_color: '#0E7490', product_count: 0, is_following: false, followed_at: '1 month ago' },
+    { username: 'yusupha-touray', name: 'Yusupha Touray',  bio: 'iWallet GM · multicurrency wallet',       avatar_color: '#3B82F6', product_count: 1, is_following: false, followed_at: '1 month ago' },
+    { username: 'mariama-kah',    name: 'Mariama Kah',     bio: 'Founder, Gambianect',                     avatar_color: '#1D4ED8', product_count: 1, is_following: false, followed_at: '2 months ago' },
+  ]
+  const following: Follower[] = followers.filter((f) => f.is_following).map((f) => ({ ...f }))
+  // Add some that you follow but don't follow you back
+  following.push(
+    { username: 'dj-latir',       name: 'DJ Latir',        bio: 'Building Turntable GM',                    avatar_color: '#0EA5E9', product_count: 1, is_following: true, followed_at: '5 days ago' },
+    { username: 'ousman-bah',     name: 'Ousman Bah',      bio: 'Taxi GM · ride-hailing for Banjul',       avatar_color: '#1E40AF', product_count: 1, is_following: true, followed_at: '2 weeks ago' },
+  )
+  return {
+    list: (direction: 'followers' | 'following') => direction === 'followers' ? followers : following,
+    setFollowing: (username: string, on: boolean) => {
+      const f = followers.find((x) => x.username === username)
+      if (f) f.is_following = on
+      // mirror to following list
+      const idx = following.findIndex((x) => x.username === username)
+      if (on && idx === -1) {
+        const seed = followers.find((x) => x.username === username)
+        if (seed) following.push({ ...seed, is_following: true })
+      } else if (!on && idx !== -1) {
+        following.splice(idx, 1)
+      }
+    },
+  }
+})()
+
+type Mention = {
+  id: string
+  context: 'thread' | 'comment' | 'request'
+  source_title: string
+  source_href: string
+  excerpt: string
+  actor: { name: string; username: string; avatar_color: string }
+  created_at: string
+}
+const mockMentions: Mention[] = [
+  { id: 'm1', context: 'thread',  source_title: 'What is the biggest blocker for Gambian startups in 2026?', source_href: '/community/threads/t1',  excerpt: '…would love to hear @musa-jallow\'s take on the talent question.',                            actor: { name: 'Lamin Saho',  username: 'lamin-saho', avatar_color: '#1E40AF' }, created_at: '2 hours ago' },
+  { id: 'm2', context: 'comment', source_title: 'PayGam — we hit 10,000 transactions yesterday',              source_href: '/p/paygam-b7x2m1',     excerpt: '@musa-jallow you should compare notes with this team.',                                       actor: { name: 'Awa Touray',  username: 'awa-touray', avatar_color: '#2563EB' }, created_at: 'yesterday' },
+  { id: 'm3', context: 'request', source_title: 'A reliable WhatsApp broadcast scheduler',                    source_href: '/community/requests/r1', excerpt: 'cc @musa-jallow — this might fit alongside FarmLink\'s notifications.',                       actor: { name: 'Aminata Touray', username: 'aminata-touray', avatar_color: '#0891B2' }, created_at: '3 days ago' },
+  { id: 'm4', context: 'thread',  source_title: 'Anyone else losing customers to slow Wave settlement times?', source_href: '/community/threads/t6', excerpt: '@musa-jallow ran into this with FarmLink\'s payouts.',                                        actor: { name: 'Mariama Kah', username: 'mariama-kah', avatar_color: '#1D4ED8' }, created_at: '1 week ago' },
+]
+
+type AccountPrefs = {
+  notify_comments: boolean
+  notify_upvotes: boolean
+  notify_waitlist: boolean
+  notify_followers: boolean
+  notify_mentions: boolean
+  weekly_digest: boolean
+  product_announcements: boolean
+}
+const accountPrefsStore = (() => {
+  let prefs: AccountPrefs = {
+    notify_comments: true,
+    notify_upvotes: true,
+    notify_waitlist: true,
+    notify_followers: true,
+    notify_mentions: true,
+    weekly_digest: true,
+    product_announcements: false,
+  }
+  return {
+    get: () => prefs,
+    update: (patch: Partial<AccountPrefs>) => { prefs = { ...prefs, ...patch } },
+  }
+})()
+
 type ProductEditExtras = Partial<{
   description: string
   website_url: string
@@ -498,6 +613,106 @@ export const handlers = [
       ...(body.source_url !== undefined ? { source_url: body.source_url } : {}),
     })
     return HttpResponse.json({ slug, ok: true })
+  }),
+
+  // GET /me/notifications?status=unread|all
+  http.get(`${BASE}/me/notifications`, ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const status = new URL(request.url).searchParams.get('status') ?? 'unread'
+    const all = notificationsStore.list()
+    const filtered = status === 'all' ? all : all.filter((n) => !n.read)
+    return HttpResponse.json({
+      items: filtered,
+      counts: { all: all.length, unread: all.filter((n) => !n.read).length },
+    })
+  }),
+
+  // POST /me/notifications/:id/read
+  http.post(`${BASE}/me/notifications/:id/read`, ({ params }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    notificationsStore.setRead(String(params.id), true)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // POST /me/notifications/read-all
+  http.post(`${BASE}/me/notifications/read-all`, () => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    notificationsStore.markAllRead()
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /me/followers?direction=followers|following
+  http.get(`${BASE}/me/followers`, ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const direction = new URL(request.url).searchParams.get('direction') ?? 'followers'
+    return HttpResponse.json({
+      items: followersStore.list(direction === 'following' ? 'following' : 'followers'),
+      counts: {
+        followers: followersStore.list('followers').length,
+        following: followersStore.list('following').length,
+      },
+    })
+  }),
+
+  // POST /me/followers/:username/follow
+  http.post(`${BASE}/me/followers/:username/follow`, ({ params }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    followersStore.setFollowing(String(params.username), true)
+    return HttpResponse.json({ ok: true, following: true })
+  }),
+
+  // DELETE /me/followers/:username/follow
+  http.delete(`${BASE}/me/followers/:username/follow`, ({ params }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    followersStore.setFollowing(String(params.username), false)
+    return HttpResponse.json({ ok: true, following: false })
+  }),
+
+  // GET /me/mentions
+  http.get(`${BASE}/me/mentions`, () => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({ items: mockMentions })
+  }),
+
+  // GET /me/account — maker account info + notification prefs
+  http.get(`${BASE}/me/account`, () => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({
+      name: mockUser.name,
+      email: mockUser.email ?? 'musa@example.com',
+      handle: mockUser.name.toLowerCase().replace(/\s+/g, '-'),
+      created_at: '2024-08-12',
+      preferences: accountPrefsStore.get(),
+    })
+  }),
+
+  // PATCH /me/account — update prefs / display name / email
+  http.patch(`${BASE}/me/account`, async ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as Partial<{
+      name: string
+      email: string
+      preferences: Partial<AccountPrefs>
+    }>
+    if (typeof body.name === 'string' && body.name.trim()) mockUser.name = body.name.trim()
+    if (typeof body.email === 'string' && body.email.trim()) mockUser.email = body.email.trim()
+    if (body.preferences) accountPrefsStore.update(body.preferences)
+    return HttpResponse.json({
+      name: mockUser.name,
+      email: mockUser.email,
+      preferences: accountPrefsStore.get(),
+    })
+  }),
+
+  // POST /me/account/delete — placeholder soft-delete
+  http.post(`${BASE}/me/account/delete`, async ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { confirm?: string }
+    if (body.confirm !== mockUser.name) {
+      return new HttpResponse(JSON.stringify({ error: 'Confirmation does not match.' }), { status: 400 })
+    }
+    setSessionActive(false)
+    return HttpResponse.json({ ok: true })
   }),
 
   // GET /me/products/:slug/analytics?period=7d|30d|90d|1y — per-product drilldown
