@@ -214,6 +214,40 @@ type RequestExtras = {
   requester_phones: string[]
   pay_pledges: Array<{ amount: number; currency: 'GMD' | 'USD' }>
 }
+
+/*
+  In-memory comment inbox store. Generated on demand from the maker's
+  product slice; per-comment status (unread/replied/archived) survives
+  across requests within the session so reply/archive actions stick
+  while you tab around the inbox.
+*/
+type CommentInboxItem = {
+  id: string
+  product_id: string
+  product_slug: string
+  product_name: string
+  author: string
+  author_username: string
+  avatar_color: string
+  body: string
+  created_at: string
+  status: 'unread' | 'replied' | 'archived'
+}
+const commentInboxStore = (() => {
+  const map = new Map<string, CommentInboxItem>()
+  return {
+    upsert(item: CommentInboxItem) {
+      const existing = map.get(item.id)
+      if (existing) return existing
+      map.set(item.id, item)
+      return item
+    },
+    setStatus(id: string, status: CommentInboxItem['status']) {
+      const item = map.get(id)
+      if (item) item.status = status
+    },
+  }
+})()
 const requestExtras = new Map<string, RequestExtras>()
 
 const mockRequests = [
@@ -411,6 +445,83 @@ export const handlers = [
     const items = mine.slice(start, start + pageSize)
 
     return HttpResponse.json({ items, total, page, page_size: pageSize })
+  }),
+
+  // GET /me/comments/inbox — comments left on the signed-in maker's products
+  http.get(`${BASE}/me/comments/inbox`, ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const url = new URL(request.url)
+    const status = url.searchParams.get('status') ?? 'unread'
+    const productSlug = url.searchParams.get('product') ?? ''
+
+    const myProducts = products.slice(0, 4)
+    const items = myProducts.flatMap((p, pi) => {
+      const count = [9, 6, 4, 3][pi] ?? 3
+      return Array.from({ length: count }, (_, i) => {
+        const seed = pi * 17 + i
+        return commentInboxStore.upsert({
+          id: `cm-${p.id}-${i}`,
+          product_id: p.id,
+          product_slug: p.slug,
+          product_name: p.name,
+          author: ['Awa Touray', 'Modou Jatta', 'Lamin Saho', 'Fatou Ceesay', 'Binta Ceesay', 'Yusupha Touray', 'Mariama Kah', 'Pa Modou Faal'][(seed * 3) % 8],
+          author_username: ['awa-touray', 'modou-jatta', 'lamin-saho', 'fatou-ceesay', 'binta-ceesay', 'yusupha-touray', 'mariama-kah', 'pa-modou-faal'][(seed * 3) % 8],
+          avatar_color: ['#2563EB', '#0891B2', '#1E40AF', '#06B6D4', '#0E7490', '#3B82F6', '#1D4ED8', '#0EA5E9'][(seed * 3) % 8],
+          body: [
+            'How does this handle offline sync? Asking because rural connectivity here is rough.',
+            'Just signed up — can I import contacts from a CSV?',
+            'This is exactly what I was looking for. When does the API ship?',
+            'Pricing page seems to be missing. What\'s the cost?',
+            'Tested the iOS build. Crashes on Android 11 — happy to share logs.',
+            'Love it. Mind if we recommend this in our next newsletter?',
+            'Saw a typo on the landing page hero. DM\'d you the screenshot.',
+            'Would you consider open-sourcing the SMS gateway piece?',
+          ][(seed * 7) % 8],
+          created_at: ['1h ago', '3h ago', '6h ago', 'yesterday', '2 days ago', '4 days ago', '1 week ago'][seed % 7],
+          status: 'unread' as 'unread' | 'replied' | 'archived',
+        })
+      })
+    })
+
+    let filtered = items
+    if (status !== 'all') filtered = filtered.filter((c) => c.status === status)
+    if (productSlug) filtered = filtered.filter((c) => c.product_slug === productSlug)
+
+    const counts = {
+      all: items.length,
+      unread: items.filter((c) => c.status === 'unread').length,
+      replied: items.filter((c) => c.status === 'replied').length,
+      archived: items.filter((c) => c.status === 'archived').length,
+    }
+
+    return HttpResponse.json({
+      items: filtered,
+      counts,
+      products: myProducts.map((p) => ({ slug: p.slug, name: p.name })),
+    })
+  }),
+
+  // POST /me/comments/:id/reply — record a reply, mark as replied
+  http.post(`${BASE}/me/comments/:id/reply`, async ({ params, request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { body?: string }
+    if (!body.body || !body.body.trim()) return new HttpResponse(JSON.stringify({ error: 'Empty reply' }), { status: 400 })
+    commentInboxStore.setStatus(String(params.id), 'replied')
+    return HttpResponse.json({ id: params.id, status: 'replied' })
+  }),
+
+  // POST /me/comments/:id/archive — move out of inbox
+  http.post(`${BASE}/me/comments/:id/archive`, ({ params }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    commentInboxStore.setStatus(String(params.id), 'archived')
+    return HttpResponse.json({ id: params.id, status: 'archived' })
+  }),
+
+  // POST /me/comments/:id/unarchive — move back to unread
+  http.post(`${BASE}/me/comments/:id/unarchive`, ({ params }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    commentInboxStore.setStatus(String(params.id), 'unread')
+    return HttpResponse.json({ id: params.id, status: 'unread' })
   }),
 
   // GET /products/today  — supports ?month=YYYY-MM&page=&page_size=

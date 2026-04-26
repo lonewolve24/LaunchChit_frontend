@@ -29,4 +29,11 @@ export const MAKER_NAV: MakerNavGroup[] = [
       { label: 'Submit new', to: '/submit', icon: 'plus' },
     ],
   },
+  {
+    label: 'Audience',
+    items: [
+      { label: 'Waitlist', to: '/dashboard/waitlist', icon: 'users' },
+      { label: 'Comment inbox', to: '/dashboard/inbox', icon: 'comment' },
+    ],
+  },
 ]

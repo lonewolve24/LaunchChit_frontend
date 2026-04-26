@@ -31,7 +31,9 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as TopicsSlugRouteImport } from './routes/topics_.$slug'
 import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as DashboardWaitlistRouteImport } from './routes/dashboard/waitlist'
 import { Route as DashboardProductsRouteImport } from './routes/dashboard/products'
+import { Route as DashboardInboxRouteImport } from './routes/dashboard/inbox'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
 import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
@@ -147,9 +149,19 @@ const PSlugRoute = PSlugRouteImport.update({
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardWaitlistRoute = DashboardWaitlistRouteImport.update({
+  id: '/waitlist',
+  path: '/waitlist',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardProductsRoute = DashboardProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardInboxRoute = DashboardInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -193,7 +205,9 @@ export interface FileRoutesByFullPath {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
@@ -221,7 +235,9 @@ export interface FileRoutesByTo {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
@@ -251,7 +267,9 @@ export interface FileRoutesById {
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/waitlist': typeof DashboardWaitlistRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics_/$slug': typeof TopicsSlugRoute
@@ -282,7 +300,9 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/inbox'
     | '/dashboard/products'
+    | '/dashboard/waitlist'
     | '/p/$slug'
     | '/profile/$username'
     | '/topics/$slug'
@@ -310,7 +330,9 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/inbox'
     | '/dashboard/products'
+    | '/dashboard/waitlist'
     | '/p/$slug'
     | '/profile/$username'
     | '/topics/$slug'
@@ -339,7 +361,9 @@ export interface FileRouteTypes {
     | '/topics'
     | '/verify-otp'
     | '/auth/callback'
+    | '/dashboard/inbox'
     | '/dashboard/products'
+    | '/dashboard/waitlist'
     | '/p/$slug'
     | '/profile/$username'
     | '/topics_/$slug'
@@ -532,11 +556,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/waitlist': {
+      id: '/dashboard/waitlist'
+      path: '/waitlist'
+      fullPath: '/dashboard/waitlist'
+      preLoaderRoute: typeof DashboardWaitlistRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/products': {
       id: '/dashboard/products'
       path: '/products'
       fullPath: '/dashboard/products'
       preLoaderRoute: typeof DashboardProductsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/inbox': {
+      id: '/dashboard/inbox'
+      path: '/inbox'
+      fullPath: '/dashboard/inbox'
+      preLoaderRoute: typeof DashboardInboxRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/auth/callback': {
@@ -571,12 +609,16 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteRouteChildren {
+  DashboardInboxRoute: typeof DashboardInboxRoute
   DashboardProductsRoute: typeof DashboardProductsRoute
+  DashboardWaitlistRoute: typeof DashboardWaitlistRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardInboxRoute: DashboardInboxRoute,
   DashboardProductsRoute: DashboardProductsRoute,
+  DashboardWaitlistRoute: DashboardWaitlistRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
