@@ -1,11 +1,8 @@
 # TODO
 
-## F06 — Header component
+## F07 — Avatar component
 
 Steps:
-1. Write failing test: Header renders logo, "Submit" link, and "Sign in" link when logged out
-2. Create `src/components/Header.tsx`
-3. Pass the test (green)
-4. Write second test: Header renders avatar when logged in
-5. Pass the test
-6. Confirm coverage ≥ 80% on Header.tsx
+1. Write failing tests: renders initials, renders image when avatar_url provided, correct size variants (sm/md)
+2. Create `src/components/Avatar.tsx`
+3. Pass all tests (green)

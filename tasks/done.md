@@ -4,6 +4,14 @@ _Completed features will be logged here._
 
 ---
 
+## F06 — Header component
+- Props: `user: { name, email } | null`
+- Logged out: logo + Submit link + Sign in link
+- Logged in: logo + Submit link + avatar with initials (name initials or email initial fallback)
+- Tests: 6/6 ✓
+
+---
+
 ## F05 — MSW mock handlers
 - Installed `msw`, initialised service worker in `public/`
 - `src/mocks/handlers.ts`: all 9 MVP endpoints with realistic Gambian product mock data

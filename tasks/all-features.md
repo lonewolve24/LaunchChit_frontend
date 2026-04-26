@@ -8,7 +8,7 @@
 - [x] F05 — Set up MSW with all 9 MVP mock handlers
 
 ## Shared Components
-- [ ] F06 — Header component
+- [x] F06 — Header component
 - [ ] F07 — Avatar component
 - [ ] F08 — ProductCard component
 - [ ] F09 — UpvoteButton component (sm + lg variants)
