@@ -41,9 +41,18 @@ import { Route as DashboardInboxRouteImport } from './routes/dashboard/inbox'
 import { Route as DashboardFollowersRouteImport } from './routes/dashboard/followers'
 import { Route as DashboardAccountRouteImport } from './routes/dashboard/account'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminThreadsRouteImport } from './routes/admin/threads'
+import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
+import { Route as AdminRolesRouteImport } from './routes/admin/roles'
+import { Route as AdminRequestsRouteImport } from './routes/admin/requests'
+import { Route as AdminReportsRouteImport } from './routes/admin/reports'
+import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminMfaEnrollRouteImport } from './routes/admin/mfa-enroll'
 import { Route as AdminMfaRouteImport } from './routes/admin/mfa'
+import { Route as AdminMakersRouteImport } from './routes/admin/makers'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminCommentsRouteImport } from './routes/admin/comments'
 import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
 import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
 import { Route as CommunityRequestsIdRouteImport } from './routes/community.requests.$id'
@@ -210,6 +219,41 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminThreadsRoute = AdminThreadsRouteImport.update({
+  id: '/threads',
+  path: '/threads',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
+  id: '/submissions',
+  path: '/submissions',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminRequestsRoute = AdminRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminMfaEnrollRoute = AdminMfaEnrollRouteImport.update({
   id: '/mfa-enroll',
   path: '/mfa-enroll',
@@ -220,9 +264,19 @@ const AdminMfaRoute = AdminMfaRouteImport.update({
   path: '/mfa',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminMakersRoute = AdminMakersRouteImport.update({
+  id: '/makers',
+  path: '/makers',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminCommentsRoute = AdminCommentsRouteImport.update({
+  id: '/comments',
+  path: '/comments',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const CommunityThreadsIdRoute = CommunityThreadsIdRouteImport.update({
@@ -273,9 +327,18 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
+  '/admin/comments': typeof AdminCommentsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/makers': typeof AdminMakersRoute
   '/admin/mfa': typeof AdminMfaRoute
   '/admin/mfa-enroll': typeof AdminMfaEnrollRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/threads': typeof AdminThreadsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/account': typeof DashboardAccountRoute
   '/dashboard/followers': typeof DashboardFollowersRoute
@@ -313,9 +376,18 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
+  '/admin/comments': typeof AdminCommentsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/makers': typeof AdminMakersRoute
   '/admin/mfa': typeof AdminMfaRoute
   '/admin/mfa-enroll': typeof AdminMfaEnrollRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/threads': typeof AdminThreadsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/account': typeof DashboardAccountRoute
   '/dashboard/followers': typeof DashboardFollowersRoute
@@ -356,9 +428,18 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
+  '/admin/comments': typeof AdminCommentsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/makers': typeof AdminMakersRoute
   '/admin/mfa': typeof AdminMfaRoute
   '/admin/mfa-enroll': typeof AdminMfaEnrollRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/threads': typeof AdminThreadsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/account': typeof DashboardAccountRoute
   '/dashboard/followers': typeof DashboardFollowersRoute
@@ -400,9 +481,18 @@ export interface FileRouteTypes {
     | '/terms'
     | '/topics'
     | '/verify-otp'
+    | '/admin/comments'
     | '/admin/login'
+    | '/admin/makers'
     | '/admin/mfa'
     | '/admin/mfa-enroll'
+    | '/admin/products'
+    | '/admin/reports'
+    | '/admin/requests'
+    | '/admin/roles'
+    | '/admin/submissions'
+    | '/admin/threads'
+    | '/admin/users'
     | '/auth/callback'
     | '/dashboard/account'
     | '/dashboard/followers'
@@ -440,9 +530,18 @@ export interface FileRouteTypes {
     | '/terms'
     | '/topics'
     | '/verify-otp'
+    | '/admin/comments'
     | '/admin/login'
+    | '/admin/makers'
     | '/admin/mfa'
     | '/admin/mfa-enroll'
+    | '/admin/products'
+    | '/admin/reports'
+    | '/admin/requests'
+    | '/admin/roles'
+    | '/admin/submissions'
+    | '/admin/threads'
+    | '/admin/users'
     | '/auth/callback'
     | '/dashboard/account'
     | '/dashboard/followers'
@@ -482,9 +581,18 @@ export interface FileRouteTypes {
     | '/terms'
     | '/topics'
     | '/verify-otp'
+    | '/admin/comments'
     | '/admin/login'
+    | '/admin/makers'
     | '/admin/mfa'
     | '/admin/mfa-enroll'
+    | '/admin/products'
+    | '/admin/reports'
+    | '/admin/requests'
+    | '/admin/roles'
+    | '/admin/submissions'
+    | '/admin/threads'
+    | '/admin/users'
     | '/auth/callback'
     | '/dashboard/account'
     | '/dashboard/followers'
@@ -759,6 +867,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/threads': {
+      id: '/admin/threads'
+      path: '/threads'
+      fullPath: '/admin/threads'
+      preLoaderRoute: typeof AdminThreadsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/submissions': {
+      id: '/admin/submissions'
+      path: '/submissions'
+      fullPath: '/admin/submissions'
+      preLoaderRoute: typeof AdminSubmissionsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/roles': {
+      id: '/admin/roles'
+      path: '/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AdminRolesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/requests': {
+      id: '/admin/requests'
+      path: '/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AdminRequestsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/mfa-enroll': {
       id: '/admin/mfa-enroll'
       path: '/mfa-enroll'
@@ -773,11 +930,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMfaRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/makers': {
+      id: '/admin/makers'
+      path: '/makers'
+      fullPath: '/admin/makers'
+      preLoaderRoute: typeof AdminMakersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/comments': {
+      id: '/admin/comments'
+      path: '/comments'
+      fullPath: '/admin/comments'
+      preLoaderRoute: typeof AdminCommentsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/community_/threads/$id': {
@@ -819,16 +990,34 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteRouteChildren {
+  AdminCommentsRoute: typeof AdminCommentsRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminMakersRoute: typeof AdminMakersRoute
   AdminMfaRoute: typeof AdminMfaRoute
   AdminMfaEnrollRoute: typeof AdminMfaEnrollRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminRequestsRoute: typeof AdminRequestsRoute
+  AdminRolesRoute: typeof AdminRolesRoute
+  AdminSubmissionsRoute: typeof AdminSubmissionsRoute
+  AdminThreadsRoute: typeof AdminThreadsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminCommentsRoute: AdminCommentsRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminMakersRoute: AdminMakersRoute,
   AdminMfaRoute: AdminMfaRoute,
   AdminMfaEnrollRoute: AdminMfaEnrollRoute,
+  AdminProductsRoute: AdminProductsRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminRequestsRoute: AdminRequestsRoute,
+  AdminRolesRoute: AdminRolesRoute,
+  AdminSubmissionsRoute: AdminSubmissionsRoute,
+  AdminThreadsRoute: AdminThreadsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

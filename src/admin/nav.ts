@@ -40,18 +40,20 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   {
     label: 'Moderation',
     items: [
-      { label: 'Submissions', to: '/admin', icon: 'package',  upcoming: true },
-      { label: 'Reports',     to: '/admin', icon: 'flag',     upcoming: true },
-      { label: 'Comments',    to: '/admin', icon: 'comment',  upcoming: true },
-      { label: 'Threads',     to: '/admin', icon: 'comment',  upcoming: true },
+      { label: 'Submissions', to: '/admin/submissions', icon: 'package' },
+      { label: 'Products',    to: '/admin/products',    icon: 'package' },
+      { label: 'Reports',     to: '/admin/reports',     icon: 'flag' },
+      { label: 'Comments',    to: '/admin/comments',    icon: 'comment' },
+      { label: 'Threads',     to: '/admin/threads',     icon: 'comment' },
+      { label: 'Requests',    to: '/admin/requests',    icon: 'comment' },
     ],
   },
   {
     label: 'People',
     items: [
-      { label: 'Users',  to: '/admin', icon: 'users',  upcoming: true },
-      { label: 'Makers', to: '/admin', icon: 'users',  upcoming: true },
-      { label: 'Roles',  to: '/admin', icon: 'shield', upcoming: true },
+      { label: 'Users',  to: '/admin/users',  icon: 'users' },
+      { label: 'Makers', to: '/admin/makers', icon: 'users' },
+      { label: 'Roles',  to: '/admin/roles',  icon: 'shield' },
     ],
   },
   {

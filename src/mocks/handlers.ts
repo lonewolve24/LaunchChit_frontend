@@ -380,6 +380,161 @@ const accountPrefsStore = (() => {
   }
 })()
 
+// Admin moderation stores ----------------------------------------------------
+
+type AdminSubmission = {
+  id: string
+  product_name: string
+  tagline: string
+  maker: string
+  maker_username: string
+  submitted_at: string
+  topics: string[]
+  status: 'pending' | 'approved' | 'rejected'
+  reason?: string
+}
+const adminSubmissionsStore = (() => {
+  const items: AdminSubmission[] = [
+    { id: 's1', product_name: 'PayGam v2',         tagline: 'Mobile payments rebuilt for the Gambian market',     maker: 'Momodou Jatta',   maker_username: 'momodou-jatta',   submitted_at: '12 min ago', topics: ['Fintech'],            status: 'pending' },
+    { id: 's2', product_name: 'Tabaski Deals',     tagline: 'Compare ram and goat prices across markets',          maker: 'Ebou Sanyang',    maker_username: 'ebou-sanyang',    submitted_at: '2 hours ago', topics: ['E-commerce', 'Social'], status: 'pending' },
+    { id: 's3', product_name: 'WolofTranslate',    tagline: 'Translate between English, Wolof, Mandinka and Fula', maker: 'Modou Lamin Joof', maker_username: 'modou-lamin-joof', submitted_at: 'yesterday',   topics: ['EdTech', 'Social'],   status: 'pending' },
+    { id: 's4', product_name: 'KasumaiChat',       tagline: 'Group chat with built-in translation',                 maker: 'Isatou Njie',     maker_username: 'isatou-njie',     submitted_at: '2 days ago',  topics: ['Social'],             status: 'approved' },
+    { id: 's5', product_name: 'BudgetGM',          tagline: 'See exactly how the national budget is spent',         maker: 'Saikou Camara',   maker_username: 'saikou-camara',   submitted_at: '4 days ago',  topics: ['GovTech'],            status: 'rejected', reason: 'Duplicate of an existing live product.' },
+  ]
+  return {
+    list: () => items,
+    setStatus: (id: string, status: AdminSubmission['status'], reason?: string) => {
+      const item = items.find((x) => x.id === id)
+      if (item) {
+        item.status = status
+        if (reason !== undefined) item.reason = reason
+      }
+    },
+  }
+})()
+
+const adminRemovedProducts = new Set<string>()
+
+type AdminCommentItem = {
+  id: string
+  body: string
+  author: string
+  author_username: string
+  product_name: string
+  product_slug: string
+  created_at: string
+  status: 'open' | 'hidden'
+  reports: number
+}
+const adminCommentsStore = (() => {
+  const items: AdminCommentItem[] = [
+    { id: 'ac1', body: 'This is great! When does the Android version drop?',                            author: 'Awa Touray',     author_username: 'awa-touray',     product_name: 'FarmLink GM',     product_slug: 'farmlink-gm-a3k9z2',     created_at: '15m ago', status: 'open',  reports: 0 },
+    { id: 'ac2', body: 'Spam: visit https://discount-deals.tld for cheap services.',                    author: 'Ousman Bot',     author_username: 'ousman-bot',     product_name: 'PayGam',          product_slug: 'paygam-b7x2m1',          created_at: '1h ago',  status: 'open',  reports: 4 },
+    { id: 'ac3', body: 'Honestly the worst app I\'ve used. Garbage.',                                    author: 'Lamin Saho',     author_username: 'lamin-saho',     product_name: 'Banjul Eats',     product_slug: 'banjul-eats-d8h3k1',     created_at: '3h ago',  status: 'open',  reports: 2 },
+    { id: 'ac4', body: 'Tried tour iOS build, crashes on Android 11. Logs in DM.',                      author: 'Fatou Ceesay',   author_username: 'fatou-ceesay',   product_name: 'Banjul Eats',     product_slug: 'banjul-eats-d8h3k1',     created_at: '6h ago',  status: 'open',  reports: 0 },
+    { id: 'ac5', body: '[hidden] inappropriate content removed by admin.',                              author: 'Anon123',        author_username: 'anon123',        product_name: 'ClassMate GM',    product_slug: 'classmate-gm-c4p8q9',    created_at: 'yesterday', status: 'hidden', reports: 6 },
+  ]
+  return {
+    list: () => items,
+    setStatus: (id: string, status: AdminCommentItem['status']) => {
+      const item = items.find((x) => x.id === id)
+      if (item) item.status = status
+    },
+  }
+})()
+
+type AdminThread = {
+  id: string
+  title: string
+  category: string
+  author: string
+  author_username: string
+  replies: number
+  upvotes: number
+  reports: number
+  status: 'open' | 'locked'
+  last_reply_at: string
+}
+const adminThreadsStore = (() => {
+  const items: AdminThread[] = [
+    { id: 'at1', title: 'What is the biggest blocker for Gambian startups in 2026?', category: 'general',       author: 'Musa Jallow',   author_username: 'musa-jallow',   replies: 47, upvotes: 124, reports: 0, status: 'open',   last_reply_at: '2h ago' },
+    { id: 'at2', title: 'Looking for an iOS dev — long thread getting heated',         category: 'jobs',          author: 'Abdul Ikumpanyi', author_username: 'abdul-ikumpanyi', replies: 56, upvotes: 12,  reports: 5, status: 'open',   last_reply_at: '34m ago' },
+    { id: 'at3', title: 'PayGam — we hit 10,000 transactions yesterday',               category: 'show-and-tell', author: 'Momodou Jatta', author_username: 'momodou-jatta', replies: 32, upvotes: 98,  reports: 0, status: 'open',   last_reply_at: '4h ago' },
+    { id: 'at4', title: 'Off-topic: best ataya spots in Serekunda',                    category: 'off-topic',     author: 'Sankung Jammeh', author_username: 'sankung-jammeh', replies: 35, upvotes: 84,  reports: 1, status: 'open',   last_reply_at: '3d ago' },
+    { id: 'at5', title: 'Heated debate that got out of hand',                           category: 'general',       author: 'Anon42',         author_username: 'anon42',         replies: 210, upvotes: 18, reports: 12, status: 'locked', last_reply_at: '1w ago' },
+  ]
+  return {
+    list: () => items,
+    setStatus: (id: string, status: AdminThread['status']) => {
+      const item = items.find((x) => x.id === id)
+      if (item) item.status = status
+    },
+  }
+})()
+
+type AdminReport = {
+  id: string
+  target_kind: 'comment' | 'thread' | 'product' | 'user'
+  target_label: string
+  target_href: string
+  reason: string
+  reported_by: string
+  reported_at: string
+  status: 'open' | 'resolved' | 'dismissed'
+}
+const adminReportsStore = (() => {
+  const items: AdminReport[] = [
+    { id: 'rep1', target_kind: 'comment', target_label: 'Spam comment by Ousman Bot on PayGam',       target_href: '/admin/comments?id=ac2', reason: 'Spam',         reported_by: 'Awa Touray',     reported_at: '12m ago', status: 'open' },
+    { id: 'rep2', target_kind: 'comment', target_label: 'Insulting comment on Banjul Eats',           target_href: '/admin/comments?id=ac3', reason: 'Harassment',   reported_by: 'Mariama Kah',    reported_at: '34m ago', status: 'open' },
+    { id: 'rep3', target_kind: 'thread',  target_label: 'Looking for an iOS dev — heated thread',    target_href: '/admin/threads?id=at2',  reason: 'Off-topic',    reported_by: 'Lamin Touray',   reported_at: '2h ago',  status: 'open' },
+    { id: 'rep4', target_kind: 'product', target_label: 'BudgetGM — duplicate submission',           target_href: '/admin/submissions',     reason: 'Duplicate',    reported_by: 'admin',          reported_at: 'yesterday', status: 'resolved' },
+    { id: 'rep5', target_kind: 'user',    target_label: 'Anon42 — repeated rule violations',         target_href: '/admin/users?q=anon42',  reason: 'Multi-strike', reported_by: 'system',         reported_at: '3d ago',  status: 'dismissed' },
+  ]
+  return {
+    list: () => items,
+    setStatus: (id: string, status: AdminReport['status']) => {
+      const item = items.find((x) => x.id === id)
+      if (item) item.status = status
+    },
+  }
+})()
+
+type AdminManagedUser = {
+  id: string
+  name: string
+  username: string
+  email: string
+  avatar_color: string
+  role: 'maker' | 'admin'
+  product_count: number
+  followers: number
+  joined_at: string
+  last_active: string
+  suspended: boolean
+}
+const adminUsersStore = (() => {
+  const items: AdminManagedUser[] = [
+    { id: 'u1',  name: 'Musa Jallow',     username: 'musa-jallow',     email: 'musa@example.com',           avatar_color: '#2563EB', role: 'maker', product_count: 4, followers: 412, joined_at: '2024-08-12', last_active: '2 min ago', suspended: false },
+    { id: 'u2',  name: 'Aminata Touray',  username: 'aminata-touray',  email: 'aminata@farmlink.gm',         avatar_color: '#0891B2', role: 'maker', product_count: 2, followers: 287, joined_at: '2024-09-02', last_active: '12 min ago', suspended: false },
+    { id: 'u3',  name: 'Momodou Jatta',   username: 'momodou-jatta',   email: 'momodou@paygam.com',          avatar_color: '#1E40AF', role: 'maker', product_count: 1, followers: 198, joined_at: '2024-09-15', last_active: '1 hour ago', suspended: false },
+    { id: 'u4',  name: 'Fatou Ceesay',    username: 'fatou-ceesay',    email: 'fatou@banjul-eats.gm',        avatar_color: '#06B6D4', role: 'maker', product_count: 1, followers: 154, joined_at: '2024-10-01', last_active: '3 hours ago', suspended: false },
+    { id: 'u5',  name: 'Abdul Ikumpanyi', username: 'abdul-ikumpanyi', email: 'abdul@classmate-gm.com',      avatar_color: '#3B82F6', role: 'maker', product_count: 1, followers: 121, joined_at: '2024-10-15', last_active: 'yesterday',   suspended: false },
+    { id: 'u6',  name: 'Lamin Touray',    username: 'lamin-touray',    email: 'lamin@touray.gm',             avatar_color: '#0E7490', role: 'maker', product_count: 0, followers: 67,  joined_at: '2024-11-08', last_active: '4 days ago',  suspended: false },
+    { id: 'u7',  name: 'Anon42',          username: 'anon42',          email: 'anon42@protonmail.com',       avatar_color: '#475569', role: 'maker', product_count: 0, followers: 3,   joined_at: '2025-02-14', last_active: '1 week ago',  suspended: true },
+    { id: 'u8',  name: 'Saikou Camara',   username: 'saikou-camara',   email: 'saikou@gov.gm',               avatar_color: '#1D4ED8', role: 'maker', product_count: 1, followers: 44,  joined_at: '2025-03-21', last_active: 'yesterday',   suspended: false },
+    { id: 'u9',  name: 'Admin',           username: 'admin',           email: 'admin@launchedchit.gm',       avatar_color: '#4338CA', role: 'admin', product_count: 0, followers: 0,   joined_at: '2024-08-01', last_active: 'now',          suspended: false },
+  ]
+  return {
+    list: () => items,
+    setRole: (id: string, role: AdminManagedUser['role']) => {
+      const u = items.find((x) => x.id === id); if (u) u.role = role
+    },
+    setSuspended: (id: string, suspended: boolean) => {
+      const u = items.find((x) => x.id === id); if (u) u.suspended = suspended
+    },
+  }
+})()
+
 type ProductEditExtras = Partial<{
   description: string
   website_url: string
@@ -711,6 +866,205 @@ export const handlers = [
     setAdminSessionActive(false)
     adminSessionStage = 'idle'
     return new HttpResponse(null, { status: 204 })
+  }),
+
+  // GET /admin/submissions?status=pending|approved|rejected
+  http.get(`${BASE}/admin/submissions`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const status = new URL(request.url).searchParams.get('status') ?? 'pending'
+    const list = adminSubmissionsStore.list().filter((s) => status === 'all' || s.status === status)
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all: adminSubmissionsStore.list().length,
+        pending: adminSubmissionsStore.list().filter((s) => s.status === 'pending').length,
+        approved: adminSubmissionsStore.list().filter((s) => s.status === 'approved').length,
+        rejected: adminSubmissionsStore.list().filter((s) => s.status === 'rejected').length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/submissions/:id/approve`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminSubmissionsStore.setStatus(String(params.id), 'approved')
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/submissions/:id/reject`, async ({ params, request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { reason?: string }
+    adminSubmissionsStore.setStatus(String(params.id), 'rejected', body.reason)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/products?status=live|removed|all
+  http.get(`${BASE}/admin/products`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const url = new URL(request.url)
+    const statusFilter = url.searchParams.get('status') ?? 'all'
+    const q = (url.searchParams.get('q') ?? '').toLowerCase()
+    let list = products.map((p) => {
+      const removed = adminRemovedProducts.has(p.id)
+      return {
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        tagline: p.tagline,
+        maker: p.maker.name,
+        vote_count: p.vote_count,
+        comments_count: (p as { comments_count?: number }).comments_count ?? 0,
+        created_at: p.created_at,
+        status: (removed ? 'removed' : 'live') as 'live' | 'removed',
+      }
+    })
+    if (statusFilter !== 'all') list = list.filter((p) => p.status === statusFilter)
+    if (q) list = list.filter((p) => p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || p.slug.includes(q))
+    return HttpResponse.json({
+      items: list.slice(0, 50),
+      total: list.length,
+      counts: {
+        all: products.length,
+        live: products.length - adminRemovedProducts.size,
+        removed: adminRemovedProducts.size,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/products/:id/remove`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminRemovedProducts.add(String(params.id))
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/products/:id/restore`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminRemovedProducts.delete(String(params.id))
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/comments?status=open|hidden
+  http.get(`${BASE}/admin/comments`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const status = new URL(request.url).searchParams.get('status') ?? 'open'
+    const list = adminCommentsStore.list().filter((c) => status === 'all' || c.status === status)
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all: adminCommentsStore.list().length,
+        open: adminCommentsStore.list().filter((c) => c.status === 'open').length,
+        hidden: adminCommentsStore.list().filter((c) => c.status === 'hidden').length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/comments/:id/hide`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminCommentsStore.setStatus(String(params.id), 'hidden')
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/comments/:id/restore`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminCommentsStore.setStatus(String(params.id), 'open')
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/threads?status=open|locked
+  http.get(`${BASE}/admin/threads`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const status = new URL(request.url).searchParams.get('status') ?? 'open'
+    const list = adminThreadsStore.list().filter((t) => status === 'all' || t.status === status)
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all: adminThreadsStore.list().length,
+        open: adminThreadsStore.list().filter((t) => t.status === 'open').length,
+        locked: adminThreadsStore.list().filter((t) => t.status === 'locked').length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/threads/:id/lock`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminThreadsStore.setStatus(String(params.id), 'locked')
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/threads/:id/unlock`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminThreadsStore.setStatus(String(params.id), 'open')
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/requests
+  http.get(`${BASE}/admin/requests`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({
+      items: mockRequests.map((r) => ({
+        id: r.id,
+        title: r.title,
+        body: r.body,
+        requester: r.requester.name,
+        upvotes: r.upvotes,
+        responses: r.responses,
+        status: r.status,
+        created_at: r.created_at,
+      })),
+    })
+  }),
+
+  // GET /admin/reports
+  http.get(`${BASE}/admin/reports`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const status = new URL(request.url).searchParams.get('status') ?? 'open'
+    const list = adminReportsStore.list().filter((r) => status === 'all' || r.status === status)
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all: adminReportsStore.list().length,
+        open: adminReportsStore.list().filter((r) => r.status === 'open').length,
+        resolved: adminReportsStore.list().filter((r) => r.status === 'resolved').length,
+        dismissed: adminReportsStore.list().filter((r) => r.status === 'dismissed').length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/reports/:id/resolve`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminReportsStore.setStatus(String(params.id), 'resolved')
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/reports/:id/dismiss`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminReportsStore.setStatus(String(params.id), 'dismissed')
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/users
+  http.get(`${BASE}/admin/users`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const url = new URL(request.url)
+    const role = url.searchParams.get('role') ?? 'all'
+    const q = (url.searchParams.get('q') ?? '').toLowerCase()
+    let list = adminUsersStore.list()
+    if (role !== 'all') list = list.filter((u) => u.role === role)
+    if (q) list = list.filter((u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.username.includes(q))
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all: adminUsersStore.list().length,
+        maker: adminUsersStore.list().filter((u) => u.role === 'maker').length,
+        admin: adminUsersStore.list().filter((u) => u.role === 'admin').length,
+        suspended: adminUsersStore.list().filter((u) => u.suspended).length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/users/:id/role`, async ({ params, request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { role?: 'maker' | 'admin' }
+    if (body.role) adminUsersStore.setRole(String(params.id), body.role)
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/users/:id/suspend`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminUsersStore.setSuspended(String(params.id), true)
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/users/:id/unsuspend`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminUsersStore.setSuspended(String(params.id), false)
+    return HttpResponse.json({ ok: true })
   }),
 
   // GET /admin/dashboard/stats — basic moderation queue + activity stats
