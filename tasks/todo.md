@@ -1,8 +1,8 @@
 # TODO
 
-## F18 — Submit route (`/submit`)
+## F19 — Product detail route (`/p/[slug]`)
 
 Steps:
-1. Write failing tests: renders all 5 fields, validates required fields on submit, shows char counters, redirects on success, shows error toast on failure
-2. Create `src/routes/submit.tsx` and export `SubmitPage`
+1. Write failing tests: renders product name, tagline, description, maker, visit link, upvote button, 404 state
+2. Create `src/routes/p.$slug.tsx` and export `ProductDetailPage`
 3. Pass all tests (green)

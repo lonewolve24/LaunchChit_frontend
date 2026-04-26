@@ -4,6 +4,16 @@ _Completed features will be logged here._
 
 ---
 
+## F18 — Submit route (`/submit`)
+- 5 fields: name (80), tagline (120), description (2000), website_url, logo_url (optional)
+- Char counters on length-limited fields
+- Validation on submit: required fields + URL format; InlineError per field
+- 401 → redirect to `/login?next=/submit`; success → `navigate` to `/p/$slug`
+- Error toast on non-401 server failure
+- Tests: 5/5 ✓
+
+---
+
 ## F17 — Auth callback route (`/auth/callback`)
 - Reads `?token=` from URL via `useSearch`
 - Calls `GET /auth/callback?token=` — backend sets cookie and redirects

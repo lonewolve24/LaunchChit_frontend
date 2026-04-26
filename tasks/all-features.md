@@ -22,7 +22,7 @@
 - [x] F15 — Feed route (`/`) — today's launches list
 - [x] F16 — Login route (`/login`) — email input + confirmation state
 - [x] F17 — Auth callback route (`/auth/callback`) — spinner + redirect
-- [ ] F18 — Submit route (`/submit`) — auth-gated product form
+- [x] F18 — Submit route (`/submit`) — auth-gated product form
 - [ ] F19 — Product detail route (`/p/[slug]`) — SSR
 
 ## End-to-End (Playwright)
