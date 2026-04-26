@@ -20,7 +20,7 @@
 
 ## Routes
 - [x] F15 — Feed route (`/`) — today's launches list
-- [ ] F16 — Login route (`/login`) — email input + confirmation state
+- [x] F16 — Login route (`/login`) — email input + confirmation state
 - [ ] F17 — Auth callback route (`/auth/callback`) — spinner + redirect
 - [ ] F18 — Submit route (`/submit`) — auth-gated product form
 - [ ] F19 — Product detail route (`/p/[slug]`) — SSR

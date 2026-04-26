@@ -4,6 +4,15 @@ _Completed features will be logged here._
 
 ---
 
+## F16 — Login route (`/login`)
+- Two steps: email input → confirmation state
+- Client-side validation: empty + invalid format → InlineError
+- POST `/auth/magic-link` on submit → transitions to "check your email" state
+- Confirmation state: Resend button, "Use a different email" resets to step 1
+- Tests: 7/7 ✓
+
+---
+
 ## F15 — Feed route (`/`)
 - `FeedPage` exported for testing, connected to route via `createFileRoute`
 - Fetches `GET /products/today`, shows `SkeletonCard` while loading

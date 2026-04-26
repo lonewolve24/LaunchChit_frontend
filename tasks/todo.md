@@ -1,8 +1,8 @@
 # TODO
 
-## F16 — Login route (`/login`)
+## F17 — Auth callback route (`/auth/callback`)
 
 Steps:
-1. Write failing tests: renders email input, submit button, confirmation state after send, resend link, error on invalid email
-2. Create `src/routes/login.tsx` and export `LoginPage`
+1. Write failing tests: renders a loading spinner, redirects to / on success, redirects to /login?error=invalid_token on failure
+2. Create `src/routes/auth.callback.tsx` and export `AuthCallbackPage`
 3. Pass all tests (green)
