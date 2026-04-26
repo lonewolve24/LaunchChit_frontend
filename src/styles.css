@@ -1,5 +1,48 @@
-
 @import "tailwindcss";
+
+/*
+  Brand tokens — change these variables to retheme the entire app.
+  Tailwind v4 reads @theme and generates utilities (bg-primary, text-accent, etc.)
+*/
+@theme {
+  /* Primary — deep Gambian green */
+  --color-primary:        #1B4332;
+  --color-primary-dark:   #0F2D20;
+  --color-primary-light:  #2D6A4F;
+  --color-primary-muted:  #52B788;
+
+  /* Accent — warm amber */
+  --color-accent:         #F59E0B;
+  --color-accent-dark:    #D97706;
+  --color-accent-light:   #FCD34D;
+
+  /* Surfaces */
+  --color-surface:        #FFFFFF;
+  --color-surface-subtle: #F8FAF9;
+  --color-surface-raised: #F1F5F2;
+
+  /* Borders */
+  --color-border:         #D1D9D4;
+  --color-border-strong:  #9CB4A8;
+
+  /* Foreground / text */
+  --color-foreground:       #111827;
+  --color-foreground-muted: #4B5563;
+  --color-foreground-faint: #9CA3AF;
+
+  /* Semantic states */
+  --color-destructive:      #EF4444;
+  --color-destructive-dark: #DC2626;
+  --color-success:          #22C55E;
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Border radius */
+  --radius-card:   0.75rem;
+  --radius-button: 0.5rem;
+  --radius-input:  0.5rem;
+}
 
 * {
   box-sizing: border-box;
@@ -13,5 +56,8 @@ body,
 
 body {
   margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-surface-subtle);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
 }
-

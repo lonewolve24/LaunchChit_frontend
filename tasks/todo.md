@@ -1,10 +1,10 @@
 # TODO
 
-## F02 — Configure Tailwind with semantic CSS variable system and brand tokens
+## F03 — Set up Vitest + Testing Library
 
 Steps:
-1. Confirm Tailwind is installed (check package.json + styles.css)
-2. Define semantic CSS custom properties in `src/styles.css` — primary, accent, surface, muted, destructive, and their dark variants
-3. Extend `tailwind.config.ts` to map those variables to Tailwind utility names
-4. Add Google Font (Plus Jakarta Sans) to `index.html`
-5. Verify a sample component picks up the brand colours in the browser
+1. Install: `vitest`, `@vitest/ui`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`
+2. Add vitest config to `vite.config.ts` (environment: jsdom, setupFiles)
+3. Create `src/test/setup.ts` — import `@testing-library/jest-dom`
+4. Write a smoke test for the root route to confirm the test runner works
+5. Confirm `pnpm test` passes
