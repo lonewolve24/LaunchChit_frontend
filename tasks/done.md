@@ -4,6 +4,13 @@ _Completed features will be logged here._
 
 ---
 
+## F22 — E2E: Auth redirect
+- Playwright test: navigate to `/submit` while unauthenticated → redirected to `/login`
+- Covered by mount-time `GET /me` check implemented in F20
+- Test: 1/1 ✓
+
+---
+
 ## F21 — E2E: Upvote toggle
 - Playwright test: auth callback → feed → click upvote → count increments → click again → count decrements
 - Uses `/auth/callback?token=valid-token` to activate MSW session before voting
