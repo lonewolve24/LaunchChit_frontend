@@ -275,6 +275,67 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 })
   }),
 
+  // GET /me/dashboard/stats?period=7d|30d|90d
+  http.get(`${BASE}/me/dashboard/stats`, ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const period = new URL(request.url).searchParams.get('period') ?? '7d'
+    const days = period === '90d' ? 90 : period === '30d' ? 30 : 7
+
+    // Treat the first 4 mock products as belonging to the signed-in user so
+    // the dashboard demo shows a richer picture than the single FarmLink GM
+    // entry that's actually authored by Musa Jallow.
+    const myProducts = products.slice(0, 4)
+
+    const totals = {
+      upvotes:  myProducts.reduce((s, p) => s + p.vote_count, 0),
+      comments: myProducts.reduce((s, p) => s + (p.comments_count ?? 0), 0),
+      waitlist: myProducts.reduce((s, p) => s + (p.waitlist_count ?? 0), 0),
+      profile_views: 1284,
+    }
+
+    const trend = Array.from({ length: days }, (_, i) => ({
+      date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+      value: Math.max(0, Math.round(8 + Math.sin(i / 3) * 4 + (i % 5))),
+    }))
+
+    return HttpResponse.json({
+      totals,
+      deltas: { upvotes: 12, comments: 3, waitlist: 47, profile_views: -8 },
+      period,
+      trend,
+      activity: [
+        { id: 'a1', kind: 'upvote',  text: '3 new upvotes on FarmLink GM',                ago: '2h' },
+        { id: 'a2', kind: 'comment', text: 'Fatou Ceesay commented on FarmLink GM',       ago: '5h' },
+        { id: 'a3', kind: 'waitlist',text: '12 new waitlist signups this week',           ago: '1d' },
+        { id: 'a4', kind: 'review',  text: 'New 5★ review on PayGam',                      ago: '2d' },
+        { id: 'a5', kind: 'milestone', text: 'FarmLink GM crossed 250 upvotes',            ago: '3d' },
+      ],
+    })
+  }),
+
+  // GET /me/products?page=&page_size=&status=
+  http.get(`${BASE}/me/products`, ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const url = new URL(request.url)
+    const page = Math.max(1, Number(url.searchParams.get('page') ?? '1'))
+    const pageSize = Math.max(1, Number(url.searchParams.get('page_size') ?? '12'))
+    const statusFilter = url.searchParams.get('status') ?? ''
+
+    // Same 4-product slice as /me/dashboard/stats for consistency.
+    // Inject status variants here (not in source array) so the demo shows
+    // off the StatusChip variants without polluting other handlers.
+    const STATUSES = ['live', 'live', 'in-review', 'draft'] as const
+    let mine = products.slice(0, 4).map((p, i) => withLicense({ ...p, status: STATUSES[i] }))
+
+    if (statusFilter) mine = mine.filter((p) => (p as { status?: string }).status === statusFilter)
+
+    const total = mine.length
+    const start = (page - 1) * pageSize
+    const items = mine.slice(start, start + pageSize)
+
+    return HttpResponse.json({ items, total, page, page_size: pageSize })
+  }),
+
   // GET /products/today  — supports ?month=YYYY-MM&page=&page_size=
   http.get(`${BASE}/products/today`, ({ request }) => {
     const url = new URL(request.url)
