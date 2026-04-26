@@ -1,0 +1,120 @@
+/*
+  Admin theme overlay
+  -------------------
+  Loaded only by the admin shell. Re-binds the same CSS variables that
+  Tailwind v4 (@theme in styles.css) generates utilities from. Because
+  the variables cascade, every existing utility — bg-primary, text-foreground,
+  border-border, rounded-card — automatically picks up the admin values
+  inside any element with the `admin-scope` class, without rebuilding
+  Tailwind's utility set.
+
+  Apply by wrapping the admin layout root in <div className="admin-scope">.
+
+  Token philosophy
+  ----------------
+  - Public site is a marketing surface: warm orange CTAs, generous radii,
+    cobalt brand color.
+  - Admin is a work surface: denser, neutral, no orange. The accent is
+    desaturated indigo so primary actions still stand out without competing
+    with status colors (success / warning / destructive) that mean things
+    in moderation queues.
+  - Tighter radii, smaller card shadows, slightly cooler background so an
+    admin tab is unmistakably different from a public tab at a glance.
+*/
+
+.admin-scope {
+  /* Primary — slate-indigo, work-tool feel (vs. public cobalt brand) */
+  --color-primary:        #4338CA;   /* indigo-700 */
+  --color-primary-dark:   #3730A3;   /* indigo-800 */
+  --color-primary-light:  #6366F1;   /* indigo-500 — hovers / active states */
+  --color-primary-muted:  #EEF2FF;   /* indigo-50 — chip / pill backgrounds */
+
+  /* Accent — neutral slate. Admin should rarely shout in orange. */
+  --color-accent:         #475569;   /* slate-600 — secondary buttons */
+  --color-accent-dark:    #334155;   /* slate-700 */
+  --color-accent-light:   #94A3B8;   /* slate-400 */
+
+  /* Surfaces — slightly cooler/grayer than public to differentiate */
+  --color-surface:        #FFFFFF;
+  --color-surface-subtle: #F1F5F9;   /* slate-100 — page background */
+  --color-surface-raised: #E2E8F0;   /* slate-200 — table headers, raised pills */
+
+  /* Borders — slightly darker for stronger table grids */
+  --color-border:         #E2E8F0;   /* slate-200 */
+  --color-border-strong:  #94A3B8;   /* slate-400 */
+
+  /* Foreground — same readable scale as public */
+  --color-foreground:       #0F172A;
+  --color-foreground-muted: #334155;
+  --color-foreground-faint: #475569;
+
+  /* Semantic states — explicit, used heavily by status badges
+     (Pending / Approved / Rejected / Suspended / Banned / Live / Draft).
+     Admin needs both bg + text variants so chips read on white. */
+  --color-destructive:      #DC2626;   /* red-600 */
+  --color-destructive-dark: #B91C1C;   /* red-700 */
+  --color-destructive-soft: #FEE2E2;   /* red-100 — chip bg */
+
+  --color-warning:          #D97706;   /* amber-600 */
+  --color-warning-dark:     #B45309;   /* amber-700 */
+  --color-warning-soft:     #FEF3C7;   /* amber-100 — pending-status chip */
+
+  --color-success:          #15803D;   /* green-700 — passes AAA on white */
+  --color-success-soft:     #DCFCE7;   /* green-100 — approved-status chip */
+
+  --color-info:             #0369A1;   /* sky-700 — info banners, draft state */
+  --color-info-soft:        #E0F2FE;   /* sky-100 */
+
+  /* Tighter geometry than public — admin is data-dense */
+  --radius-card:   0.5rem;     /* was 0.75 */
+  --radius-button: 0.375rem;   /* was 0.5 */
+  --radius-input:  0.375rem;
+
+  /* Quieter shadows — admin cards sit on a busy page with many cards */
+  --shadow-card:       0 1px 2px 0 rgb(15 23 42 / 0.05), 0 1px 1px 0 rgb(15 23 42 / 0.04);
+  --shadow-card-hover: 0 4px 12px -2px rgb(15 23 42 / 0.10), 0 2px 4px -1px rgb(15 23 42 / 0.06);
+}
+
+/* Page background snaps to the admin tone when the scope is on body level */
+.admin-scope body,
+body.admin-scope {
+  background-color: var(--color-surface-subtle);
+}
+
+/*
+  Admin-only utility classes (kept tiny on purpose).
+  Use Tailwind for everything else.
+*/
+
+.admin-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;     /* 11px */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+.admin-status-chip--pending  { color: var(--color-warning-dark);     background: var(--color-warning-soft); }
+.admin-status-chip--approved { color: var(--color-success);          background: var(--color-success-soft); }
+.admin-status-chip--rejected { color: var(--color-destructive-dark); background: var(--color-destructive-soft); }
+.admin-status-chip--draft    { color: var(--color-info);             background: var(--color-info-soft); }
+.admin-status-chip--live     { color: var(--color-success);          background: var(--color-success-soft); }
+.admin-status-chip--removed  { color: var(--color-foreground-muted); background: var(--color-surface-raised); }
+
+/* Dense table row — used by every list view */
+.admin-table-row {
+  display: grid;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.875rem;
+}
+
+.admin-table-row:hover {
+  background-color: var(--color-surface-subtle);
+}

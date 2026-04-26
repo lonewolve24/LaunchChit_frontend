@@ -26,8 +26,10 @@ import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as TopicsSlugRouteImport } from './routes/topics_.$slug'
 import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
@@ -39,6 +41,9 @@ import { Route as DashboardInboxRouteImport } from './routes/dashboard/inbox'
 import { Route as DashboardFollowersRouteImport } from './routes/dashboard/followers'
 import { Route as DashboardAccountRouteImport } from './routes/dashboard/account'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AdminMfaEnrollRouteImport } from './routes/admin/mfa-enroll'
+import { Route as AdminMfaRouteImport } from './routes/admin/mfa'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
 import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
 import { Route as CommunityRequestsIdRouteImport } from './routes/community.requests.$id'
@@ -130,6 +135,11 @@ const DashboardRouteRoute = DashboardRouteRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -139,6 +149,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const TopicsSlugRoute = TopicsSlugRouteImport.update({
   id: '/topics_/$slug',
@@ -195,6 +210,21 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminMfaEnrollRoute = AdminMfaEnrollRouteImport.update({
+  id: '/mfa-enroll',
+  path: '/mfa-enroll',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminMfaRoute = AdminMfaRouteImport.update({
+  id: '/mfa',
+  path: '/mfa',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const CommunityThreadsIdRoute = CommunityThreadsIdRouteImport.update({
   id: '/community_/threads/$id',
   path: '/community/threads/$id',
@@ -225,6 +255,7 @@ const DashboardProductsSlugAnalyticsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/archive': typeof ArchiveRoute
@@ -242,6 +273,9 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/mfa': typeof AdminMfaRoute
+  '/admin/mfa-enroll': typeof AdminMfaEnrollRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/account': typeof DashboardAccountRoute
   '/dashboard/followers': typeof DashboardFollowersRoute
@@ -253,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community/events/$id': typeof CommunityEventsIdRoute
@@ -278,6 +313,9 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/mfa': typeof AdminMfaRoute
+  '/admin/mfa-enroll': typeof AdminMfaEnrollRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/account': typeof DashboardAccountRoute
   '/dashboard/followers': typeof DashboardFollowersRoute
@@ -289,6 +327,7 @@ export interface FileRoutesByTo {
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics/$slug': typeof TopicsSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community/events/$id': typeof CommunityEventsIdRoute
@@ -299,6 +338,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/archive': typeof ArchiveRoute
@@ -316,6 +356,9 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
   '/verify-otp': typeof VerifyOtpRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/mfa': typeof AdminMfaRoute
+  '/admin/mfa-enroll': typeof AdminMfaEnrollRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/account': typeof DashboardAccountRoute
   '/dashboard/followers': typeof DashboardFollowersRoute
@@ -327,6 +370,7 @@ export interface FileRoutesById {
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/topics_/$slug': typeof TopicsSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/community/requests/$id': typeof CommunityRequestsIdRoute
   '/community_/events/$id': typeof CommunityEventsIdRoute
@@ -338,6 +382,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/about'
     | '/archive'
@@ -355,6 +400,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/topics'
     | '/verify-otp'
+    | '/admin/login'
+    | '/admin/mfa'
+    | '/admin/mfa-enroll'
     | '/auth/callback'
     | '/dashboard/account'
     | '/dashboard/followers'
@@ -366,6 +414,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/profile/$username'
     | '/topics/$slug'
+    | '/admin/'
     | '/dashboard/'
     | '/community/requests/$id'
     | '/community/events/$id'
@@ -391,6 +440,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/topics'
     | '/verify-otp'
+    | '/admin/login'
+    | '/admin/mfa'
+    | '/admin/mfa-enroll'
     | '/auth/callback'
     | '/dashboard/account'
     | '/dashboard/followers'
@@ -402,6 +454,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/profile/$username'
     | '/topics/$slug'
+    | '/admin'
     | '/dashboard'
     | '/community/requests/$id'
     | '/community/events/$id'
@@ -411,6 +464,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/about'
     | '/archive'
@@ -428,6 +482,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/topics'
     | '/verify-otp'
+    | '/admin/login'
+    | '/admin/mfa'
+    | '/admin/mfa-enroll'
     | '/auth/callback'
     | '/dashboard/account'
     | '/dashboard/followers'
@@ -439,6 +496,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/profile/$username'
     | '/topics_/$slug'
+    | '/admin/'
     | '/dashboard/'
     | '/community/requests/$id'
     | '/community_/events/$id'
@@ -449,6 +507,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ArchiveRoute: typeof ArchiveRoute
@@ -595,6 +654,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -608,6 +674,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/topics_/$slug': {
       id: '/topics_/$slug'
@@ -686,6 +759,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/mfa-enroll': {
+      id: '/admin/mfa-enroll'
+      path: '/mfa-enroll'
+      fullPath: '/admin/mfa-enroll'
+      preLoaderRoute: typeof AdminMfaEnrollRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/mfa': {
+      id: '/admin/mfa'
+      path: '/mfa'
+      fullPath: '/admin/mfa'
+      preLoaderRoute: typeof AdminMfaRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/community_/threads/$id': {
       id: '/community_/threads/$id'
       path: '/community/threads/$id'
@@ -723,6 +817,24 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteRouteChildren {
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminMfaRoute: typeof AdminMfaRoute
+  AdminMfaEnrollRoute: typeof AdminMfaEnrollRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminLoginRoute: AdminLoginRoute,
+  AdminMfaRoute: AdminMfaRoute,
+  AdminMfaEnrollRoute: AdminMfaEnrollRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
 interface DashboardProductsRouteChildren {
   DashboardProductsSlugAnalyticsRoute: typeof DashboardProductsSlugAnalyticsRoute
@@ -777,6 +889,7 @@ const CommunityRouteWithChildren = CommunityRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ArchiveRoute: ArchiveRoute,

@@ -9,6 +9,38 @@ const mockUser = {
   avatar_url: null,
 }
 
+const mockAdmin = {
+  id: 'admin-001',
+  email: 'admin@launchedchit.gm',
+  name: 'Admin',
+  role: 'super-admin' as const,
+  mfa_enrolled: false,
+}
+
+/*
+  Admin session — kept on its own key so that maker login and admin
+  login don't trample each other (you can be both, and an admin
+  shouldn't get auto-elevated just by hitting /login).
+  Two-stage state: 'idle' before login, 'mfa-required' after password,
+  fully active once MFA is verified.
+*/
+const ADMIN_SESSION_KEY = 'launchedchit:mock-admin-session'
+let adminSessionActive: boolean = (() => {
+  if (typeof window === 'undefined') return false
+  try { return window.localStorage?.getItem(ADMIN_SESSION_KEY) === '1' } catch { return false }
+})()
+let adminSessionStage: 'idle' | 'mfa-required' = adminSessionActive ? 'idle' : 'idle'
+function setAdminSessionActive(on: boolean) {
+  adminSessionActive = on
+  if (typeof window !== 'undefined') {
+    try {
+      if (on) window.localStorage?.setItem(ADMIN_SESSION_KEY, '1')
+      else window.localStorage?.removeItem(ADMIN_SESSION_KEY)
+    } catch { /* ignore quota errors */ }
+  }
+  if (on) adminSessionStage = 'idle'
+}
+
 const T = {
   fintech:    { slug: 'fintech',    name: 'Fintech' },
   agritech:   { slug: 'agri-tech',  name: 'Agri-Tech' },
@@ -613,6 +645,101 @@ export const handlers = [
       ...(body.source_url !== undefined ? { source_url: body.source_url } : {}),
     })
     return HttpResponse.json({ slug, ok: true })
+  }),
+
+  // === Admin scope =====================================================
+
+  // POST /admin/auth/login — only admin@launchedchit.gm with password "admin"
+  http.post(`${BASE}/admin/auth/login`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { email?: string; password?: string }
+    if (body.email !== mockAdmin.email || body.password !== 'admin') {
+      return new HttpResponse(JSON.stringify({ error: 'Invalid credentials.' }), { status: 401 })
+    }
+    adminSessionStage = 'mfa-required'
+    if (!mockAdmin.mfa_enrolled) {
+      return HttpResponse.json({ requires_enrollment: true })
+    }
+    return HttpResponse.json({ requires_mfa: true })
+  }),
+
+  // POST /admin/auth/mfa-verify — accept "123456" only
+  http.post(`${BASE}/admin/auth/mfa-verify`, async ({ request }) => {
+    if (adminSessionStage !== 'mfa-required') {
+      return new HttpResponse(JSON.stringify({ error: 'No login in progress.' }), { status: 400 })
+    }
+    const body = (await request.json().catch(() => ({}))) as { code?: string }
+    if (body.code !== '123456') {
+      return new HttpResponse(JSON.stringify({ error: 'Invalid code.' }), { status: 401 })
+    }
+    setAdminSessionActive(true)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // POST /admin/auth/enroll-start — return shared secret + provisioning URI
+  http.post(`${BASE}/admin/auth/enroll-start`, () => {
+    if (adminSessionStage !== 'mfa-required') {
+      return new HttpResponse(JSON.stringify({ error: 'No login in progress.' }), { status: 400 })
+    }
+    return HttpResponse.json({
+      secret: 'JBSWY3DPEHPK3PXP',
+      otpauth_url: `otpauth://totp/LaunchedChit%20Admin:${encodeURIComponent(mockAdmin.email)}?secret=JBSWY3DPEHPK3PXP&issuer=LaunchedChit%20Admin`,
+    })
+  }),
+
+  // POST /admin/auth/enroll-finish — accept "123456" to finish first-time enrollment
+  http.post(`${BASE}/admin/auth/enroll-finish`, async ({ request }) => {
+    if (adminSessionStage !== 'mfa-required') {
+      return new HttpResponse(JSON.stringify({ error: 'No login in progress.' }), { status: 400 })
+    }
+    const body = (await request.json().catch(() => ({}))) as { code?: string }
+    if (body.code !== '123456') {
+      return new HttpResponse(JSON.stringify({ error: 'Invalid code.' }), { status: 401 })
+    }
+    mockAdmin.mfa_enrolled = true
+    setAdminSessionActive(true)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/me — returns admin user when fully authenticated
+  http.get(`${BASE}/admin/me`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json(mockAdmin)
+  }),
+
+  // POST /admin/auth/logout
+  http.post(`${BASE}/admin/auth/logout`, () => {
+    setAdminSessionActive(false)
+    adminSessionStage = 'idle'
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // GET /admin/dashboard/stats — basic moderation queue + activity stats
+  http.get(`${BASE}/admin/dashboard/stats`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const days = 14
+    const trend = Array.from({ length: days }, (_, i) => ({
+      date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+      value: Math.max(0, Math.round(8 + Math.sin(i / 2) * 4 + (i % 5))),
+    }))
+    return HttpResponse.json({
+      kpis: {
+        signups_today:        24,
+        signups_delta:        12,
+        products_in_review:   7,
+        comments_flagged:     3,
+        threads_flagged:      2,
+        active_makers_30d:    312,
+        active_makers_delta:  18,
+      },
+      submissions_trend: trend,
+      recent_activity: [
+        { id: 'a1', kind: 'submission',  text: 'New product submission: "PayGam v2"',         actor: 'Momodou Jatta', ago: '12m', href: '/admin/products' },
+        { id: 'a2', kind: 'report',      text: 'Comment reported on Banjul Eats',             actor: 'Awa Touray',    ago: '34m', href: '/admin/reports' },
+        { id: 'a3', kind: 'maker',       text: 'New maker signup: Aminata Touray',            actor: 'system',         ago: '1h',  href: '/admin/makers' },
+        { id: 'a4', kind: 'thread',      text: 'Thread flagged: "Looking for an iOS dev"',    actor: 'Lamin Saho',    ago: '2h',  href: '/admin/threads' },
+        { id: 'a5', kind: 'request',     text: 'Product request: "Open API for GRA tax rates"', actor: 'Lamin Touray', ago: '4h',  href: '/admin/requests' },
+      ],
+    })
   }),
 
   // GET /me/notifications?status=unread|all
