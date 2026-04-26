@@ -16,7 +16,7 @@
 - [x] F11 — Toast component
 - [x] F12 — Skeleton component
 - [x] F13 — InlineError component
-- [ ] F14 — PageError component (404 / 500)
+- [x] F14 — PageError component (404 / 500)
 
 ## Routes
 - [ ] F15 — Feed route (`/`) — today's launches list

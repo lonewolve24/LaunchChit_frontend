@@ -1,8 +1,8 @@
 # TODO
 
-## F14 — PageError component (404 / 500)
+## F15 — Feed route (`/`)
 
 Steps:
-1. Write failing tests: renders heading and message for 404 and 500, renders a link back to feed
-2. Create `src/components/PageError.tsx`
+1. Write failing tests: renders product list from MSW, shows skeleton while loading, shows EmptyState when list is empty, renders Header
+2. Implement `src/routes/index.tsx` — fetch `/products/today`, render ProductCard list
 3. Pass all tests (green)

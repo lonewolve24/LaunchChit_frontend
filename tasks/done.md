@@ -4,6 +4,15 @@ _Completed features will be logged here._
 
 ---
 
+## F14 — PageError component
+- Props: `status: 404 | 500`, `message?`
+- Built-in copy for 404 ("Page Not Found") and 500 ("Something Went Wrong")
+- Custom `message` overrides default body text
+- "Back to feed" link always present, pointing to `/`
+- Tests: 4/4 ✓
+
+---
+
 ## F13 — InlineError component
 - Props: `message: string | null`, `id?`
 - Returns null when message is null — renders nothing
