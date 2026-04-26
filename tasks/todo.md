@@ -1,8 +1,8 @@
 # TODO
 
-## F09 — UpvoteButton component (sm + lg variants)
+## F10 — EmptyState component
 
 Steps:
-1. Write failing tests: renders vote count, two size variants, voted/unvoted states, calls onVote on click
-2. Create `src/components/UpvoteButton.tsx`
+1. Write failing tests: renders heading, optional body text, optional CTA button
+2. Create `src/components/EmptyState.tsx`
 3. Pass all tests (green)

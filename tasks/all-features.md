@@ -11,7 +11,7 @@
 - [x] F06 — Header component
 - [x] F07 — Avatar component
 - [x] F08 — ProductCard component
-- [ ] F09 — UpvoteButton component (sm + lg variants)
+- [x] F09 — UpvoteButton component (sm + lg variants)
 - [ ] F10 — EmptyState component
 - [ ] F11 — Toast component
 - [ ] F12 — Skeleton component

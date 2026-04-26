@@ -4,6 +4,15 @@ _Completed features will be logged here._
 
 ---
 
+## F09 — UpvoteButton component
+- Props: `voteCount`, `hasVoted`, `onVote`, `size: sm | lg`
+- Voted state: amber border + tinted background
+- `aria-pressed` reflects voted state
+- Size variants: `sm` (text-xs) for cards, `lg` (text-base) for detail page
+- Tests: 6/6 ✓
+
+---
+
 ## F08 — ProductCard component
 - Props: `product` (id, slug, name, tagline, logo_url, vote_count, has_voted, maker), `onVote`
 - Upvote button: left-side chevron + count, `aria-pressed` voted state, calls `onVote(id)`
