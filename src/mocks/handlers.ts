@@ -148,9 +148,38 @@ export const handlers = [
   }),
 
   // GET /products/leaderboard — MUST be before /products/:slug
-  http.get(`${BASE}/products/leaderboard`, () => {
-    const ranked = [...products].sort((a, b) => b.vote_count - a.vote_count)
-    return HttpResponse.json(ranked)
+  // Supports ?period=daily|weekly|monthly|yearly &date=YYYY-MM-DD &filter=featured|all
+  http.get(`${BASE}/products/leaderboard`, ({ request }) => {
+    const url = new URL(request.url)
+    const period = (url.searchParams.get('period') ?? 'daily') as 'daily' | 'weekly' | 'monthly' | 'yearly'
+    const dateStr = url.searchParams.get('date') ?? new Date().toISOString().slice(0, 10)
+    const filter = url.searchParams.get('filter') ?? 'all'
+
+    const target = new Date(dateStr + 'T12:00:00')
+    const targetTime = target.getTime()
+
+    const within = (created: string) => {
+      const c = new Date(created).getTime()
+      const diffDays = Math.floor((targetTime - c) / 86400000)
+      if (diffDays < 0) return false
+      if (period === 'daily') {
+        // Same calendar date as `dateStr`
+        return created.slice(0, 10) === dateStr
+      }
+      if (period === 'weekly') return diffDays < 7
+      if (period === 'monthly') return diffDays < 30
+      return diffDays < 365
+    }
+
+    let ranked = products.filter((p) => within(p.created_at))
+    if (filter === 'featured') {
+      // "Featured" = top half by votes within the period
+      const sorted = [...ranked].sort((a, b) => b.vote_count - a.vote_count)
+      ranked = sorted.slice(0, Math.max(1, Math.ceil(sorted.length / 2)))
+    }
+    ranked.sort((a, b) => b.vote_count - a.vote_count)
+
+    return HttpResponse.json({ items: ranked, period, date: dateStr, filter })
   }),
 
   // GET /products/archive — MUST be before /products/:slug
