@@ -3,14 +3,15 @@ import { describe, it, expect } from 'vitest'
 const BASE = 'http://localhost:8000'
 
 describe('MSW handlers', () => {
-  it('GET /products/today returns a list of products', async () => {
+  it('GET /products/today returns a paginated list of products', async () => {
     const res = await fetch(`${BASE}/products/today`)
     const data = await res.json()
 
     expect(res.status).toBe(200)
-    expect(Array.isArray(data)).toBe(true)
-    expect(data.length).toBeGreaterThan(0)
-    expect(data[0]).toMatchObject({
+    expect(Array.isArray(data.items)).toBe(true)
+    expect(data.items.length).toBeGreaterThan(0)
+    expect(typeof data.total).toBe('number')
+    expect(data.items[0]).toMatchObject({
       slug: expect.any(String),
       name: expect.any(String),
       tagline: expect.any(String),

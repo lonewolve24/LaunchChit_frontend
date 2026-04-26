@@ -18,7 +18,7 @@
 
   /* Surfaces */
   --color-surface:        #FFFFFF;
-  --color-surface-subtle: #E9EEF2;   /* noticeably distinct from white cards */
+  --color-surface-subtle: #F7F8FA;   /* near-white, gentle separation from cards */
   --color-surface-raised: #F1F5F2;
 
   /* Borders */
