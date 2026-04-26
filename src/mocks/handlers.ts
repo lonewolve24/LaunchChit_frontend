@@ -78,6 +78,91 @@ function topicProductCount(topicSlug: string) {
   return mockProducts.filter((p) => p.topics?.some((t) => t.slug === topicSlug)).length
 }
 
+const mockForumCategories = [
+  { slug: 'general',       name: 'General',       description: 'Anything related to building in The Gambia',  icon_color: '#1B4332' },
+  { slug: 'show-and-tell', name: 'Show & Tell',   description: 'Share what you\'re working on, get feedback', icon_color: '#7C5CBF' },
+  { slug: 'help',          name: 'Help',          description: 'Get unstuck on a technical or business problem', icon_color: '#2563EB' },
+  { slug: 'feedback',      name: 'Feedback',      description: 'Reviews of your product, landing page, or copy', icon_color: '#DC4A22' },
+  { slug: 'jobs',          name: 'Jobs & Hiring', description: 'Hire builders or find work',                  icon_color: '#0891B2' },
+  { slug: 'off-topic',     name: 'Off Topic',     description: 'Memes, news, life — everything else',         icon_color: '#B45309' },
+]
+
+const mockThreads = [
+  { id: 't1',  category: 'general',       product_slug: null,                     title: 'What is the biggest blocker for Gambian startups in 2026?',                          body_preview: 'I keep hearing the same three things — payments, distribution, talent…',  author: { name: 'Musa Jallow' },      replies: 47, upvotes: 124, last_reply_at: '2 hours ago',  pinned: true },
+  { id: 't2',  category: 'show-and-tell', product_slug: 'paygam-b7x2m1',          title: 'PayGam — we hit 10,000 transactions yesterday 🎉',                                  body_preview: 'Took us 8 months and 14 rewrites of the QR flow. Here\'s what we learned…', author: { name: 'Momodou Jatta' },    replies: 32, upvotes: 98,  last_reply_at: '4 hours ago',  pinned: false },
+  { id: 't3',  category: 'help',          product_slug: null,                     title: 'How are people handling KYC for fintech apps in The Gambia?',                       body_preview: 'Looking for recommendations. We\'ve been using Smile Identity but it\'s expensive…', author: { name: 'Yusupha Touray' },   replies: 19, upvotes: 67,  last_reply_at: '6 hours ago',  pinned: false },
+  { id: 't4',  category: 'feedback',      product_slug: 'farmlink-gm-a3k9z2',     title: 'Roast my landing page — FarmLink GM redesign',                                      body_preview: 'Pushed a new landing page yesterday. I think the hero is too text-heavy. Thoughts?', author: { name: 'Musa Jallow' },      replies: 14, upvotes: 45,  last_reply_at: '8 hours ago',  pinned: false },
+  { id: 't5',  category: 'jobs',          product_slug: null,                     title: 'Hiring: React Native dev for ClassMate GM (Banjul or remote)',                      body_preview: 'We\'re building the mobile companion to ClassMate. 2+ years RN experience…',     author: { name: 'Abdul Ikumpanyi' },  replies: 8,  upvotes: 31,  last_reply_at: '12 hours ago', pinned: false },
+  { id: 't6',  category: 'general',       product_slug: null,                     title: 'Anyone else losing customers to slow Wave settlement times?',                       body_preview: 'Had three users complain this week about funds taking 2-3 days to settle…',     author: { name: 'Aminata Touray' },   replies: 22, upvotes: 89,  last_reply_at: '1 day ago',    pinned: false },
+  { id: 't7',  category: 'show-and-tell', product_slug: 'turntable-gm-w7c4r6',    title: 'Just shipped Turntable GM — streaming for Gambian artists',                         body_preview: 'After 18 months, our music platform for local artists is live. Demo + AMA inside.',  author: { name: 'DJ Latir' },         replies: 41, upvotes: 156, last_reply_at: '1 day ago',    pinned: false },
+  { id: 't8',  category: 'help',          product_slug: null,                     title: 'Best way to send SMS to all four mobile networks?',                                 body_preview: 'Comium, Africell, QCell, Gamtel — building a notification system that hits all…', author: { name: 'Lamin Touray' },     replies: 11, upvotes: 38,  last_reply_at: '2 days ago',   pinned: false },
+  { id: 't9',  category: 'general',       product_slug: null,                     title: 'Should LaunchedChit add a "Built in Banjul" badge?',                                body_preview: 'Some founders are based in Dakar / London but build for The Gambia. Should we…',  author: { name: 'Fatim Singhateh' },  replies: 28, upvotes: 73,  last_reply_at: '2 days ago',   pinned: false },
+  { id: 't10', category: 'off-topic',     product_slug: null,                     title: 'Best ataya spots in Serekunda for a long coding session?',                          body_preview: 'Need somewhere with wifi, plug points, and ataya. Recommendations welcome.',     author: { name: 'Sankung Jammeh' },   replies: 35, upvotes: 84,  last_reply_at: '3 days ago',   pinned: false },
+  { id: 't11', category: 'feedback',      product_slug: 'banjul-eats-d8h3k1',     title: 'Banjul Eats checkout flow — 3 of 5 testers gave up',                                body_preview: 'Did a small usability test, attaching the recordings. Anyone want to help debug?',  author: { name: 'Fatou Ceesay' },     replies: 18, upvotes: 52,  last_reply_at: '4 days ago',   pinned: false },
+  { id: 't12', category: 'general',       product_slug: null,                     title: 'Kombo founder dinner — who\'s in for next month?',                                  body_preview: 'Trying to organise a casual dinner for builders in the Kombo area. RSVP inside.',  author: { name: 'Mariama Kah' },      replies: 24, upvotes: 61,  last_reply_at: '5 days ago',   pinned: false },
+]
+
+const mockEvents = [
+  {
+    id: 'e1',
+    title: 'Builders Meetup — Banjul Edition',
+    date: '2026-05-08T18:00:00',
+    location: 'Café Touba, Bertil Harding Highway',
+    mode: 'In person',
+    host: 'Musa Jallow',
+    description: 'Casual evening for Gambian makers. Bring a demo, leave with feedback. Drinks on us for the first 30 RSVPs.',
+    attendees: 47,
+    capacity: 60,
+    color: '#1B4332',
+  },
+  {
+    id: 'e2',
+    title: 'Mobile Money APIs — Workshop',
+    date: '2026-05-15T15:00:00',
+    location: 'Online · Google Meet',
+    mode: 'Online',
+    host: 'Momodou Jatta (PayGam)',
+    description: 'Hands-on workshop on integrating Wave, QMoney, and Africell Money APIs. Live coding, no slides.',
+    attendees: 124,
+    capacity: 200,
+    color: '#7C5CBF',
+  },
+  {
+    id: 'e3',
+    title: 'Demo Night — May Cohort',
+    date: '2026-05-22T19:00:00',
+    location: 'TechHub Brikama',
+    mode: 'In person',
+    host: 'LaunchedChit',
+    description: 'Five Gambian startups demo what they shipped this month. 5 minutes each. 5 questions each. Audience votes.',
+    attendees: 89,
+    capacity: 100,
+    color: '#DC4A22',
+  },
+  {
+    id: 'e4',
+    title: 'Designing for Low Bandwidth — Talk',
+    date: '2026-06-03T17:00:00',
+    location: 'Online · YouTube Live',
+    mode: 'Online',
+    host: 'Lamin Saho',
+    description: 'How we got Banjul Eats to load in <2s on a 3G connection. Practical performance tips.',
+    attendees: 56,
+    capacity: 500,
+    color: '#2563EB',
+  },
+]
+
+const mockRequests = [
+  { id: 'r1', title: 'A reliable WhatsApp broadcast scheduler', body: 'We run an osusu group of 200 people. Sending weekly updates to everyone is painful. Need a tool that schedules and sends WhatsApp messages.', requester: { name: 'Aminata Touray' }, upvotes: 142, responses: 4, status: 'open',     created_at: '3 days ago' },
+  { id: 'r2', title: 'Bus schedule for the Brikama–Banjul route',    body: 'No app shows me when the next gele-gele leaves. Just a simple schedule + ETA would change my life.',                                                          requester: { name: 'Ousman Bah' },     upvotes: 98,  responses: 2, status: 'in-progress', created_at: '5 days ago' },
+  { id: 'r3', title: 'Land registry lookup',                          body: 'Want to verify ownership of a plot before signing anything. Currently requires multiple in-person trips. Even a basic public lookup would help.',         requester: { name: 'Babucarr Sowe' }, upvotes: 76,  responses: 1, status: 'open',     created_at: '1 week ago' },
+  { id: 'r4', title: 'Mosque prayer time + adhan widget',             body: 'Local mosques each have slightly different times. An app showing the nearest mosque\'s schedule with adhan playback would be amazing for the diaspora.',     requester: { name: 'Modou Saine' },   upvotes: 63,  responses: 0, status: 'open',     created_at: '1 week ago' },
+  { id: 'r5', title: 'Voter registration status checker',             body: 'Election season approaches. People want to know if they\'re registered without trekking to the IEC office. SMS-based query would work for non-smartphone users.', requester: { name: 'Saikou Camara' }, upvotes: 51,  responses: 3, status: 'open',     created_at: '2 weeks ago' },
+  { id: 'r6', title: 'Local artist booking marketplace',               body: 'Hiring a kora player or DJ for a wedding is all word-of-mouth. A marketplace with profiles, prices, and reviews would unlock real money for these artists.',  requester: { name: 'Fatim Singhateh' }, upvotes: 38, responses: 0, status: 'open',     created_at: '2 weeks ago' },
+  { id: 'r7', title: 'Open API for GRA tax rates',                    body: 'Building a small accounting tool. Would love a public, machine-readable source of VAT and income tax brackets. Currently parsing a PDF every quarter.',       requester: { name: 'Lamin Touray' },  upvotes: 22,  responses: 1, status: 'open',     created_at: '3 weeks ago' },
+]
+
 const mockProfile = {
   id: 'user-001',
   username: 'musa-jallow',
@@ -379,5 +464,68 @@ export const handlers = [
   http.get(`${BASE}/profile/:username`, ({ params }) => {
     if (params.username === mockProfile.username) return HttpResponse.json(mockProfile)
     return new HttpResponse(null, { status: 404 })
+  }),
+
+  // GET /community/categories
+  http.get(`${BASE}/community/categories`, () => {
+    const withCounts = mockForumCategories.map((c) => ({
+      ...c,
+      thread_count: mockThreads.filter((t) => t.category === c.slug).length,
+    }))
+    return HttpResponse.json(withCounts)
+  }),
+
+  // GET /community/product-forums
+  http.get(`${BASE}/community/product-forums`, () => {
+    const slugSet = new Set(mockThreads.map((t) => t.product_slug).filter(Boolean) as string[])
+    const forums = Array.from(slugSet).map((slug) => {
+      const product = products.find((p) => p.slug === slug)!
+      return {
+        slug,
+        name: product.name,
+        thread_count: mockThreads.filter((t) => t.product_slug === slug).length,
+        topics: product.topics ?? [],
+      }
+    })
+    return HttpResponse.json(forums)
+  }),
+
+  // GET /community/threads — supports ?category=&product=&sort=
+  http.get(`${BASE}/community/threads`, ({ request }) => {
+    const url = new URL(request.url)
+    const category = url.searchParams.get('category')
+    const product = url.searchParams.get('product')
+    const sort = url.searchParams.get('sort') ?? 'recent'
+
+    let threads = [...mockThreads]
+    if (category) threads = threads.filter((t) => t.category === category)
+    if (product) threads = threads.filter((t) => t.product_slug === product)
+
+    if (sort === 'popular') threads.sort((a, b) => b.upvotes - a.upvotes)
+    // 'recent' is the default order in the mock data
+
+    return HttpResponse.json(threads)
+  }),
+
+  // GET /community/events
+  http.get(`${BASE}/community/events`, () => {
+    return HttpResponse.json(mockEvents)
+  }),
+
+  // GET /community/requests — supports ?sort=
+  http.get(`${BASE}/community/requests`, ({ request }) => {
+    const url = new URL(request.url)
+    const sort = url.searchParams.get('sort') ?? 'popular'
+    const list = [...mockRequests]
+    if (sort === 'popular') list.sort((a, b) => b.upvotes - a.upvotes)
+    return HttpResponse.json(list)
+  }),
+
+  // POST /community/requests — increment upvote
+  http.post(`${BASE}/community/requests/:id/upvote`, ({ params }) => {
+    const req = mockRequests.find((r) => r.id === params.id)
+    if (!req) return new HttpResponse(null, { status: 404 })
+    req.upvotes += 1
+    return HttpResponse.json({ upvotes: req.upvotes })
   }),
 ]
