@@ -116,12 +116,12 @@ export function EventDetailPage() {
       .catch(() => setLoading(false))
   }, [id])
 
-  if (notFound) return <><Header user={null} /><PageError status={404} message="That event does not exist." /></>
+  if (notFound) return <><Header /><PageError status={404} message="That event does not exist." /></>
 
   if (loading || !event) {
     return (
       <div className="min-h-screen bg-surface-subtle">
-        <Header user={null} />
+        <Header />
         <main className="max-w-7xl mx-auto px-6 lg:px-10 py-10 space-y-4">
           <Skeleton className="h-48 w-full rounded-card" />
           <Skeleton className="h-72 w-full rounded-card" />
@@ -141,7 +141,7 @@ export function EventDetailPage() {
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <Header user={null} />
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
         {/* Breadcrumb */}

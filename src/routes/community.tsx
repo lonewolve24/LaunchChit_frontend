@@ -86,7 +86,7 @@ export function CommunityPage() {
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <Header user={null} />
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">

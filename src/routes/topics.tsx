@@ -31,7 +31,7 @@ export function TopicsPage() {
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <Header user={null} />
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
         <div className="mb-10">

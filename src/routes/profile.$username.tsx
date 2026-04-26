@@ -86,12 +86,12 @@ export function ProfilePage() {
     }
   }
 
-  if (notFound) return <><Header user={null} /><PageError status={404} message="That builder does not exist." /></>
+  if (notFound) return <><Header /><PageError status={404} message="That builder does not exist." /></>
 
   if (loading || !profile) {
     return (
       <div className="min-h-screen bg-surface-subtle">
-        <Header user={null} />
+        <Header />
         <main className="max-w-5xl mx-auto px-6 lg:px-10 py-10 space-y-4">
           <Skeleton className="h-48 w-full rounded-card" />
           <Skeleton className="h-7 w-48" />
@@ -106,7 +106,7 @@ export function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <Header user={null} />
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
         {/* Hero card */}

@@ -71,6 +71,9 @@ describe('SubmitPage', () => {
     await userEvent.type(screen.getByLabelText(/tagline/i), 'Connecting farmers to buyers')
     await userEvent.type(screen.getByLabelText(/description/i), 'A platform that helps farmers.')
     await userEvent.type(screen.getByLabelText(/website url/i), 'https://farmlink.gm')
+    // New required fields: at least one topic and one platform
+    await userEvent.click(screen.getByText('Agri-Tech'))
+    await userEvent.click(screen.getByText('Web app'))
     await userEvent.click(screen.getByRole('button', { name: /launch it/i }))
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(expect.objectContaining({ to: '/p/$slug' }))

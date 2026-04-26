@@ -6,7 +6,7 @@ export const Route = createFileRoute('/terms')({ component: TermsPage })
 export function TermsPage() {
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <Header user={null} />
+      <Header />
       <main className="max-w-2xl mx-auto px-6 lg:px-10 py-16">
         <h1 className="text-3xl font-bold text-foreground mb-6">Terms of Service</h1>
         <div className="bg-surface rounded-card p-8 text-sm text-foreground leading-relaxed space-y-4" style={{ boxShadow: '0 1px 4px 0 rgb(0 0 0 / 0.08)' }}>

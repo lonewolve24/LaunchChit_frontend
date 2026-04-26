@@ -70,13 +70,13 @@ export function TopicFeedPage() {
     }
   }
 
-  if (notFound) return <><Header user={null} /><PageError status={404} message="That topic does not exist." /></>
+  if (notFound) return <><Header /><PageError status={404} message="That topic does not exist." /></>
 
   const topicColor = TOPIC_COLOR
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <Header user={null} />
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
         {/* Breadcrumb */}

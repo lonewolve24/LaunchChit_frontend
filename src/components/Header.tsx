@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
-import { clearMe } from '../lib/auth'
+import { clearMe, getMe } from '../lib/auth'
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
 export type User = { name: string | null; email: string }
 
 type Props = {
-  user: User | null
+  // When omitted, Header fetches /me itself via the memoized helper.
+  // Pass `null` to force the logged-out state. Pass a User to override.
+  user?: User | null
 }
 
 function initials(user: User): string {
@@ -37,7 +39,23 @@ const moreSubMenu = [
   { label: 'About Us', href: '/about', desc: 'Who we are and why LaunchedChit exists' },
 ]
 
-export function Header({ user }: Props) {
+export function Header({ user: propUser }: Props) {
+  const [fetchedUser, setFetchedUser] = useState<User | null>(null)
+
+  // If a user isn't passed in, hydrate from /me so the header reflects the
+  // session on every public route without each page wiring it up itself.
+  useEffect(() => {
+    if (propUser !== undefined) return
+    let cancelled = false
+    getMe().then((me) => {
+      if (cancelled || !me) return
+      setFetchedUser({ name: me.name, email: me.email })
+    })
+    return () => { cancelled = true }
+  }, [propUser])
+
+  const user = propUser !== undefined ? propUser : fetchedUser
+
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [communityOpen, setCommunityOpen] = useState(false)
