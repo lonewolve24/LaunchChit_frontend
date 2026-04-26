@@ -9,13 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyOtpRouteImport } from './routes/verify-otp'
 import { Route as TopicsRouteImport } from './routes/topics'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SubmitRouteImport } from './routes/submit'
+import { Route as StoriesRouteImport } from './routes/stories'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as ArchiveRouteImport } from './routes/archive'
@@ -28,6 +33,11 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as CommunityThreadsIdRouteImport } from './routes/community_.threads.$id'
 import { Route as CommunityEventsIdRouteImport } from './routes/community_.events.$id'
 
+const VerifyOtpRoute = VerifyOtpRouteImport.update({
+  id: '/verify-otp',
+  path: '/verify-otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TopicsRoute = TopicsRouteImport.update({
   id: '/topics',
   path: '/topics',
@@ -43,9 +53,24 @@ const SubmitRoute = SubmitRouteImport.update({
   path: '/submit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoriesRoute = StoriesRouteImport.update({
+  id: '/stories',
+  path: '/stories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -61,6 +86,11 @@ const LoginRoute = LoginRouteImport.update({
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityRoute = CommunityRouteImport.update({
@@ -125,13 +155,18 @@ export interface FileRoutesByFullPath {
   '/archive': typeof ArchiveRoute
   '/collections': typeof CollectionsRoute
   '/community': typeof CommunityRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/stories': typeof StoriesRoute
   '/submit': typeof SubmitRoute
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
+  '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
@@ -145,13 +180,18 @@ export interface FileRoutesByTo {
   '/archive': typeof ArchiveRoute
   '/collections': typeof CollectionsRoute
   '/community': typeof CommunityRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/stories': typeof StoriesRoute
   '/submit': typeof SubmitRoute
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
+  '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
@@ -166,13 +206,18 @@ export interface FileRoutesById {
   '/archive': typeof ArchiveRoute
   '/collections': typeof CollectionsRoute
   '/community': typeof CommunityRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/stories': typeof StoriesRoute
   '/submit': typeof SubmitRoute
   '/terms': typeof TermsRoute
   '/topics': typeof TopicsRoute
+  '/verify-otp': typeof VerifyOtpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/p/$slug': typeof PSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
@@ -188,13 +233,18 @@ export interface FileRouteTypes {
     | '/archive'
     | '/collections'
     | '/community'
+    | '/forgot-password'
     | '/leaderboard'
     | '/login'
     | '/privacy'
+    | '/reset-password'
     | '/settings'
+    | '/signup'
+    | '/stories'
     | '/submit'
     | '/terms'
     | '/topics'
+    | '/verify-otp'
     | '/auth/callback'
     | '/p/$slug'
     | '/profile/$username'
@@ -208,13 +258,18 @@ export interface FileRouteTypes {
     | '/archive'
     | '/collections'
     | '/community'
+    | '/forgot-password'
     | '/leaderboard'
     | '/login'
     | '/privacy'
+    | '/reset-password'
     | '/settings'
+    | '/signup'
+    | '/stories'
     | '/submit'
     | '/terms'
     | '/topics'
+    | '/verify-otp'
     | '/auth/callback'
     | '/p/$slug'
     | '/profile/$username'
@@ -228,13 +283,18 @@ export interface FileRouteTypes {
     | '/archive'
     | '/collections'
     | '/community'
+    | '/forgot-password'
     | '/leaderboard'
     | '/login'
     | '/privacy'
+    | '/reset-password'
     | '/settings'
+    | '/signup'
+    | '/stories'
     | '/submit'
     | '/terms'
     | '/topics'
+    | '/verify-otp'
     | '/auth/callback'
     | '/p/$slug'
     | '/profile/$username'
@@ -249,13 +309,18 @@ export interface RootRouteChildren {
   ArchiveRoute: typeof ArchiveRoute
   CollectionsRoute: typeof CollectionsRoute
   CommunityRoute: typeof CommunityRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
+  SignupRoute: typeof SignupRoute
+  StoriesRoute: typeof StoriesRoute
   SubmitRoute: typeof SubmitRoute
   TermsRoute: typeof TermsRoute
   TopicsRoute: typeof TopicsRoute
+  VerifyOtpRoute: typeof VerifyOtpRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   PSlugRoute: typeof PSlugRoute
   ProfileUsernameRoute: typeof ProfileUsernameRoute
@@ -266,6 +331,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-otp': {
+      id: '/verify-otp'
+      path: '/verify-otp'
+      fullPath: '/verify-otp'
+      preLoaderRoute: typeof VerifyOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/topics': {
       id: '/topics'
       path: '/topics'
@@ -287,11 +359,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stories': {
+      id: '/stories'
+      path: '/stories'
+      fullPath: '/stories'
+      preLoaderRoute: typeof StoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -313,6 +406,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community': {
@@ -401,13 +501,18 @@ const rootRouteChildren: RootRouteChildren = {
   ArchiveRoute: ArchiveRoute,
   CollectionsRoute: CollectionsRoute,
   CommunityRoute: CommunityRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
+  SignupRoute: SignupRoute,
+  StoriesRoute: StoriesRoute,
   SubmitRoute: SubmitRoute,
   TermsRoute: TermsRoute,
   TopicsRoute: TopicsRoute,
+  VerifyOtpRoute: VerifyOtpRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   PSlugRoute: PSlugRoute,
   ProfileUsernameRoute: ProfileUsernameRoute,

@@ -34,10 +34,9 @@ type Product = {
   created_at?: string
 }
 
-const PLACEHOLDER_COLORS = ['#1B4332', '#7C5CBF', '#2563EB', '#DC4A22', '#0891B2', '#B45309', '#065F46']
-function placeholderColor(name: string): string {
-  const idx = name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % PLACEHOLDER_COLORS.length
-  return PLACEHOLDER_COLORS[idx]
+const PLACEHOLDER_COLOR = '#1E293B'
+function placeholderColor(_name: string): string {
+  return PLACEHOLDER_COLOR
 }
 
 function toDateString(d: Date) { return d.toISOString().slice(0, 10) }
@@ -124,7 +123,7 @@ export function LeaderboardPage() {
             <div className="flex items-center gap-3 mb-6">
               <div
                 className="w-9 h-9 rounded-card flex items-center justify-center text-white font-bold text-base flex-shrink-0"
-                style={{ backgroundColor: '#1B4332' }}
+                style={{ backgroundColor: PLACEHOLDER_COLOR }}
               >
                 L
               </div>

@@ -108,7 +108,7 @@ export function ArchivePage() {
         {loading ? (
           <SkeletonCard count={3} />
         ) : products.length === 0 ? (
-          <EmptyState heading="No launches that day" body="Nothing was shipped on this date yet." cta={{ label: "View today's launches", onClick: () => { window.location.href = '/' } }} />
+          <EmptyState heading="No launches that day" body="Nothing was shipped on this date yet." cta={{ label: 'View launches', onClick: () => { window.location.href = '/' } }} />
         ) : (
           <div className="space-y-4">
             {products.map((p) => <ProductCard key={p.id} product={p} onVote={handleVote} />)}

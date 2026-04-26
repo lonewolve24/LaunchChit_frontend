@@ -1,56 +1,75 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect } from 'vitest'
 import { LoginPage } from './login'
 
 describe('LoginPage', () => {
-  it('renders the email input', () => {
+  it('renders the email input by default', () => {
     render(<LoginPage />)
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument()
   })
 
-  it('renders the send magic link button', () => {
+  it('renders the password input', () => {
     render(<LoginPage />)
-    expect(screen.getByRole('button', { name: /send magic link/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument()
   })
 
-  it('shows inline error when submitting an empty email', async () => {
+  it('renders the sign in button', () => {
     render(<LoginPage />)
-    await userEvent.click(screen.getByRole('button', { name: /send magic link/i }))
+    expect(screen.getByRole('button', { name: /^sign in$/i })).toBeInTheDocument()
+  })
+
+  it('renders the forgot password link', () => {
+    render(<LoginPage />)
+    expect(screen.getByRole('link', { name: /forgot password/i })).toBeInTheDocument()
+  })
+
+  it('renders the remember me toggle', () => {
+    render(<LoginPage />)
+    expect(screen.getByLabelText(/remember me/i)).toBeInTheDocument()
+  })
+
+  it('toggles to phone input when phone tab is selected', async () => {
+    render(<LoginPage />)
+    await userEvent.click(screen.getByRole('button', { name: /^phone$/i }))
+    expect(screen.getByLabelText(/phone number/i)).toBeInTheDocument()
+  })
+
+  it('shows inline error when submitting empty email', async () => {
+    render(<LoginPage />)
+    await userEvent.click(screen.getByRole('button', { name: /^sign in$/i }))
     expect(screen.getByRole('alert')).toBeInTheDocument()
   })
 
-  it('shows inline error for an invalid email format', async () => {
+  it('shows inline error for invalid email format', async () => {
     render(<LoginPage />)
-    await userEvent.type(screen.getByLabelText(/email/i), 'notanemail')
-    await userEvent.click(screen.getByRole('button', { name: /send magic link/i }))
+    await userEvent.type(screen.getByLabelText(/email address/i), 'notanemail')
+    await userEvent.type(screen.getByLabelText(/^password$/i), 'secret123')
+    await userEvent.click(screen.getByRole('button', { name: /^sign in$/i }))
     expect(screen.getByRole('alert')).toBeInTheDocument()
   })
 
-  it('shows confirmation state after a successful send', async () => {
+  it('shows inline error when password is missing', async () => {
     render(<LoginPage />)
-    await userEvent.type(screen.getByLabelText(/email/i), 'musa@example.com')
-    await userEvent.click(screen.getByRole('button', { name: /send magic link/i }))
-    await waitFor(() => {
-      expect(screen.getByText(/check your email/i)).toBeInTheDocument()
-    })
+    await userEvent.type(screen.getByLabelText(/email address/i), 'musa@example.com')
+    await userEvent.click(screen.getByRole('button', { name: /^sign in$/i }))
+    expect(screen.getByRole('alert')).toBeInTheDocument()
   })
 
-  it('shows a resend link in confirmation state', async () => {
+  it('shows inline error for invalid phone number', async () => {
     render(<LoginPage />)
-    await userEvent.type(screen.getByLabelText(/email/i), 'musa@example.com')
-    await userEvent.click(screen.getByRole('button', { name: /send magic link/i }))
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /resend/i })).toBeInTheDocument()
-    })
+    await userEvent.click(screen.getByRole('button', { name: /^phone$/i }))
+    await userEvent.type(screen.getByLabelText(/phone number/i), 'abc')
+    await userEvent.type(screen.getByLabelText(/^password$/i), 'secret123')
+    await userEvent.click(screen.getByRole('button', { name: /^sign in$/i }))
+    expect(screen.getByRole('alert')).toBeInTheDocument()
   })
 
-  it('returns to email input when "use a different email" is clicked', async () => {
+  it('toggles password visibility', async () => {
     render(<LoginPage />)
-    await userEvent.type(screen.getByLabelText(/email/i), 'musa@example.com')
-    await userEvent.click(screen.getByRole('button', { name: /send magic link/i }))
-    await waitFor(() => screen.getByRole('button', { name: /different email/i }))
-    await userEvent.click(screen.getByRole('button', { name: /different email/i }))
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
+    const password = screen.getByLabelText(/^password$/i) as HTMLInputElement
+    expect(password.type).toBe('password')
+    await userEvent.click(screen.getByRole('button', { name: /show password/i }))
+    expect(password.type).toBe('text')
   })
 })

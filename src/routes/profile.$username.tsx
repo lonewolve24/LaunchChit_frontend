@@ -119,7 +119,7 @@ export function ProfilePage() {
             <div className="absolute -bottom-12 md:-bottom-14 left-6 md:left-8">
               <div
                 className="w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center text-white font-bold text-4xl md:text-5xl border-4 border-surface"
-                style={{ backgroundColor: profile.cover_color ?? '#1B4332' }}
+                style={{ backgroundColor: profile.cover_color ?? '#1E293B' }}
               >
                 {profile.name[0]}
               </div>

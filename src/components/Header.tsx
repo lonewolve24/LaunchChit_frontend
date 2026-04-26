@@ -31,12 +31,19 @@ const communitySubMenu = [
   { label: 'Mailing List', href: '/community?tab=mailing-list', desc: 'Weekly digest in your inbox' },
 ]
 
+const moreSubMenu = [
+  { label: 'Stories', href: '/stories', desc: 'Founder journeys and notes from the tech scene' },
+  { label: 'About Us', href: '/about', desc: 'Who we are and why LaunchedChit exists' },
+]
+
 export function Header({ user }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [communityOpen, setCommunityOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const communityRef = useRef<HTMLDivElement>(null)
+  const moreRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -45,6 +52,9 @@ export function Header({ user }: Props) {
       }
       if (communityRef.current && !communityRef.current.contains(e.target as Node)) {
         setCommunityOpen(false)
+      }
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -71,7 +81,7 @@ export function Header({ user }: Props) {
             <a
               key={l.href}
               href={l.href}
-              className="text-white/70 hover:text-white text-sm font-medium px-3 py-1.5 rounded-button transition-colors hover:bg-white/10"
+              className="text-white hover:text-white text-sm font-medium px-3 py-1.5 rounded-button transition-colors hover:bg-white/10"
             >
               {l.label}
             </a>
@@ -82,7 +92,7 @@ export function Header({ user }: Props) {
             <button
               onClick={() => setCommunityOpen((o) => !o)}
               aria-expanded={communityOpen}
-              className="flex items-center gap-1 text-white/70 hover:text-white text-sm font-medium px-3 py-1.5 rounded-button transition-colors hover:bg-white/10"
+              className="flex items-center gap-1 text-white hover:text-white text-sm font-medium px-3 py-1.5 rounded-button transition-colors hover:bg-white/10"
             >
               Community
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${communityOpen ? 'rotate-180' : ''}`}>
@@ -95,6 +105,37 @@ export function Header({ user }: Props) {
                 style={{ boxShadow: '0 8px 24px -4px rgb(0 0 0 / 0.18)' }}
               >
                 {communitySubMenu.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="block px-4 py-3 hover:bg-surface-subtle transition-colors"
+                  >
+                    <div className="text-sm font-semibold text-foreground">{item.label}</div>
+                    <div className="text-xs text-foreground-muted mt-0.5">{item.desc}</div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* More dropdown */}
+          <div className="relative" ref={moreRef}>
+            <button
+              onClick={() => setMoreOpen((o) => !o)}
+              aria-expanded={moreOpen}
+              className="flex items-center gap-1 text-white hover:text-white text-sm font-medium px-3 py-1.5 rounded-button transition-colors hover:bg-white/10"
+            >
+              More
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${moreOpen ? 'rotate-180' : ''}`}>
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            {moreOpen && (
+              <div
+                className="absolute left-0 top-10 bg-surface rounded-card py-2 w-72 z-50"
+                style={{ boxShadow: '0 8px 24px -4px rgb(0 0 0 / 0.18)' }}
+              >
+                {moreSubMenu.map((item) => (
                   <a
                     key={item.href}
                     href={item.href}
@@ -124,7 +165,7 @@ export function Header({ user }: Props) {
             ) : (
               <button
                 onClick={() => setSearchOpen(true)}
-                className="text-white/60 hover:text-white transition-colors p-1.5 rounded-button hover:bg-white/10"
+                className="text-white/90 hover:text-white transition-colors p-1.5 rounded-button hover:bg-white/10"
                 aria-label="Search"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -190,7 +231,7 @@ export function Header({ user }: Props) {
           ) : (
             <a
               href="/login"
-              className="text-sm font-medium text-white/70 hover:text-white transition-colors flex-shrink-0"
+              className="text-sm font-medium text-white hover:text-white transition-colors flex-shrink-0"
             >
               Sign in
             </a>

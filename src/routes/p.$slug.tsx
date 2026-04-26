@@ -10,10 +10,9 @@ export const Route = createFileRoute('/p/$slug')({ component: ProductDetailPage 
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
-const PLACEHOLDER_COLORS = ['#1B4332', '#7C5CBF', '#2563EB', '#DC4A22', '#0891B2', '#B45309', '#065F46']
-function placeholderColor(name: string): string {
-  const idx = name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % PLACEHOLDER_COLORS.length
-  return PLACEHOLDER_COLORS[idx]
+const PLACEHOLDER_COLOR = '#1E293B'
+function placeholderColor(_name: string): string {
+  return PLACEHOLDER_COLOR
 }
 
 const cardShadow = '0 1px 4px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06)'
@@ -426,8 +425,8 @@ export function ProductDetailPage() {
                     <div>
                       <dt className="text-xs font-semibold text-foreground-faint uppercase tracking-wider mb-1">Website</dt>
                       <dd>
-                        <a href={product.website_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                          {product.website_url.replace(/^https?:\/\//, '')}
+                        <a href={product.website_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
+                          {product.website_url}
                         </a>
                       </dd>
                     </div>
@@ -520,7 +519,7 @@ export function ProductDetailPage() {
                       <div className="flex items-start gap-3 mb-2">
                         <div
                           className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                          style={{ backgroundColor: '#7C5CBF' }}
+                          style={{ backgroundColor: PLACEHOLDER_COLOR }}
                         >
                           {r.author.name[0]}
                         </div>
@@ -555,7 +554,7 @@ export function ProductDetailPage() {
                         <div key={member.name} className="flex items-start gap-3">
                           <div
                             className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-base flex-shrink-0"
-                            style={{ backgroundColor: member.avatar_color }}
+                            style={{ backgroundColor: PLACEHOLDER_COLOR }}
                           >
                             {member.name[0]}
                           </div>
@@ -585,7 +584,7 @@ export function ProductDetailPage() {
                         <div key={tech.name} className="flex items-start gap-4 p-4 rounded-card bg-surface-subtle">
                           <div
                             className="w-11 h-11 rounded-card flex items-center justify-center text-white font-bold text-base flex-shrink-0"
-                            style={{ backgroundColor: tech.icon_color }}
+                            style={{ backgroundColor: '#0891B2' }}
                           >
                             {tech.name[0]}
                           </div>
@@ -643,7 +642,7 @@ export function ProductDetailPage() {
                     <p className="text-xs text-foreground-faint uppercase tracking-wider font-semibold">Day Rank</p>
                     <p className="text-3xl font-bold text-primary mt-1">#{product.day_rank}</p>
                   </div>
-                  <p className="text-xs text-foreground-muted text-right">Today's<br />Launches</p>
+                  <p className="text-xs text-foreground-muted text-right">Launches</p>
                 </div>
               )}
               <div className="flex items-center justify-center">
@@ -684,13 +683,13 @@ export function ProductDetailPage() {
                       href={product.ios_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 bg-foreground text-white rounded-button px-4 py-2.5 hover:opacity-90 transition-opacity"
+                      className="flex items-center gap-3 bg-accent text-white rounded-button px-4 py-2.5 hover:bg-accent-dark transition-colors"
                     >
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                       </svg>
                       <div className="flex-1 text-left">
-                        <p className="text-[10px] uppercase opacity-80 leading-none">Download on the</p>
+                        <p className="text-[11px] font-bold uppercase text-white leading-none tracking-wider">Download on the</p>
                         <p className="text-sm font-bold leading-tight">App Store</p>
                       </div>
                     </a>
@@ -700,13 +699,13 @@ export function ProductDetailPage() {
                       href={product.android_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 bg-foreground text-white rounded-button px-4 py-2.5 hover:opacity-90 transition-opacity"
+                      className="flex items-center gap-3 bg-accent text-white rounded-button px-4 py-2.5 hover:bg-accent-dark transition-colors"
                     >
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M3 20.5V3.5c0-.9.7-1.6 1.6-1.6.3 0 .5.1.8.2l13.4 8c.8.5.8 1.6 0 2.1l-13.4 8c-.7.4-1.6.2-2-.5-.2-.3-.4-.6-.4-1.2zm10-7.5l3.5-2.1L7 5.6v12.7l9.5-5.3L13 13z" />
                       </svg>
                       <div className="flex-1 text-left">
-                        <p className="text-[10px] uppercase opacity-80 leading-none">Get it on</p>
+                        <p className="text-[11px] font-bold uppercase text-white leading-none tracking-wider">Get it on</p>
                         <p className="text-sm font-bold leading-tight">Google Play</p>
                       </div>
                     </a>
@@ -732,7 +731,7 @@ export function ProductDetailPage() {
                     <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.6.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.119 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
                   </svg>
                   <div className="flex-1 text-left">
-                    <p className="text-[10px] uppercase opacity-80 leading-none">View on</p>
+                    <p className="text-[11px] font-bold uppercase text-white leading-none tracking-wider">View on</p>
                     <p className="text-sm font-bold leading-tight">GitHub</p>
                   </div>
                 </a>
@@ -748,7 +747,7 @@ export function ProductDetailPage() {
               <a href={`/profile/${makerSlug}`} className="flex items-center gap-3">
                 <div
                   className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-base flex-shrink-0"
-                  style={{ backgroundColor: '#1B4332' }}
+                  style={{ backgroundColor: PLACEHOLDER_COLOR }}
                 >
                   {product.maker.name[0]}
                 </div>
@@ -783,7 +782,7 @@ export function ProductDetailPage() {
                     >
                       <span
                         className="w-4 h-4 rounded-sm flex items-center justify-center text-white text-[9px] font-bold"
-                        style={{ backgroundColor: tech.icon_color }}
+                        style={{ backgroundColor: '#0891B2' }}
                       >
                         {tech.name[0]}
                       </span>
@@ -875,7 +874,7 @@ function CommentBlock({ comment }: { comment: Comment }) {
     <div className="flex gap-3">
       <div
         className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-        style={{ backgroundColor: '#1B4332' }}
+        style={{ backgroundColor: PLACEHOLDER_COLOR }}
       >
         {comment.author.name[0]}
       </div>
@@ -901,7 +900,7 @@ function CommentBlock({ comment }: { comment: Comment }) {
               <div key={r.id} className="flex gap-3">
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
-                  style={{ backgroundColor: '#7C5CBF' }}
+                  style={{ backgroundColor: PLACEHOLDER_COLOR }}
                 >
                   {r.author.name[0]}
                 </div>

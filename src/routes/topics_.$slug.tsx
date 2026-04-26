@@ -31,16 +31,7 @@ type Product = {
   topics?: Array<{ slug: string; name: string }>
 }
 
-const TOPIC_COLORS: Record<string, string> = {
-  fintech: '#2563EB',
-  'agri-tech': '#065F46',
-  edtech: '#7C5CBF',
-  healthtech: '#DC4A22',
-  logistics: '#0891B2',
-  ecommerce: '#B45309',
-  govtech: '#9D174D',
-  social: '#1B4332',
-}
+const TOPIC_COLOR = '#1E293B'
 
 export function TopicFeedPage() {
   const { slug } = useParams({ from: '/topics_/$slug' })
@@ -81,7 +72,7 @@ export function TopicFeedPage() {
 
   if (notFound) return <><Header user={null} /><PageError status={404} message="That topic does not exist." /></>
 
-  const topicColor = topic ? TOPIC_COLORS[topic.slug] ?? '#1B4332' : '#1B4332'
+  const topicColor = TOPIC_COLOR
 
   return (
     <div className="min-h-screen bg-surface-subtle">

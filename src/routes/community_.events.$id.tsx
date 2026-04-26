@@ -122,7 +122,7 @@ export function EventDetailPage() {
     return (
       <div className="min-h-screen bg-surface-subtle">
         <Header user={null} />
-        <main className="max-w-5xl mx-auto px-6 lg:px-10 py-10 space-y-4">
+        <main className="max-w-7xl mx-auto px-6 lg:px-10 py-10 space-y-4">
           <Skeleton className="h-48 w-full rounded-card" />
           <Skeleton className="h-72 w-full rounded-card" />
         </main>
@@ -143,7 +143,7 @@ export function EventDetailPage() {
     <div className="min-h-screen bg-surface-subtle">
       <Header user={null} />
 
-      <main className="max-w-5xl mx-auto px-6 lg:px-10 py-8">
+      <main className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-5 text-sm">
           <a href="/community" className="text-foreground-faint hover:text-foreground transition-colors">Community</a>
@@ -223,7 +223,7 @@ export function EventDetailPage() {
                 <div className="flex items-center gap-3">
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                    style={{ backgroundColor: '#1B4332' }}
+                    style={{ backgroundColor: '#1E293B' }}
                   >
                     {event.host[0]}
                   </div>

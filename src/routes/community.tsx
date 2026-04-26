@@ -718,10 +718,10 @@ function RequestsTab() {
 
 // ---------- MAILING LIST ----------
 const MAILING_TOPICS = [
-  { id: 'launches',   label: 'Daily launches digest',     desc: 'A short email with today\'s top Gambian launches, weekday mornings.' },
+  { id: 'launches',   label: 'Daily launches digest',     desc: 'A short email with the top launches, weekday mornings.' },
   { id: 'weekly',     label: 'Weekly community recap',    desc: 'The most-discussed threads, top requests, and upcoming events. Sundays.' },
   { id: 'events',     label: 'Event reminders',           desc: 'A heads-up the day before any event you might want to attend.' },
-  { id: 'jobs',       label: 'Jobs from the community',   desc: 'When a Gambian product team is hiring, you hear about it.' },
+  { id: 'jobs',       label: 'Jobs from the community',   desc: 'When a product team is hiring, you hear about it.' },
   { id: 'milestones', label: 'Maker milestones',          desc: 'When a launched product hits a big number — funding, users, revenue.' },
 ]
 
@@ -833,7 +833,7 @@ function MailingListTab() {
         <div className="bg-surface rounded-card p-5" style={{ boxShadow: cardShadow }}>
           <p className="text-xs font-semibold text-foreground-faint uppercase tracking-wider mb-3">Sample subjects</p>
           <ul className="space-y-3 text-sm text-foreground">
-            <li>📨 <strong>5 Gambian launches today</strong> — FarmLink GM, PayGam, +3</li>
+            <li>📨 <strong>5 launches today</strong> — FarmLink GM, PayGam, +3</li>
             <li>📨 <strong>What we discussed this week in Community</strong></li>
             <li>📨 <strong>Builders Meetup tomorrow at 6pm</strong> in Senegambia</li>
             <li>📨 <strong>Hiring: 3 new roles from Gambian builders</strong></li>

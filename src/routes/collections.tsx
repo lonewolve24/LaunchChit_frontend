@@ -78,7 +78,7 @@ export function CollectionsPage() {
           <EmptyState
             heading="Nothing saved yet"
             body="Tap the bookmark icon on any product to save it here for later."
-            cta={{ label: 'Browse today\'s launches', onClick: () => { window.location.href = '/' } }}
+            cta={{ label: 'Browse launches', onClick: () => { window.location.href = '/' } }}
           />
         ) : (
           <div className="space-y-4">

@@ -1,10 +1,7 @@
-const PLACEHOLDER_COLORS = [
-  '#1B4332', '#7C5CBF', '#2563EB', '#DC4A22', '#0891B2', '#B45309', '#065F46',
-]
+const PLACEHOLDER_COLOR = '#1E293B'
 
-function placeholderColor(name: string): string {
-  const idx = name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % PLACEHOLDER_COLORS.length
-  return PLACEHOLDER_COLORS[idx]
+function placeholderColor(_name: string): string {
+  return PLACEHOLDER_COLOR
 }
 
 function formatLaunchDate(iso: string): string {
@@ -107,7 +104,8 @@ export function ProductCard({ product, onVote, onWaitlist }: Props) {
         onClick={() => onVote?.(product.id)}
         aria-label="Upvote"
         aria-pressed={product.has_voted}
-        className={`flex flex-col items-center gap-1 w-12 rounded-button border-2 py-2 transition-all flex-shrink-0 ${
+        title={product.has_voted ? 'Remove upvote' : 'Upvote'}
+        className={`flex flex-col items-center gap-1 w-12 rounded-button border-2 py-2 transition-all flex-shrink-0 cursor-pointer ${
           product.has_voted
             ? 'border-accent bg-accent/10 text-accent'
             : 'border-border text-foreground-muted hover:border-accent hover:text-accent'
@@ -175,7 +173,7 @@ export function ProductCard({ product, onVote, onWaitlist }: Props) {
                     key={topic.slug}
                     href={`/topics/${topic.slug}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="text-xs font-medium text-foreground-muted bg-surface-subtle hover:bg-primary hover:text-white px-2 py-0.5 rounded-full border border-border transition-colors"
+                    className="text-xs font-medium text-primary bg-primary-muted hover:bg-primary hover:text-white px-2.5 py-0.5 rounded-full transition-colors"
                   >
                     {topic.name}
                   </a>
@@ -208,7 +206,7 @@ export function ProductCard({ product, onVote, onWaitlist }: Props) {
         </a>
         <button
           onClick={(e) => { e.preventDefault(); onWaitlist?.(product.id) }}
-          className="flex items-center gap-1.5 text-xs font-semibold text-foreground-muted hover:text-accent hover:border-accent transition-colors px-2.5 py-1.5 rounded-button border border-border bg-surface min-w-[64px] justify-end"
+          className="flex items-center gap-1.5 text-xs font-semibold text-foreground-muted hover:text-accent hover:border-accent transition-colors px-2.5 py-1.5 rounded-button border border-border bg-surface min-w-[64px] justify-end cursor-pointer"
           title={`${product.waitlist_count ?? 0} on waitlist · join waitlist`}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
