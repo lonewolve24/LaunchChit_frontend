@@ -4,6 +4,13 @@ _Completed features will be logged here._
 
 ---
 
+## F10 — EmptyState component
+- Props: `heading`, `body?`, `cta?: { label, onClick }`
+- CTA button only rendered when `cta` is provided
+- Tests: 5/5 ✓
+
+---
+
 ## F09 — UpvoteButton component
 - Props: `voteCount`, `hasVoted`, `onVote`, `size: sm | lg`
 - Voted state: amber border + tinted background

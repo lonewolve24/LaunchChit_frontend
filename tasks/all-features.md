@@ -12,7 +12,7 @@
 - [x] F07 — Avatar component
 - [x] F08 — ProductCard component
 - [x] F09 — UpvoteButton component (sm + lg variants)
-- [ ] F10 — EmptyState component
+- [x] F10 — EmptyState component
 - [ ] F11 — Toast component
 - [ ] F12 — Skeleton component
 - [ ] F13 — InlineError component
