@@ -660,6 +660,173 @@ const adminFeaturedStore = (() => {
   }
 })()
 
+// Admin communications stores ------------------------------------------------
+
+type MailingListSubscriber = {
+  id: string
+  email: string
+  name: string | null
+  source: 'organic' | 'profile' | 'launch'
+  topics: string[]
+  subscribed_at: string
+  status: 'subscribed' | 'unsubscribed'
+}
+const adminMailingListStore = (() => {
+  const items: MailingListSubscriber[] = [
+    { id: 'ml1', email: 'aminata@farmlink.gm',     name: 'Aminata Touray',  source: 'profile', topics: ['Agri-Tech'],            subscribed_at: '2026-04-22', status: 'subscribed' },
+    { id: 'ml2', email: 'momodou@paygam.com',      name: 'Momodou Jatta',   source: 'profile', topics: ['Fintech'],              subscribed_at: '2026-04-21', status: 'subscribed' },
+    { id: 'ml3', email: 'reader1@gmail.com',       name: null,              source: 'organic', topics: [],                       subscribed_at: '2026-04-20', status: 'subscribed' },
+    { id: 'ml4', email: 'fatou@banjul-eats.gm',    name: 'Fatou Ceesay',    source: 'profile', topics: ['E-commerce'],           subscribed_at: '2026-04-18', status: 'subscribed' },
+    { id: 'ml5', email: 'lamin@touray.gm',         name: 'Lamin Touray',    source: 'launch',  topics: ['GovTech', 'Fintech'],   subscribed_at: '2026-04-15', status: 'subscribed' },
+    { id: 'ml6', email: 'ndey@example.com',        name: 'Ndey Suso',       source: 'organic', topics: ['EdTech'],               subscribed_at: '2026-04-10', status: 'subscribed' },
+    { id: 'ml7', email: 'unsub@example.com',       name: 'Anon',            source: 'organic', topics: [],                       subscribed_at: '2026-03-22', status: 'unsubscribed' },
+    { id: 'ml8', email: 'investor@vc.gm',          name: 'Sira Sanneh',     source: 'organic', topics: ['Fintech', 'GovTech'],   subscribed_at: '2026-03-12', status: 'subscribed' },
+    { id: 'ml9', email: 'press@news.gm',           name: 'News Desk',       source: 'organic', topics: [],                       subscribed_at: '2026-02-04', status: 'subscribed' },
+  ]
+  return {
+    list: () => items,
+    setStatus: (id: string, status: MailingListSubscriber['status']) => {
+      const item = items.find((x) => x.id === id)
+      if (item) item.status = status
+    },
+  }
+})()
+
+type Broadcast = {
+  id: string
+  subject: string
+  body: string
+  segment: string
+  status: 'draft' | 'scheduled' | 'sent'
+  created_at: string
+  sent_at?: string
+  recipients?: number
+  open_rate?: number
+}
+const adminBroadcastsStore = (() => {
+  const items: Broadcast[] = [
+    { id: 'bc1', subject: 'Friday digest — week 17, 2026',         body: '6 new launches, 2 deep dives, and a meetup tomorrow…',                 segment: 'all-subscribers',  status: 'sent',     created_at: '2026-04-25', sent_at: '2026-04-25', recipients: 287, open_rate: 0.42 },
+    { id: 'bc2', subject: 'PayGam launched today — go give them a 👋', body: 'Mobile money built for The Gambia. Try the demo and leave feedback.', segment: 'fintech-followers', status: 'sent',     created_at: '2026-04-19', sent_at: '2026-04-19', recipients: 88,  open_rate: 0.51 },
+    { id: 'bc3', subject: 'Submissions deadline reminder',         body: 'Last call to submit for the May spotlight rail.',                       segment: 'all-makers',        status: 'scheduled', created_at: '2026-04-26' },
+    { id: 'bc4', subject: 'Untitled draft',                        body: 'Rough idea about a quarterly retro post…',                                segment: 'all-subscribers',  status: 'draft',    created_at: '2026-04-26' },
+  ]
+  let id = items.length + 1
+  function today() { return new Date().toISOString().slice(0, 10) }
+  return {
+    list: () => items,
+    create: (subject: string, body: string, segment: string) => {
+      const created: Broadcast = { id: `bc${id++}`, subject, body, segment, status: 'draft', created_at: today() }
+      items.unshift(created)
+      return created
+    },
+    send: (id: string, recipients: number) => {
+      const item = items.find((x) => x.id === id)
+      if (item) {
+        item.status = 'sent'
+        item.sent_at = today()
+        item.recipients = recipients
+        item.open_rate = 0.45
+      }
+    },
+    remove: (id: string) => {
+      const i = items.findIndex((x) => x.id === id)
+      if (i !== -1) items.splice(i, 1)
+    },
+  }
+})()
+
+const adminSystemNotifications = [
+  { id: 'sn1', kind: 'incident', title: 'Intermittent waitlist signup failures',     body: '2 reports in the last hour from PayGam users.', ago: '12 min ago' },
+  { id: 'sn2', kind: 'spike',    title: 'Signup spike — 4× baseline',                body: 'Likely from the FarmLink GM story going viral.', ago: '1 hour ago' },
+  { id: 'sn3', kind: 'release',  title: 'Deploy: feed perf v2 (commit 90085ba)',     body: 'Median feed render down 22%.',                   ago: '3 hours ago' },
+  { id: 'sn4', kind: 'security', title: '3 admin login attempts failed for unknown', body: 'Source IPs from outside The Gambia. Auto-blocked.', ago: 'yesterday' },
+]
+
+type EmailTemplate = {
+  id: string
+  key: string
+  name: string
+  subject: string
+  body: string
+  variables: string[]
+}
+const adminTemplatesStore = (() => {
+  const items: EmailTemplate[] = [
+    { id: 'tpl1', key: 'welcome',           name: 'Welcome email',           subject: 'Welcome to LaunchedChit, {{name}}',                  body: 'Hi {{name}},\n\nGreat to have you on LaunchedChit. Here are 3 things to do in your first week…',                                       variables: ['name'] },
+    { id: 'tpl2', key: 'product-approved',  name: 'Product approved',        subject: 'Your product "{{product}}" is live',                  body: 'Hey {{name}},\n\n{{product}} is approved and live on LaunchedChit. Share your launch link with your audience…',                       variables: ['name', 'product'] },
+    { id: 'tpl3', key: 'product-rejected',  name: 'Product rejected',        subject: 'Your submission needs an update',                     body: 'Hi {{name}},\n\nThanks for submitting {{product}}. We can\'t publish it as-is — here\'s why:\n\n{{reason}}\n\nResubmit when ready.', variables: ['name', 'product', 'reason'] },
+    { id: 'tpl4', key: 'weekly-digest',     name: 'Friday weekly digest',    subject: 'This week on LaunchedChit',                            body: 'A handful of new launches, what shipped, and what the community is talking about…',                                                  variables: [] },
+    { id: 'tpl5', key: 'mfa-otp',           name: 'MFA login code',          subject: 'Your LaunchedChit admin code',                        body: 'Your one-time code is {{code}}. It expires in 5 minutes.',                                                                            variables: ['code'] },
+    { id: 'tpl6', key: 'comment-reply',     name: 'Reply on your product',   subject: '{{author}} replied on {{product}}',                   body: 'Hi {{name}},\n\n{{author}} just replied on {{product}}:\n\n"{{excerpt}}"\n\nView and reply here: {{link}}',                          variables: ['name', 'author', 'product', 'excerpt', 'link'] },
+  ]
+  return {
+    list: () => items,
+    update: (id: string, patch: Partial<Pick<EmailTemplate, 'subject' | 'body'>>) => {
+      const item = items.find((x) => x.id === id)
+      if (item) Object.assign(item, patch)
+    },
+  }
+})()
+
+// Admin insights + system stores ---------------------------------------------
+
+type FeatureFlag = {
+  id: string
+  key: string
+  name: string
+  description: string
+  enabled: boolean
+  rollout: number
+  updated_at: string
+}
+const adminFlagsStore = (() => {
+  const items: FeatureFlag[] = [
+    { id: 'f1', key: 'product_request_modal',  name: 'Product request modal', description: 'New product request submission modal on the community tab.', enabled: true,  rollout: 100, updated_at: '2026-04-22' },
+    { id: 'f2', key: 'sparkline_tooltips',     name: 'Sparkline hover tooltips', description: 'Date + value tooltip on profile and dashboard charts.',     enabled: true,  rollout: 100, updated_at: '2026-04-19' },
+    { id: 'f3', key: 'admin_v2_layout',        name: 'Admin v2 layout',         description: 'New slate-indigo themed admin shell.',                          enabled: true,  rollout: 100, updated_at: '2026-04-26' },
+    { id: 'f4', key: 'image_uploads',          name: 'Image uploads (submit)',  description: 'Replace logo/gallery URL fields with native uploads.',          enabled: false, rollout: 0,   updated_at: '2026-04-23' },
+    { id: 'f5', key: 'maker_followers_v2',     name: 'Maker follower graph v2', description: 'Mutual-follow indicator and graph view.',                       enabled: false, rollout: 25,  updated_at: '2026-04-20' },
+    { id: 'f6', key: 'broadcast_html_email',   name: 'Broadcast HTML email',    description: 'Send broadcasts as HTML instead of plain text.',                enabled: false, rollout: 0,   updated_at: '2026-04-24' },
+  ]
+  return {
+    list: () => items,
+    update: (id: string, patch: Partial<Pick<FeatureFlag, 'enabled' | 'rollout'>>) => {
+      const item = items.find((x) => x.id === id)
+      if (item) {
+        Object.assign(item, patch)
+        item.updated_at = new Date().toISOString().slice(0, 10)
+      }
+    },
+  }
+})()
+
+type AdminSettings = {
+  site_name: string
+  support_email: string
+  default_currency: 'GMD' | 'USD'
+  signups_open: boolean
+  submissions_open: boolean
+  comments_require_approval: boolean
+  default_session_minutes: number
+  admin_session_minutes: number
+}
+const adminSettingsStore = (() => {
+  let prefs: AdminSettings = {
+    site_name: 'LaunchedChit',
+    support_email: 'support@launchedchit.gm',
+    default_currency: 'GMD',
+    signups_open: true,
+    submissions_open: true,
+    comments_require_approval: false,
+    default_session_minutes: 60 * 24 * 30,
+    admin_session_minutes: 60 * 8,
+  }
+  return {
+    get: () => prefs,
+    update: (patch: Partial<AdminSettings>) => { prefs = { ...prefs, ...patch } },
+  }
+})()
+
 type ProductEditExtras = Partial<{
   description: string
   website_url: string
@@ -1310,6 +1477,167 @@ export const handlers = [
     if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
     adminFeaturedStore.remove(String(params.id))
     return HttpResponse.json({ ok: true })
+  }),
+
+  // === Communications =====================================================
+
+  // GET /admin/mailing-list?status=subscribed|unsubscribed|all
+  http.get(`${BASE}/admin/mailing-list`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const url = new URL(request.url)
+    const status = url.searchParams.get('status') ?? 'subscribed'
+    const q = (url.searchParams.get('q') ?? '').toLowerCase()
+    let list = adminMailingListStore.list()
+    if (status === 'subscribed')   list = list.filter((s) => s.status === 'subscribed')
+    if (status === 'unsubscribed') list = list.filter((s) => s.status === 'unsubscribed')
+    if (q) list = list.filter((s) => s.email.toLowerCase().includes(q) || (s.name ?? '').toLowerCase().includes(q))
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all: adminMailingListStore.list().length,
+        subscribed: adminMailingListStore.list().filter((s) => s.status === 'subscribed').length,
+        unsubscribed: adminMailingListStore.list().filter((s) => s.status === 'unsubscribed').length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/mailing-list/:id/unsubscribe`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminMailingListStore.setStatus(String(params.id), 'unsubscribed')
+    return HttpResponse.json({ ok: true })
+  }),
+  http.post(`${BASE}/admin/mailing-list/:id/resubscribe`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminMailingListStore.setStatus(String(params.id), 'subscribed')
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/broadcasts
+  http.get(`${BASE}/admin/broadcasts`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const status = new URL(request.url).searchParams.get('status') ?? 'all'
+    const list = adminBroadcastsStore.list().filter((b) => status === 'all' || b.status === status)
+    return HttpResponse.json({
+      items: list,
+      counts: {
+        all:       adminBroadcastsStore.list().length,
+        scheduled: adminBroadcastsStore.list().filter((b) => b.status === 'scheduled').length,
+        sent:      adminBroadcastsStore.list().filter((b) => b.status === 'sent').length,
+        draft:     adminBroadcastsStore.list().filter((b) => b.status === 'draft').length,
+      },
+    })
+  }),
+  http.post(`${BASE}/admin/broadcasts`, async ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { subject?: string; body?: string; segment?: string }
+    if (!body.subject || !body.body) return new HttpResponse(JSON.stringify({ error: 'Missing fields' }), { status: 400 })
+    const created = adminBroadcastsStore.create(body.subject.trim(), body.body.trim(), body.segment ?? 'all-subscribers')
+    return HttpResponse.json(created, { status: 201 })
+  }),
+  http.post(`${BASE}/admin/broadcasts/:id/send`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const recipients = adminMailingListStore.list().filter((s) => s.status === 'subscribed').length
+    adminBroadcastsStore.send(String(params.id), recipients)
+    return HttpResponse.json({ ok: true, recipients })
+  }),
+  http.delete(`${BASE}/admin/broadcasts/:id`, ({ params }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    adminBroadcastsStore.remove(String(params.id))
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/notifications/feed — system-level events seen by admins
+  http.get(`${BASE}/admin/notifications/feed`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({ items: adminSystemNotifications })
+  }),
+
+  // GET /admin/templates
+  http.get(`${BASE}/admin/templates`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({ items: adminTemplatesStore.list() })
+  }),
+  http.patch(`${BASE}/admin/templates/:id`, async ({ params, request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { subject?: string; body?: string }
+    adminTemplatesStore.update(String(params.id), body)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // === Insights + System ==================================================
+
+  // GET /admin/analytics?period=7d|30d|90d|1y
+  http.get(`${BASE}/admin/analytics`, ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const period = new URL(request.url).searchParams.get('period') ?? '30d'
+    const days = period === '1y' ? 365 : period === '90d' ? 90 : period === '7d' ? 7 : 30
+    const trend = (offset: number, base: number, amp: number) => Array.from({ length: days }, (_, i) => ({
+      date: new Date(Date.now() - (days - 1 - i) * 86400000).toISOString().slice(0, 10),
+      value: Math.max(0, Math.round(base + Math.sin((i + offset) / 4) * amp + (i % 7))),
+    }))
+    return HttpResponse.json({
+      period,
+      kpis: {
+        signups:       3420,
+        signups_delta: 12,
+        active_users:  1284,
+        active_delta:  8,
+        products_live: 32,
+        products_delta: 4,
+        upvotes:       8541,
+        upvotes_delta: 22,
+      },
+      signups_trend:   trend(0, 12, 6),
+      active_trend:    trend(3, 90, 18),
+      upvotes_trend:   trend(7, 60, 24),
+      submissions_trend: trend(11, 4, 2),
+      top_products: products.slice(0, 5).map((p) => ({ slug: p.slug, name: p.name, vote_count: p.vote_count })),
+      top_topics: adminTopicsStore.list().slice(0, 5).map((t) => ({ slug: t.slug, name: t.name, product_count: t.product_count })),
+    })
+  }),
+
+  // GET /admin/flags
+  http.get(`${BASE}/admin/flags`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({ items: adminFlagsStore.list() })
+  }),
+  http.patch(`${BASE}/admin/flags/:id`, async ({ params, request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as { enabled?: boolean; rollout?: number }
+    adminFlagsStore.update(String(params.id), body)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  // GET /admin/health
+  http.get(`${BASE}/admin/health`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json({
+      services: [
+        { name: 'API',           status: 'healthy', uptime_pct: 99.98, latency_ms: 142, last_incident: '12 days ago' },
+        { name: 'Database',      status: 'healthy', uptime_pct: 99.99, latency_ms: 8,   last_incident: '34 days ago' },
+        { name: 'Email worker',  status: 'degraded', uptime_pct: 98.4, latency_ms: 612, last_incident: '2 hours ago' },
+        { name: 'Search index',  status: 'healthy', uptime_pct: 99.9,  latency_ms: 41,  last_incident: '7 days ago' },
+        { name: 'CDN',           status: 'healthy', uptime_pct: 100,   latency_ms: 28,  last_incident: '90+ days ago' },
+        { name: 'Background jobs', status: 'healthy', uptime_pct: 99.7, latency_ms: 280, last_incident: '5 days ago' },
+      ],
+      jobs: [
+        { id: 'j1', name: 'Send weekly digest', last_run: 'Friday 09:00', status: 'ok',     duration_ms: 4200 },
+        { id: 'j2', name: 'Refresh leaderboard cache', last_run: '3 minutes ago', status: 'ok', duration_ms: 180 },
+        { id: 'j3', name: 'Index new products', last_run: '15 minutes ago', status: 'ok', duration_ms: 90 },
+        { id: 'j4', name: 'Notify waitlist on launch', last_run: '2 hours ago', status: 'retry', duration_ms: 1200 },
+      ],
+    })
+  }),
+
+  // GET /admin/settings
+  http.get(`${BASE}/admin/settings`, () => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json(adminSettingsStore.get())
+  }),
+  http.patch(`${BASE}/admin/settings`, async ({ request }) => {
+    if (!adminSessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json().catch(() => ({}))) as Partial<AdminSettings>
+    adminSettingsStore.update(body)
+    return HttpResponse.json(adminSettingsStore.get())
   }),
 
   // GET /admin/dashboard/stats — basic moderation queue + activity stats

@@ -68,18 +68,19 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   {
     label: 'Comms',
     items: [
-      { label: 'Mailing list', to: '/admin', icon: 'mail', upcoming: true },
-      { label: 'Broadcasts',   to: '/admin', icon: 'mail', upcoming: true },
-      { label: 'Templates',    to: '/admin', icon: 'mail', upcoming: true },
+      { label: 'Mailing list',  to: '/admin/mailing-list',   icon: 'mail' },
+      { label: 'Broadcasts',    to: '/admin/broadcasts',     icon: 'mail' },
+      { label: 'Notifications', to: '/admin/notifications',  icon: 'mail' },
+      { label: 'Templates',     to: '/admin/templates',      icon: 'mail' },
     ],
   },
   {
     label: 'Insights',
     items: [
-      { label: 'Analytics', to: '/admin', icon: 'chart', upcoming: true },
-      { label: 'Flags',     to: '/admin', icon: 'flag',  upcoming: true },
-      { label: 'Health',    to: '/admin', icon: 'cog',   upcoming: true },
-      { label: 'Settings',  to: '/admin', icon: 'settings', upcoming: true },
+      { label: 'Analytics', to: '/admin/analytics', icon: 'chart' },
+      { label: 'Flags',     to: '/admin/flags',     icon: 'flag' },
+      { label: 'Health',    to: '/admin/health',    icon: 'cog' },
+      { label: 'Settings',  to: '/admin/settings',  icon: 'settings' },
     ],
   },
 ]
