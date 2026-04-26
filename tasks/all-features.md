@@ -5,7 +5,7 @@
 - [x] F02 — Configure Tailwind with semantic CSS variable system and brand tokens
 - [x] F03 — Set up Vitest + Testing Library
 - [x] F04 — Set up Playwright
-- [ ] F05 — Set up MSW with all 9 MVP mock handlers
+- [x] F05 — Set up MSW with all 9 MVP mock handlers
 
 ## Shared Components
 - [ ] F06 — Header component

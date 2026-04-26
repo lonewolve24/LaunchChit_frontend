@@ -1,0 +1,139 @@
+import { http, HttpResponse } from 'msw'
+
+const BASE = 'http://localhost:8000'
+
+const mockUser = {
+  id: 'user-001',
+  email: 'musa@example.com',
+  name: 'Musa Jallow',
+  avatar_url: null,
+}
+
+const mockProducts = [
+  {
+    id: 'prod-001',
+    slug: 'farmlink-gm-a3k9z2',
+    name: 'FarmLink GM',
+    tagline: 'Connecting Gambian farmers to buyers directly',
+    logo_url: null,
+    vote_count: 24,
+    has_voted: false,
+    maker: { name: 'Musa Jallow' },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'prod-002',
+    slug: 'paygam-b7x2m1',
+    name: 'PayGam',
+    tagline: 'Mobile payments built for The Gambia',
+    logo_url: null,
+    vote_count: 18,
+    has_voted: false,
+    maker: { name: 'Momodou Jatta' },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'prod-003',
+    slug: 'classmate-gm-c4p8q9',
+    name: 'ClassMate GM',
+    tagline: 'School management for Gambian institutions',
+    logo_url: null,
+    vote_count: 11,
+    has_voted: false,
+    maker: { name: 'Abdul Ikumpanyi' },
+    created_at: new Date().toISOString(),
+  },
+]
+
+let products = [...mockProducts]
+let votes = new Set<string>()
+let sessionActive = false
+
+export const handlers = [
+  // POST /auth/magic-link
+  http.post(`${BASE}/auth/magic-link`, () => {
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // GET /auth/callback
+  http.get(`${BASE}/auth/callback`, () => {
+    sessionActive = true
+    return HttpResponse.redirect('http://localhost:3000/', 302)
+  }),
+
+  // POST /auth/logout
+  http.post(`${BASE}/auth/logout`, () => {
+    sessionActive = false
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // GET /me
+  http.get(`${BASE}/me`, () => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    return HttpResponse.json(mockUser)
+  }),
+
+  // GET /products/today
+  http.get(`${BASE}/products/today`, () => {
+    const feed = [...products].sort((a, b) => b.vote_count - a.vote_count)
+    return HttpResponse.json(feed)
+  }),
+
+  // GET /products/:slug
+  http.get(`${BASE}/products/:slug`, ({ params }) => {
+    const product = products.find((p) => p.slug === params.slug)
+    if (!product) return new HttpResponse(null, { status: 404 })
+    return HttpResponse.json({
+      ...product,
+      description: 'A detailed description of this product goes here.',
+      website_url: 'https://example.com',
+      maker: { id: 'user-001', name: 'Musa Jallow', avatar_url: null },
+    })
+  }),
+
+  // POST /products
+  http.post(`${BASE}/products`, async ({ request }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const body = (await request.json()) as Record<string, string>
+    const slug = `${body.name.toLowerCase().replace(/\s+/g, '-')}-${Math.random().toString(36).slice(2, 8)}`
+    const newProduct = {
+      id: `prod-${Date.now()}`,
+      slug,
+      name: body.name,
+      tagline: body.tagline,
+      logo_url: body.logo_url ?? null,
+      vote_count: 0,
+      has_voted: false,
+      maker: { name: mockUser.name },
+      created_at: new Date().toISOString(),
+    }
+    products = [newProduct, ...products]
+    return HttpResponse.json({ slug }, { status: 201 })
+  }),
+
+  // POST /products/:id/vote
+  http.post(`${BASE}/products/:id/vote`, ({ params }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const key = `${mockUser.id}:${params.id}`
+    if (votes.has(key)) return new HttpResponse(null, { status: 409 })
+    votes.add(key)
+    const product = products.find((p) => p.id === params.id)
+    if (!product) return new HttpResponse(null, { status: 404 })
+    product.vote_count += 1
+    product.has_voted = true
+    return HttpResponse.json({ vote_count: product.vote_count })
+  }),
+
+  // DELETE /products/:id/vote
+  http.delete(`${BASE}/products/:id/vote`, ({ params }) => {
+    if (!sessionActive) return new HttpResponse(null, { status: 401 })
+    const key = `${mockUser.id}:${params.id}`
+    if (!votes.has(key)) return new HttpResponse(null, { status: 404 })
+    votes.delete(key)
+    const product = products.find((p) => p.id === params.id)
+    if (!product) return new HttpResponse(null, { status: 404 })
+    product.vote_count -= 1
+    product.has_voted = false
+    return HttpResponse.json({ vote_count: product.vote_count })
+  }),
+]

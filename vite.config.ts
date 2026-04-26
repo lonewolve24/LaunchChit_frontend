@@ -17,6 +17,8 @@ const config = defineConfig({
     setupFiles: ['src/test/setup.ts'],
     globals: true,
     css: false,
+    include: ['src/**/*.test.{ts,tsx}'],
+    exclude: ['e2e/**', 'node_modules/**'],
   },
 })
 

@@ -1,12 +1,11 @@
 # TODO
 
-## F05 — Set up MSW with all 9 MVP mock handlers
+## F06 — Header component
 
 Steps:
-1. Install `msw`
-2. Create `src/mocks/handlers.ts` with all 9 handlers matching BACKEND_SPEC.md response shapes
-3. Create `src/mocks/browser.ts` (browser worker setup)
-4. Create `src/mocks/server.ts` (node server for Vitest)
-5. Wire MSW into `src/main.tsx` — start worker in development only
-6. Update test setup to use MSW server
-7. Write a test confirming a mock handler returns the expected shape
+1. Write failing test: Header renders logo, "Submit" link, and "Sign in" link when logged out
+2. Create `src/components/Header.tsx`
+3. Pass the test (green)
+4. Write second test: Header renders avatar when logged in
+5. Pass the test
+6. Confirm coverage ≥ 80% on Header.tsx

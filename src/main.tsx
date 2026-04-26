@@ -14,9 +14,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const rootElement = document.getElementById('app')!
+async function bootstrap() {
+  if (import.meta.env.DEV) {
+    const { worker } = await import('./mocks/browser')
+    await worker.start({ onUnhandledRequest: 'bypass' })
+  }
 
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement)
-  root.render(<RouterProvider router={router} />)
+  const rootElement = document.getElementById('app')!
+  if (!rootElement.innerHTML) {
+    const root = ReactDOM.createRoot(rootElement)
+    root.render(<RouterProvider router={router} />)
+  }
 }
+
+bootstrap()

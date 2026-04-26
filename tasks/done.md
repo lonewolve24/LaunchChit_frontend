@@ -4,6 +4,17 @@ _Completed features will be logged here._
 
 ---
 
+## F05 — MSW mock handlers
+- Installed `msw`, initialised service worker in `public/`
+- `src/mocks/handlers.ts`: all 9 MVP endpoints with realistic Gambian product mock data
+- `src/mocks/browser.ts`: browser worker (activated in dev only via `main.tsx`)
+- `src/mocks/server.ts`: node server wired into Vitest setup
+- `src/test/setup.ts`: MSW server lifecycle (beforeAll/afterEach/afterAll)
+- Fixed Vitest picking up e2e/ files — added `include: src/**` + `exclude: e2e/**`
+- Tests: 4/4 ✓
+
+---
+
 ## F04 — Playwright
 - Installed `@playwright/test`, Chromium browser
 - `playwright.config.ts`: baseURL `localhost:3000`, Chromium only, webServer auto-start
