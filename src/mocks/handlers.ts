@@ -28,9 +28,19 @@ function dateOffset(daysAgo: number): string {
   return d.toISOString()
 }
 
+// Deterministic license assignment from slug; ~1 in 3 products are open-source
+function productLicense(slug: string): 'open-source' | 'commercial' {
+  const sum = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+  return sum % 3 === 0 ? 'open-source' : 'commercial'
+}
+
+function withLicense<T extends { license?: string; slug: string }>(p: T) {
+  return { ...p, license: p.license ?? productLicense(p.slug) }
+}
+
 const mockProducts = [
-  { id: 'prod-001', slug: 'farmlink-gm-a3k9z2',     name: 'FarmLink GM',        tagline: 'Connecting Gambian farmers to buyers directly',           logo_url: null, vote_count: 247, has_voted: false, maker: { name: 'Musa Jallow' },      topics: [T.agritech, T.logistics],     comments_count: 38, waitlist_count: 412, platforms: ['web', 'mobile'],            created_at: dateOffset(0) },
-  { id: 'prod-002', slug: 'paygam-b7x2m1',          name: 'PayGam',             tagline: 'Mobile payments built for The Gambia',                    logo_url: null, vote_count: 218, has_voted: false, maker: { name: 'Momodou Jatta' },    topics: [T.fintech, T.ecommerce],      comments_count: 52, waitlist_count: 803, platforms: ['mobile'],                   created_at: dateOffset(0) },
+  { id: 'prod-001', slug: 'farmlink-gm-a3k9z2',     name: 'FarmLink GM',        tagline: 'Connecting Gambian farmers to buyers directly',           logo_url: null, vote_count: 247, has_voted: false, maker: { name: 'Musa Jallow' },      topics: [T.agritech, T.logistics],     comments_count: 38, waitlist_count: 412, platforms: ['web', 'mobile'], license: 'open-source', created_at: dateOffset(0) },
+  { id: 'prod-002', slug: 'paygam-b7x2m1',          name: 'PayGam',             tagline: 'Mobile payments built for The Gambia',                    logo_url: null, vote_count: 218, has_voted: false, maker: { name: 'Momodou Jatta' },    topics: [T.fintech, T.ecommerce],      comments_count: 52, waitlist_count: 803, platforms: ['mobile'], license: 'commercial', created_at: dateOffset(0) },
   { id: 'prod-003', slug: 'classmate-gm-c4p8q9',    name: 'ClassMate GM',       tagline: 'School management for Gambian institutions',              logo_url: null, vote_count: 196, has_voted: false, maker: { name: 'Abdul Ikumpanyi' },  topics: [T.edtech],                    comments_count: 24, waitlist_count: 156, platforms: ['web', 'desktop'],          created_at: dateOffset(1) },
   { id: 'prod-004', slug: 'banjul-eats-d8h3k1',     name: 'Banjul Eats',        tagline: 'Order from your favourite restaurants in Banjul',          logo_url: null, vote_count: 184, has_voted: false, maker: { name: 'Fatou Ceesay' },     topics: [T.ecommerce, T.logistics],    comments_count: 31, waitlist_count: 287, platforms: ['web', 'mobile'],            created_at: dateOffset(2) },
   { id: 'prod-005', slug: 'taxi-gm-r2m9p5',         name: 'Taxi GM',            tagline: 'Hail a ride anywhere in the Greater Banjul Area',          logo_url: null, vote_count: 172, has_voted: false, maker: { name: 'Ousman Bah' },       topics: [T.logistics],                 comments_count: 47, waitlist_count: 521, platforms: ['mobile'],                   created_at: dateOffset(3) },
@@ -284,7 +294,7 @@ export const handlers = [
 
     const total = filtered.length
     const start = (page - 1) * pageSize
-    const items = filtered.slice(start, start + pageSize)
+    const items = filtered.slice(start, start + pageSize).map(withLicense)
     return HttpResponse.json({ items, total, page, page_size: pageSize })
   }),
 
@@ -320,12 +330,12 @@ export const handlers = [
     }
     ranked.sort((a, b) => b.vote_count - a.vote_count)
 
-    return HttpResponse.json({ items: ranked, period, date: dateStr, filter })
+    return HttpResponse.json({ items: ranked.map(withLicense), period, date: dateStr, filter })
   }),
 
   // GET /products/archive — MUST be before /products/:slug
   http.get(`${BASE}/products/archive`, () => {
-    const archived = [...products].sort((a, b) => b.vote_count - a.vote_count)
+    const archived = [...products].sort((a, b) => b.vote_count - a.vote_count).map(withLicense)
     return HttpResponse.json(archived)
   }),
 
@@ -344,8 +354,11 @@ export const handlers = [
       .filter((p) => p.id !== product.id && p.topics?.some((t) => productTopicSlugs.has(t.slug)))
       .slice(0, 4)
 
+    const license = (product as { license?: string }).license ?? productLicense(product.slug)
     return HttpResponse.json({
       ...product,
+      license,
+      source_url: license === 'open-source' ? `https://github.com/launchedchit/${product.slug}` : null,
       description: `${product.tagline}.\n\n${product.name} was built to solve a specific problem for the Gambian market. After months of working with users in Banjul, Brikama, and the rural Kombo areas, the team shipped a first version that focuses on three things: simplicity, offline reliability, and a price point that works for the market.\n\nThe team is small but committed — every feature you see has been requested by at least three real users. There's no growth-hacking, no fake testimonials, no "AI-powered" buzzwords thrown in for fundraising. Just a tool that works.\n\nWhat's next: we're rolling out support for additional regions, integrating with local payment providers, and (in beta) a partnership with two ministries to scale distribution.`,
       website_url: `https://${product.slug.replace(/-/g, '')}.gm`,
       pricing: 'Free during beta · Paid plans from D200/month',
@@ -518,13 +531,15 @@ export const handlers = [
     const topic = mockTopics.find((t) => t.slug === params.slug)
     if (!topic) return new HttpResponse(null, { status: 404 })
     const filtered = products.filter((p) => p.topics?.some((t) => t.slug === topic.slug))
-    return HttpResponse.json([...filtered].sort((a, b) => b.vote_count - a.vote_count))
+    return HttpResponse.json([...filtered].sort((a, b) => b.vote_count - a.vote_count).map(withLicense))
   }),
 
   // GET /profile/:username
   http.get(`${BASE}/profile/:username`, ({ params }) => {
     const username = String(params.username).toLowerCase()
-    if (username === mockProfile.username) return HttpResponse.json(mockProfile)
+    if (username === mockProfile.username) {
+      return HttpResponse.json({ ...mockProfile, products: mockProfile.products.map(withLicense) })
+    }
 
     // Generate a profile for any other maker that exists in mockProducts
     const productsByMaker = mockProducts.filter((p) => p.maker.name.toLowerCase().replace(/\s+/g, '-') === username)
@@ -554,7 +569,7 @@ export const handlers = [
       followers: Math.round(totalUpvotes * 1.3),
       following: 24,
       total_upvotes: totalUpvotes,
-      products: productsByMaker,
+      products: productsByMaker.map(withLicense),
     })
   }),
 

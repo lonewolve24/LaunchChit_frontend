@@ -108,30 +108,32 @@ export function ProfilePage() {
     <div className="min-h-screen bg-surface-subtle">
       <Header user={null} />
 
-      <main className="max-w-5xl mx-auto px-6 lg:px-10 py-8">
+      <main className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
         {/* Hero card */}
         <div className="bg-surface rounded-card overflow-hidden mb-6" style={{ boxShadow: cardShadow }}>
-          {/* Cover */}
+          {/* Cover band — avatar overlaps it, name sits below on the light card */}
           <div
-            className="h-28 md:h-36"
+            className="h-32 md:h-40 relative"
             style={{ background: `linear-gradient(135deg, ${profile.cover_color ?? '#1B4332'} 0%, #0F2D20 100%)` }}
-          />
-          <div className="px-6 md:px-8 pb-6 md:pb-8 -mt-12 md:-mt-14">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-              <div className="flex items-end gap-5">
-                <div
-                  className="w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center text-white font-bold text-4xl md:text-5xl border-4 border-surface flex-shrink-0"
-                  style={{ backgroundColor: profile.cover_color ?? '#1B4332' }}
-                >
-                  {profile.name[0]}
-                </div>
-                <div className="min-w-0 pb-1">
-                  <h1 className="text-2xl md:text-3xl font-bold text-foreground">{profile.name}</h1>
-                  <p className="text-sm text-foreground-muted">@{profile.username}</p>
-                  {profile.tagline && <p className="text-sm text-foreground-muted mt-0.5">{profile.tagline}</p>}
-                </div>
+          >
+            <div className="absolute -bottom-12 md:-bottom-14 left-6 md:left-8">
+              <div
+                className="w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center text-white font-bold text-4xl md:text-5xl border-4 border-surface"
+                style={{ backgroundColor: profile.cover_color ?? '#1B4332' }}
+              >
+                {profile.name[0]}
               </div>
-              <div className="flex items-center gap-2">
+            </div>
+          </div>
+
+          <div className="px-6 md:px-8 pt-16 md:pt-20 pb-6 md:pb-8">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">{profile.name}</h1>
+                <p className="text-sm text-foreground-muted mt-0.5">@{profile.username}</p>
+                {profile.tagline && <p className="text-sm text-foreground-muted mt-1">{profile.tagline}</p>}
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => { setFollowing((f) => !f); setToast({ message: following ? 'Unfollowed.' : 'Following — you\'ll see their new launches.', variant: 'success' }) }}
                   className={`text-sm font-semibold px-5 py-2 rounded-button transition-colors border ${
