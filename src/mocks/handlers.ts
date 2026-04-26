@@ -249,6 +249,55 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 })
   }),
 
+  // POST /auth/login — password login.
+  // Demo credentials: musa@example.com / password (or any password >= 6 chars
+  // for any email — this is a mock, real validation happens server-side).
+  http.post(`${BASE}/auth/login`, async ({ request }) => {
+    const body = (await request.json()) as { email?: string; phone?: string; password?: string }
+    if (!body.password || body.password.length < 6) {
+      return new HttpResponse(null, { status: 401 })
+    }
+    if (!body.email && !body.phone) return new HttpResponse(null, { status: 400 })
+    sessionActive = true
+    return HttpResponse.json(mockUser)
+  }),
+
+  // POST /auth/signup — mirror of login for the demo.
+  http.post(`${BASE}/auth/signup`, async ({ request }) => {
+    const body = (await request.json()) as { name?: string; email?: string; phone?: string }
+    if (!body.name || (!body.email && !body.phone)) return new HttpResponse(null, { status: 400 })
+    if (body.name) mockUser.name = body.name
+    if (body.email) mockUser.email = body.email
+    sessionActive = true
+    return HttpResponse.json(mockUser)
+  }),
+
+  // POST /auth/forgot-password — mock acknowledgement.
+  http.post(`${BASE}/auth/forgot-password`, () => new HttpResponse(null, { status: 204 })),
+
+  // POST /auth/reset-password — accepts any token + password >= 8 chars.
+  http.post(`${BASE}/auth/reset-password`, async ({ request }) => {
+    const body = (await request.json()) as { token?: string; password?: string }
+    if (!body.token || !body.password || body.password.length < 8) {
+      return new HttpResponse(null, { status: 400 })
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // POST /auth/verify-otp — accept the canonical demo code 123456.
+  http.post(`${BASE}/auth/verify-otp`, async ({ request }) => {
+    const body = (await request.json()) as { code?: string; purpose?: string }
+    if (body.code !== '123456') return new HttpResponse(null, { status: 401 })
+    if (body.purpose === 'reset') {
+      return HttpResponse.json({ token: 'demo-reset-token' })
+    }
+    sessionActive = true
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // POST /auth/send-otp — mock acknowledgement (used by OTP "resend" button).
+  http.post(`${BASE}/auth/send-otp`, () => new HttpResponse(null, { status: 204 })),
+
   // GET /auth/callback
   http.get(`${BASE}/auth/callback`, () => {
     sessionActive = true
