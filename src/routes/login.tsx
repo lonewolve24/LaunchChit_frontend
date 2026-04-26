@@ -1,8 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { InlineError } from '../components/InlineError'
+import { clearMe } from '../lib/auth'
 
-export const Route = createFileRoute('/login')({ component: LoginPage })
+function safeNext(raw: unknown): string {
+  if (typeof raw !== 'string' || !raw) return '/'
+  // Only allow same-origin relative paths — never external URLs (open redirect guard).
+  if (!raw.startsWith('/') || raw.startsWith('//')) return '/'
+  return raw
+}
+
+export const Route = createFileRoute('/login')({
+  component: LoginPage,
+  validateSearch: (s: Record<string, unknown>) => ({ next: safeNext(s.next) }),
+})
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -139,6 +150,12 @@ function ProductSlideshow() {
   )
 }
 
+function readNextFromLocation(): string {
+  if (typeof window === 'undefined') return '/'
+  const raw = new URLSearchParams(window.location.search).get('next')
+  return safeNext(raw)
+}
+
 export function LoginPage() {
   const [method, setMethod] = useState<Method>('email')
   const [identifier, setIdentifier] = useState('')
@@ -177,7 +194,8 @@ export function LoginPage() {
       setError('Those credentials did not match. Try again.')
       return
     }
-    window.location.href = '/'
+    clearMe()
+    window.location.href = readNextFromLocation()
   }
 
   return (

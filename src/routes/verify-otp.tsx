@@ -9,6 +9,7 @@ export const Route = createFileRoute('/verify-otp')({
     method: (s.method === 'phone' ? 'phone' : 'email') as 'email' | 'phone',
     target: typeof s.target === 'string' ? s.target : '',
     purpose: typeof s.purpose === 'string' ? s.purpose : 'verify',
+    next: typeof s.next === 'string' && s.next.startsWith('/') && !s.next.startsWith('//') ? s.next : '/',
   }),
 })
 
@@ -30,7 +31,7 @@ function maskTarget(method: 'email' | 'phone', target: string): string {
 }
 
 export function VerifyOtpPage() {
-  const { method, target, purpose } = Route.useSearch()
+  const { method, target, purpose, next } = Route.useSearch()
   const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''))
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -107,7 +108,7 @@ export function VerifyOtpPage() {
       const token = (data && typeof data.token === 'string') ? data.token : ''
       window.location.href = `/reset-password?token=${encodeURIComponent(token)}`
     } else {
-      window.location.href = '/'
+      window.location.href = next
     }
   }
 

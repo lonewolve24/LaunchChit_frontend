@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { clearMe } from '../lib/auth'
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -63,6 +64,7 @@ export function Header({ user }: Props) {
 
   async function handleSignOut() {
     await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' })
+    clearMe()
     window.location.href = '/'
   }
 

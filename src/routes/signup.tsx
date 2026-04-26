@@ -3,7 +3,16 @@ import { useState } from 'react'
 import { InlineError } from '../components/InlineError'
 import { AuthLayout, AuthHeader } from '../components/AuthLayout'
 
-export const Route = createFileRoute('/signup')({ component: SignupPage })
+function safeNext(raw: unknown): string {
+  if (typeof raw !== 'string' || !raw) return '/'
+  if (!raw.startsWith('/') || raw.startsWith('//')) return '/'
+  return raw
+}
+
+export const Route = createFileRoute('/signup')({
+  component: SignupPage,
+  validateSearch: (s: Record<string, unknown>) => ({ next: safeNext(s.next) }),
+})
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -30,6 +39,12 @@ function passwordStrength(password: string): { score: 0 | 1 | 2 | 3 | 4; label: 
   if (/[^A-Za-z0-9]/.test(password)) score++
   const label = ['Too weak', 'Weak', 'Fair', 'Good', 'Strong'][score]
   return { score: score as 0 | 1 | 2 | 3 | 4, label }
+}
+
+function readNextFromLocation(): string {
+  if (typeof window === 'undefined') return '/'
+  const raw = new URLSearchParams(window.location.search).get('next')
+  return safeNext(raw)
 }
 
 export function SignupPage() {
@@ -75,7 +90,9 @@ export function SignupPage() {
       return
     }
     const target = method === 'email' ? identifier.toLowerCase().trim() : identifier.replace(/[\s\-()]/g, '')
-    window.location.href = `/verify-otp?method=${method}&target=${encodeURIComponent(target)}`
+    const nxt = readNextFromLocation()
+    const nextParam = nxt && nxt !== '/' ? `&next=${encodeURIComponent(nxt)}` : ''
+    window.location.href = `/verify-otp?method=${method}&target=${encodeURIComponent(target)}${nextParam}`
   }
 
   const strength = passwordStrength(password)
