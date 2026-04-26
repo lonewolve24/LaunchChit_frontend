@@ -1,8 +1,7 @@
 # TODO
 
-## F19 — Product detail route (`/p/[slug]`)
+## F20 — E2E: Submit flow
 
 Steps:
-1. Write failing tests: renders product name, tagline, description, maker, visit link, upvote button, 404 state
-2. Create `src/routes/p.$slug.tsx` and export `ProductDetailPage`
-3. Pass all tests (green)
+1. Write Playwright test: visit `/`, click Submit → land on `/login` → enter email → see confirmation state
+2. Pass test (green)

@@ -4,6 +4,15 @@ _Completed features will be logged here._
 
 ---
 
+## F19 — Product detail route (`/p/[slug]`)
+- Fetches `GET /products/:slug`, skeleton while loading
+- Renders: logo, name (h1), tagline, description, maker name, vote count, UpvoteButton (lg), Visit website link
+- 404 → `PageError` with custom message
+- Upvote toggle: 401 → redirect to `/login`, error → Toast
+- Tests: 8/8 ✓
+
+---
+
 ## F18 — Submit route (`/submit`)
 - 5 fields: name (80), tagline (120), description (2000), website_url, logo_url (optional)
 - Char counters on length-limited fields

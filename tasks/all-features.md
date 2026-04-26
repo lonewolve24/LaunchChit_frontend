@@ -23,7 +23,7 @@
 - [x] F16 — Login route (`/login`) — email input + confirmation state
 - [x] F17 — Auth callback route (`/auth/callback`) — spinner + redirect
 - [x] F18 — Submit route (`/submit`) — auth-gated product form
-- [ ] F19 — Product detail route (`/p/[slug]`) — SSR
+- [x] F19 — Product detail route (`/p/[slug]`) — SSR
 
 ## End-to-End (Playwright)
 - [ ] F20 — Submit flow: login → submit → redirect to detail page
