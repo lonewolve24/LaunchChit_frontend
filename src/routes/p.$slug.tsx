@@ -56,7 +56,7 @@ export function ProductDetailPage() {
     <div className="min-h-screen bg-surface-subtle">
       <Header user={null} />
 
-      <main className="max-w-4xl mx-auto px-4 py-10">
+      <main className="max-w-4xl mx-auto px-6 lg:px-10 py-10">
         {loading || !product ? (
           <div className="space-y-4">
             <Skeleton className="h-16 w-16 rounded-card" />
@@ -65,7 +65,7 @@ export function ProductDetailPage() {
             <Skeleton className="h-32 w-full" />
           </div>
         ) : (
-          <div className="bg-surface border border-border rounded-card shadow-sm p-8">
+          <div className="bg-surface rounded-card p-8" style={{ boxShadow: '0 1px 4px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06)' }}>
             <div className="flex items-start justify-between gap-6 mb-8">
               <div className="flex items-start gap-5">
                 {product.logo_url ? (

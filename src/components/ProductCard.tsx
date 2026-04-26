@@ -23,22 +23,30 @@ type Props = {
   onVote: (id: string) => void
 }
 
+const cardShadow = '0 1px 4px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06)'
+const cardShadowHover = '0 8px 20px -4px rgb(0 0 0 / 0.12), 0 2px 6px -1px rgb(0 0 0 / 0.08)'
+
 export function ProductCard({ product, onVote }: Props) {
   return (
-    <div className="bg-surface border border-border rounded-card px-4 py-4 flex gap-4 items-center hover:border-border-strong hover:shadow-md transition-all shadow-sm">
+    <div
+      className="bg-surface rounded-card px-5 py-4 flex gap-5 items-center transition-shadow cursor-default"
+      style={{ boxShadow: cardShadow }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = cardShadowHover }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = cardShadow }}
+    >
       {/* Upvote */}
       <button
         onClick={() => onVote(product.id)}
         aria-label="Upvote"
         aria-pressed={product.has_voted}
-        className={`flex flex-col items-center gap-1 min-w-[48px] rounded-button border-2 px-2 py-2 transition-all flex-shrink-0 ${
+        className={`flex flex-col items-center gap-1 w-12 rounded-button border-2 py-2 transition-all flex-shrink-0 ${
           product.has_voted
             ? 'border-accent bg-accent/10 text-accent'
             : 'border-border text-foreground-muted hover:border-accent hover:text-accent'
         }`}
       >
-        <svg width="12" height="10" viewBox="0 0 12 10" fill="currentColor" aria-hidden>
-          <path d="M6 0L12 10H0L6 0Z" />
+        <svg width="11" height="9" viewBox="0 0 11 9" fill="currentColor" aria-hidden>
+          <path d="M5.5 0L11 9H0L5.5 0Z" />
         </svg>
         <span className="text-xs font-bold leading-none">{product.vote_count}</span>
       </button>
@@ -48,11 +56,11 @@ export function ProductCard({ product, onVote }: Props) {
         <img
           src={product.logo_url}
           alt={product.name}
-          className="w-12 h-12 rounded-card object-cover flex-shrink-0"
+          className="w-14 h-14 rounded-card object-cover flex-shrink-0"
         />
       ) : (
         <div
-          className="w-12 h-12 rounded-card flex items-center justify-center flex-shrink-0 text-white font-bold text-xl"
+          className="w-14 h-14 rounded-card flex items-center justify-center flex-shrink-0 text-white font-bold text-2xl"
           style={{ backgroundColor: placeholderColor(product.name) }}
         >
           {product.name[0]}
@@ -63,12 +71,12 @@ export function ProductCard({ product, onVote }: Props) {
       <div className="min-w-0 flex-1">
         <a
           href={`/p/${product.slug}`}
-          className="font-bold text-[15px] text-foreground hover:text-primary transition-colors"
+          className="font-bold text-base text-foreground hover:text-primary transition-colors"
         >
           {product.name}
         </a>
         <p className="text-sm text-foreground-muted mt-0.5 truncate">{product.tagline}</p>
-        <p className="text-xs text-foreground-faint mt-1">by {product.maker.name}</p>
+        <p className="text-xs text-foreground-faint mt-1.5">by {product.maker.name}</p>
       </div>
     </div>
   )

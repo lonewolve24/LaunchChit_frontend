@@ -16,25 +16,28 @@ function initials(user: User): string {
 
 export function Header({ user }: Props) {
   return (
-    <header className="bg-primary sticky top-0 z-10 shadow-md">
-      <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+    <header className="bg-primary sticky top-0 z-10" style={{ boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.25)' }}>
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
         <a
           href="/"
-          className="text-white font-bold text-lg tracking-tight"
+          className="text-white font-bold text-xl tracking-tight"
         >
           LaunchedChit
         </a>
 
-        <nav className="flex items-center gap-3">
+        <nav className="flex items-center gap-4">
           <a
             href="/submit"
-            className="bg-accent text-white text-sm font-semibold px-4 py-1.5 rounded-button hover:bg-accent-dark transition-colors"
+            className="bg-accent text-white text-sm font-semibold px-5 py-2 rounded-button hover:bg-accent-dark transition-colors"
           >
             Submit
           </a>
 
           {user ? (
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+              style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+            >
               {initials(user)}
             </div>
           ) : (

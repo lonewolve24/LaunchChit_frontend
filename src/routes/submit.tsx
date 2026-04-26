@@ -91,7 +91,7 @@ export function SubmitPage() {
   return (
     <div className="min-h-screen bg-surface-subtle">
       <Header user={null} />
-      <main className="max-w-xl mx-auto px-4 py-10">
+      <main className="max-w-2xl mx-auto px-6 lg:px-10 py-10">
         <h1 className="text-2xl font-bold text-foreground mb-8">Ship something</h1>
 
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
